@@ -1,0 +1,242 @@
+<div class="bg-artwork__1 min-height-100vh flex flex-center padding-sm">
+    <form method="POST" action="/sign-up" class="bg radius-md shadow-lg padding-lg max-width-xs">
+        <div class="text-center margin-bottom-sm">
+            <h1>Signup</h1>
+        </div>
+
+        <div class="grid gap-xs">
+            <div class="col-6@xs">
+                <button class="btn btn--subtle width-100%">
+                    <i class="fab icon margin-right-xxxs fa-twitter"></i>
+
+                    <span>Signup with Twitter</span>
+                </button>
+            </div>
+
+            <div class="col-6@xs">
+                <button class="btn btn--subtle width-100%">
+                    <i class="fab icon margin-right-xxxs fa-github"></i>
+
+                    <span>Signup with Github</span>
+                </button>
+            </div>
+        </div>
+
+        <p class="text-center margin-y-xxs">or</p>
+
+        <!--<div class="margin-bottom-sm">
+            <div class="grid gap-xs">
+                <div class="col-6@md">
+                    <label class="form-label margin-bottom-xxxs" for="firstname">Firstname</label>
+                    <input class="form-control width-100%" placeholder="____________" required type="text" name="firstname"
+                        id="firstname">
+                </div>
+
+                <div class="col-6@md">
+                    <label class="form-label margin-bottom-xxxs" for="lastname">Lastname</label>
+                    <input class="form-control width-100%" placeholder="__________" required type="text" name="lastname"
+                        id="lastname">
+                </div>
+            </div>
+        </div>-->
+
+        <div class="margin-bottom-sm">
+            <label class="form-label margin-bottom-xxxs" for="username">What do you want as your username?</label>
+            <input class="form-control width-100%" id="username" title="There is a maximum length of 12 characters." autocomplete="off" name="username"
+                aria-label="Username" type="text" placeholder="john_doe202" maxlength="12" pattern=".{8,}" required
+                title="8 characters minimum">
+        </div>
+
+        <div class="margin-bottom-sm">
+            <label class="form-label margin-bottom-xxxs" for="email">What is your email address?
+                <span class="margin-left-xxxs"><i class="fas icon text-sm fa-info-circle"></i></span>
+            </label>
+            <input class="form-control width-100%" id="email" title="There is a maximum length of 64 characters." autocomplete="off" name="email"
+                aria-label="Email" type="email" placeholder="john_doe1216@jdoe.com" maxlength="64" pattern=".{8,}" required
+                title="8 characters minimum">
+        </div>
+
+        <div class="margin-bottom-sm">
+            <div class="flex justify-between margin-bottom-xxxs">
+                <label class="form-label" for="password">What do you want as your password?</label>
+                <span class="text-sm"><a href="/forgot-your-password">Forgot your password?</a></span>
+            </div>
+
+            <input class="form-control password__input js-password__input width-100%" id="password"
+                autocomplete="off" class="form-control " name="password" aria-label="Password"
+                type="password" placeholder="jdoe/@01" title="There is a maximum length of 20 characters." maxlength="20" pattern=".{10,}" required
+                title="10 characters minimum">
+        </div>
+
+        <div class="margin-bottom-sm">
+            <div class="flex justify-between">
+                <input class="checkbox checkbox--inline" type="checkbox" name="newsletter"
+                    id="newsletter">
+                <label class="text-sm" for="newsletter">Send me updates and news about Slacks</label>
+            </div>
+        </div>
+
+        <div class="margin-bottom-xs">
+            <button type="submit"
+                class="btn btn--primary sign-up__btn btn--form btn--preserve-width btn--md width-100%">
+                <span class="btn__content-a">Signup</span>
+                <span class="btn__content-b">
+                    <svg class="icon icon--is-spinning" aria-hidden="true" viewBox="0 0 16 16">
+                        <title>Loading</title>
+                        <g stroke-width="1" fill="currentColor" stroke="currentColor">
+                            <path d="M.5,8a7.5,7.5,0,1,1,1.91,5" fill="none" stroke="currentColor"
+                                stroke-linecap="round" stroke-linejoin="round"></path>
+                        </g>
+                    </svg>
+                </span>
+            </button>
+        </div>
+
+        <div class="text-center">
+            <p class="text-sm">Already have an account? <a href="/sign-in">Signin</a></p>
+        </div>
+    </form>
+</div>
+
+<script class="hbs-ui__scripts">
+    /*
+
+    /- Sign-up -/
+
+    {
+        err: {
+            elements: ['username', 'email', 'password'],
+            xhr: {
+                username: 'You have entered an already in-use username..',
+                email: 'You have entered an already in-use email address.'
+                password: 'You have entered an invalid and in-secure password.',
+            },
+            async: true
+        },
+        _id: 'ObjectID("2151581259245125")',
+        xhr: {
+            uuid: 'juhawjdaw-gaw9241-waf981',
+            url: '/sign-in',
+            async: true
+        }
+    }
+
+    */
+
+    $(async () => {
+        $('form').on('submit', async (e) => {
+            e.preventDefault();
+
+            $('[type=submit]').toggleClass('btn--state-b');
+
+            $.ajax({
+                type: 'POST',
+                url: '/sign-up',
+                dataType: 'json',
+                contentType: 'application/x-www-form-urlencoded',
+                data: $('form').serialize(),
+                beforeSend: async (xhr) => {
+                    console.log('You have requested to sign-up with Slacks.');
+                },
+                error: async (err) => {
+                    if (err) {
+                        $('[type=submit]').toggleClass('btn--state-b');
+
+                        return console.error(err);
+                    }
+                },
+                success: async (args) => {
+                    const {
+                        err,
+                        _id,
+                        xhr
+                    } = args;
+
+                    if (err) {
+                        return await (async (err) => {
+                            const {
+                                elements,
+                                xhr,
+                                async
+                            } = err;
+
+                            if (async) {
+                                return await elements.forEach(async (_id, i, elements) => {
+                                    if (!document.querySelector(_id)) {
+                                        $('[type=submit]').toggleClass('btn--state-b');
+
+                                        return;
+                                    }
+
+                                    const element = document.querySelector(_id);
+
+                                    element.classList.add('form-control--error');
+
+                                    element.addEventListener('focus', async (e) => {
+                                        if (e.target.closest('input').classList.contains('form-control--error')) {
+                                            e.target.closest('input').classList.remove('form-control--error');
+                                        }
+                                    });
+
+                                    if (xhr) {
+                                        element.setAttribute('placeholder', xhr[_id]);
+                                    }
+
+                                    $('[type=submit]').toggleClass('btn--state-b');
+                                });
+                            }
+
+                            elements.forEach((_id, i, elements) => {
+                                if (!document.querySelector(_id)) {
+                                    $('[type=submit]').toggleClass('btn--state-b');
+
+                                    return;
+                                }
+
+                                const element = document.querySelector(_id);
+
+                                element.classList.add('form-control--error');
+
+                                element.addEventListener('focus', (e) => {
+                                    if (e.target.closest('input').classList.contains('form-control--error')) {
+                                        e.target.closest('input').classList.remove('form-control--error');
+                                    }
+                                });
+
+                                if (xhr) {
+                                    element.setAttribute('placeholder', xhr[_id]);
+                                }
+
+                                $('[type=submit]').toggleClass('btn--state-b');
+                            });
+                        })(err);
+                    }
+
+                    localStorage.setItem('_id', _id);
+
+                    if (xhr) {
+                        const {
+                            uuid,
+                            url,
+                            async
+                        } = xhr;
+
+                        if (uuid) {
+                            sessionStorage.setItem('uuid', uuid);
+
+                            if (async) {
+                                $('[type=submit]').toggleClass('btn--state-b');
+
+                                return await window.location.replace(url);
+                            }
+
+                            $('[type=submit]').toggleClass('btn--state-b');
+
+                            window.location.replace(url);
+                        }
+                    }
+                }
+            });
+        });
+    });
+</script>
