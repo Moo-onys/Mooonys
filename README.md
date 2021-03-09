@@ -1,2 +1,2 @@
 # Mooonys
-This repository is for the involvement of GitHub and our projects on GitHub with Mooonys.
+This repository is for the involvement of our projects and collaborative projects with Mooonys.
