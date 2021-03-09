@@ -2,7 +2,7 @@
   "name": "Mooonys",
   "version": "1.0.5",
   "description": "Dynamics are important when designing for the web.",
-  "main": "Mooonys.js",
+  "main": "env.js",
   "scripts": {
     "start": "node .",
     "gulp": "gulp",
@@ -12,19 +12,19 @@
     "publish": "electron-forge publish"
   },
   "author": {
-    "name": "Slacks",
-    "email": "slacksjs@outlook.com"
+    "name": "Mooonys",
+    "email": "contact-us@mooonys.co"
   },
-  "license": "ISC",
+  "license": "MIT",
   "config": {
     "forge": {
       "packagerConfig": {
-        "icon": "utils/img/Slacks.icns"
+        "icon": "utils/img/Mooonys.icns"
       },
       "makers": [{
           "name": "@electron-forge/maker-squirrel",
           "config": {
-            "name": "Slacks"
+            "name": "Mooonys"
           }
         },
         {
