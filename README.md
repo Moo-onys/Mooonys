@@ -1,2 +1,2 @@
 # Mooonys
-Dynamics are important when designing for the web.
+This repository is for the involvement of GitHub and our projects on GitHub with Mooonys.
