@@ -7,4 +7,8 @@ https://github.com/Mooonys/Mooonys/wiki/dependencies
 
 ## Installation
 
+https://github.com/Mooonys/Mooonys/wiki/installation
+
 ## Collaborators
+
+https://github.com/Mooonys/Mooonys/wiki/collaborators
