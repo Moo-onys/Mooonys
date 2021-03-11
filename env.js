@@ -1,28 +1,52 @@
 const child_process = require('child_process');
 
-class Script {
+class Children {
     constructor(path, callback) {
-        var invoked = false;
+        this.path = path;
+        this.callback = callback;
+        this.invoked = false;
 
-        var process = child_process.fork(path);
+        this.cp = child_process.fork(this.path);
 
-        process.on('error', function (err) {
-            if (invoked) return;
-            invoked = true;
-            callback(err);
+        this.cp.on('error', (err) => {
+            if (this.invoked) return;
+            this.invoked = true;
+
+            this.callback(err);
         });
 
-        process.on('exit', function (code) {
-            if (invoked) return;
-            invoked = true;
-            var err = code === 0 ? null : new Error('exit code ' + code);
-            callback(err);
+        this.cp.on('exit', (status) => {
+            if (this.invoked) return;
+            this.invoked = true;
+
+            const err = status === 0 ? null : new Error(`exit status ${status}`);
+            this.callback(err);
         });
+    }
+    __del__ = async () => {
+        this.cp.kill(1);
     }
 }
 
-// Now we can run a script and invoke a callback when complete, e.g.
-new Script('./Mooonys.js', function (err) {
-    if (err) throw err;
-    console.log('finished running some-script.js');
+let child = new Children('./Mooonys.js', async (err) => {
+    if (err) {
+        if (typeof err === 'interface') throw err;
+    }
+
+    console.log('The child process has been stopped.');
 });
+
+setTimeout(async () => {
+    await child.__del__();
+    await child_process.execSync('rm -r env; mkdir env');
+    await child_process.execSync('cd env && git clone https://github.com/Mooonys/Mooonys.git');
+    await child_process.execSync('cd env/Mooonys && npm install');
+
+    child = new Children('./env/Mooonys/Mooonys.js', async (err) => {
+        if (err) {
+            if (typeof err === 'interface') throw err;
+        }
+
+        console.log('The child process has been stopped.');
+    });
+}, 5000);

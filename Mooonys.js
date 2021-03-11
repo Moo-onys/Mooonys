@@ -22,14 +22,16 @@ const {
 } = require('mongodb-stitch-browser-sdk');
 
 const client = express();
-const https = require('https').createServer({
-    cert: fs.readFileSync('./.env/ssl/mooonys_co.crt'),
-    ca: fs.readFileSync('./.env/ssl/mooonys_co.ca-bundle'),
-    key: fs.readFileSync('./.env/ssl/mooonys_co.key')
-}, client);
+const https = require('http').createServer(
+    /*{
+        cert: fs.readFileSync('./.env/ssl/mooonys_co.crt'),
+        ca: fs.readFileSync('./.env/ssl/mooonys_co.ca-bundle'),
+        key: fs.readFileSync('./.env/ssl/mooonys_co.key')
+    },*/
+    client);
 const io = require('socket.io')(https);
 
-const config = require('./config.json');
+const config = require('./.env/env.json');
 const init = require('./init.js');
 const realm = Realm.App.getApp(config.realm._id);
 
@@ -38,9 +40,9 @@ realm.logIn(Realm.Credentials.emailPassword(config.realm.username, config.realm.
 const mongodb = realm.currentUser.mongoClient(config.realm._atlas);
 
 config.utils = {
-    URL: 'https://www.mooonys.co/',
-    PORT: 443,
-    SECURITY: true
+    URL: 'http://localhost:8080/',
+    PORT: 8090,
+    SECURITY: false
 }
 
 client.set('session', session({
@@ -124,7 +126,7 @@ client.use(async (req, res, next) => {
 process.stdout.write(clc.reset);
 
 https.listen(config.utils.PORT, async () => {
-    process.stdout.write(`\nSlacks: ${config.utils.PORT}\nURL: ${config.utils.URL}`);
+    process.stdout.write(`\nMooonys: ${config.utils.PORT}\nURL: ${config.utils.URL}`);
 });
 
 client.get('/', async (req, res) => {

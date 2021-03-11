@@ -58,8 +58,8 @@ module.exports.nodemailer = nodemailer.createTransport({
     port: 587,
     secure: false,
     auth: {
-        user: require('./config.json').nodemailer.user,
-        pass: require('./config.json').nodemailer.pass
+        user: require('./.env/env.json').nodemailer.user,
+        pass: require('./.env/env.json').nodemailer.pass
     },
     tls: {
         rejectUnauthorized: false
