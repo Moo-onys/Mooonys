@@ -3,8 +3,8 @@ This repository is for the involvement of our projects and collaborative project
 
 ## Dependencies
 
-## Installation
+https://github.com/Mooonys/Mooonys/wiki/dependencies
 
-## 
+## Installation
 
 ## Collaborators
