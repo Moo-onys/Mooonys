@@ -128,3 +128,13 @@ https://github.com/Mooonys/Mooonys/wiki/installation
 ## Collaborators
 
 https://github.com/Mooonys/Mooonys/wiki/collaborators
+
+For more information on our collaborators, visit our [collaborators](https://www.mooonys.co/github/collaborators) page.
+
+***
+
+> The list of collaborators is always growing with more and more people getting involved so check back here often and congratulate those responsible for making Mooonys a wonderful project.
+
+* [Measion](https://github.com/Measion) – Ownership
+
+> If you want to become a collaborator, or you want your name put on this list. Contact us by, using the email address [contact-us@mooonys.co](mailto:contact-us@mooonys.co).
