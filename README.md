@@ -5,7 +5,7 @@ This repository is for the involvement of our projects and collaborative project
 
 https://github.com/Mooonys/Mooonys/wiki/dependencies
 
-For more information on our dependencies check out our [wiki](https://www.mooonys.co/github/wiki/dependencies) page.
+For more information on our dependencies check out our [wiki](https://www.mooonys.co/github/dependencies) page.
 
 ***
 
@@ -125,7 +125,7 @@ For more information on our dependencies check out our [wiki](https://www.mooony
 
 https://github.com/Mooonys/Mooonys/wiki/installation
 
-For more information on our installation process, check out our [wiki](https://www.mooonys.co/github/wiki/installation) page.
+For more information on our installation process, check out our [wiki](https://www.mooonys.co/github/installation) page.
 
 ***
 
@@ -150,7 +150,7 @@ For any issues with this process please contact us by, using the email address [
 
 https://github.com/Mooonys/Mooonys/wiki/collaborators
 
-For more information on our collaborators, visit our [collaborators](https://www.mooonys.co/github/collaborators) page.
+For more information on our collaborators, check out our [wiki](https://www.mooonys.co/github/collaborators) page.
 
 ***
 
