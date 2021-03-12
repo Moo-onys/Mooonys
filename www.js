@@ -36,11 +36,9 @@ realm.logIn(Realm.Credentials.emailPassword(env.realm.username, env.realm.passwo
 
 const mongodb = realm.currentUser.mongoClient(env.realm._atlas);
 
-env.utils = {
-    URL: `http://localhost:${env.PORT}/`,
-    PORT: env.PORT,
-    SECURITY: false
-}
+process.env.PORT = process.env.PORT ? process.env.PORT : 443;
+process.env.URL = process.env.URL ? process.env.URL : `http://localhost:${process.env.PORT}/`;
+process.env.SECURITY = process.env.SECURITY ? process.env.SECURITY : true;
 
 client.set('session', session({
     genid: () => {
@@ -52,7 +50,7 @@ client.set('session', session({
     saveUninitialized: false,
     cookie: {
         sameSite: true,
-        secure: env.utils.SECURITY,
+        secure: process.env.SECURITY,
         maxAge: 60000 * 60
     }
 }));
@@ -122,8 +120,8 @@ client.use(async (req, res, next) => {
 
 process.stdout.write(clc.reset);
 
-https.listen(env.utils.PORT, async () => {
-    process.stdout.write(`\nMooonys: ${env.utils.PORT}\nURL: ${env.utils.URL}`);
+https.listen(process.env.PORT, async () => {
+    process.stdout.write(`\n${process.env.URL}`);
 });
 
 client.get('/', async (req, res) => {
