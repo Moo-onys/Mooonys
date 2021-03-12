@@ -1,8 +1,8 @@
 {
   "name": "Mooonys",
-  "version": "1.0.5",
+  "version": "0.0.1",
   "description": "Dynamics are important when designing for the web.",
-  "main": "env.js",
+  "main": "www.js",
   "scripts": {
     "start": "node .",
     "gulp": "gulp",
@@ -21,8 +21,7 @@
       "packagerConfig": {
         "icon": "utils/img/Mooonys.icns"
       },
-      "makers": [
-        {
+      "makers": [{
           "name": "@electron-forge/maker-squirrel",
           "config": {
             "name": "Mooonys"
@@ -54,7 +53,7 @@
     "@electron-forge/maker-rpm": "^6.0.0-beta.54",
     "@electron-forge/maker-squirrel": "^6.0.0-beta.54",
     "@electron-forge/maker-zip": "^6.0.0-beta.54",
-    "electron": "10.1.5",
+    "electron": "^12.0.1",
     "electron-reload": "^1.5.0",
     "electron-squirrel-startup": "^1.0.0"
   },
@@ -85,7 +84,7 @@
     "dotenv": "^8.2.0",
     "eiows": "^3.4.1",
     "ejs": "^3.1.5",
-    "email-templates": "^7.1.2",
+    "email-templates": "^8.0.3",
     "express": "^4.17.1",
     "express-fileupload": "^1.2.0",
     "express-handlebars": "^5.2.0",
