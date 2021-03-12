@@ -1,5 +1,3 @@
-this.$ = new Object();
-
 const express = require('express');
 const session = require('express-session');
 const exphbs = require('express-handlebars');
@@ -11,7 +9,7 @@ const clc = require('cli-color');
 const clt = require('cli-table');
 const uuid = require('uuid');
 
-this.$.session = require('connect-mongodb-session')(session);
+this.session = require('connect-mongodb-session')(session);
 
 const fs = require('fs');
 const path = require('path');
@@ -22,26 +20,25 @@ const {
 } = require('mongodb-stitch-browser-sdk');
 
 const client = express();
-const https = require('http').createServer(
-    /*{
+const https = require('https').createServer({
         cert: fs.readFileSync('./.env/ssl/mooonys_co.crt'),
         ca: fs.readFileSync('./.env/ssl/mooonys_co.ca-bundle'),
         key: fs.readFileSync('./.env/ssl/mooonys_co.key')
-    },*/
+    },
     client);
 const io = require('socket.io')(https);
 
-const config = require('./.env/env.json');
-const init = require('./init.js');
-const realm = Realm.App.getApp(config.realm._id);
+const env = require('./env.json');
+const utils = require('./utils.js');
+const realm = Realm.App.getApp(env.realm._id);
 
-realm.logIn(Realm.Credentials.emailPassword(config.realm.username, config.realm.password));
+realm.logIn(Realm.Credentials.emailPassword(env.realm.username, env.realm.password));
 
-const mongodb = realm.currentUser.mongoClient(config.realm._atlas);
+const mongodb = realm.currentUser.mongoClient(env.realm._atlas);
 
-config.utils = {
-    URL: `http://localhost:${config.PORT}/`,
-    PORT: config.PORT,
+env.utils = {
+    URL: `http://localhost:${env.PORT}/`,
+    PORT: env.PORT,
     SECURITY: false
 }
 
@@ -50,12 +47,12 @@ client.set('session', session({
         return uuid.v4();
     },
     secret: uuid.v4(),
-    store: new this.$.session(config.mongodb),
+    store: new this.session(env.mongodb),
     resave: false,
     saveUninitialized: false,
     cookie: {
         sameSite: true,
-        secure: config.utils.SECURITY,
+        secure: env.utils.SECURITY,
         maxAge: 60000 * 60
     }
 }));
@@ -65,7 +62,7 @@ client.set('hbs', exphbs.create({
     defaultLayout: '1',
     partialsDir: path.join(process.cwd(), '/views/partials'),
     layoutsDir: path.join(process.cwd(), '/views/layouts'),
-    helpers: init.helpers()
+    helpers: utils.hbs_js()
 }));
 
 io.set('transports', ['websocket']);
@@ -125,8 +122,8 @@ client.use(async (req, res, next) => {
 
 process.stdout.write(clc.reset);
 
-https.listen(config.utils.PORT, async () => {
-    process.stdout.write(`\nMooonys: ${config.utils.PORT}\nURL: ${config.utils.URL}`);
+https.listen(env.utils.PORT, async () => {
+    process.stdout.write(`\nMooonys: ${env.utils.PORT}\nURL: ${env.utils.URL}`);
 });
 
 client.get('/', async (req, res) => {
