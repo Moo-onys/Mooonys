@@ -36,7 +36,7 @@ let child = new Children('./Mooonys.js', async (err) => {
     console.log('The child process has been stopped.');
 });
 
-setTimeout(async () => {
+const reload_child_process = module.exports.reload_child_process = async () => {
     await child.__del__();
     await child_process.execSync('rm -r env; mkdir env');
     await child_process.execSync('cd env && git clone https://github.com/Mooonys/Mooonys.git');
@@ -49,4 +49,4 @@ setTimeout(async () => {
 
         console.log('The child process has been stopped.');
     });
-}, 5000);
+}

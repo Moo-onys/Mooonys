@@ -40,8 +40,8 @@ realm.logIn(Realm.Credentials.emailPassword(config.realm.username, config.realm.
 const mongodb = realm.currentUser.mongoClient(config.realm._atlas);
 
 config.utils = {
-    URL: 'http://localhost:8080/',
-    PORT: 8090,
+    URL: `http://localhost:${config.PORT}/`,
+    PORT: config.PORT,
     SECURITY: false
 }
 
