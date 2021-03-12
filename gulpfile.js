@@ -71,7 +71,7 @@ gulp.gulp.task('watch', gulp.gulp.series(['scss', 'js'], () => {
     gulp['gulp-livereload'].listen();
 
     nodemon({
-        script: 'Mooonys.js',
+        script: 'www.js',
         stdout: true
     }).on('readable', () => {
         this.stdout.on('data', (chunk) => {
