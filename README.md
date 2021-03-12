@@ -11,6 +11,8 @@ For more information on our dependencies check out our [wiki](https://www.mooony
 
 > These dependencies are constantly being updated so check back here often for any changes.
 
+> There could be some dependencies that are deprecated, so please be sure to report any deprecations to our issues page.
+
 ```
   "dependencies": {
     "@electron-forge/cli": "^6.0.0-beta.54",
