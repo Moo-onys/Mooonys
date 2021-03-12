@@ -23,8 +23,8 @@ this.nodemailer = nodemailer.createTransport({
     port: 465,
     secure: true,
     auth: {
-        user: 'no-reply@mooonys.co',
-        pass: 'mooonys.co3569'
+        user: '',
+        pass: ''
     },
     tls: {
         rejectUnauthorized: false
