@@ -21,9 +21,9 @@ const {
 
 const client = express();
 const https = require('https').createServer({
-        cert: fs.readFileSync('./.env/ssl/mooonys_co.crt'),
-        ca: fs.readFileSync('./.env/ssl/mooonys_co.ca-bundle'),
-        key: fs.readFileSync('./.env/ssl/mooonys_co.key')
+        cert: fs.readFileSync('./ssl/mooonys_co.crt'),
+        ca: fs.readFileSync('./ssl/mooonys_co.ca-bundle'),
+        key: fs.readFileSync('./ssl/mooonys_co.key')
     },
     client);
 const io = require('socket.io')(https);
@@ -340,7 +340,7 @@ client.post('/sign-up', async (req, res, next) => {
             notifications: [{
                     authors: {
                         profile: 'logo.svg',
-                        username: 'Slacks'
+                        username: 'Mooonys'
                     },
                     notification: `<i class="font-semibold">${username}</i> has just signed up.`,
                     _moment: moment().format()
@@ -348,7 +348,7 @@ client.post('/sign-up', async (req, res, next) => {
                 {
                     authors: {
                         profile: 'logo.svg',
-                        username: 'Slacks'
+                        username: 'Mooonys'
                     },
                     notification: `<i class="font-semibold">Olivia Saturday</i> commented on your <i class="font-semibold">"This is all it takes to improve..."</i> post.`,
                     _moment: moment().format()

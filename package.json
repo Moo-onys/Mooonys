@@ -4,7 +4,7 @@
   "description": "Dynamics are important when designing for the web.",
   "main": "www.js",
   "scripts": {
-    "start": "node .",
+    "start": "URL=https://www.mooonys.co/ node .",
     "gulp": "gulp",
     "forge": "electron-forge start",
     "package": "electron-forge package",

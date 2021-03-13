@@ -5,9 +5,9 @@ const nodemailer = require('nodemailer');
 this.hbs_js = () => {
     const hbs = {};
 
-    fs.readdir('./etc/hbs', (err, files) => {
+    fs.readdir('./utils/hbs', (err, files) => {
         files.forEach((hbs_) => {
-            require(`./etc/hbs/${hbs_}`).forEach((_hbs, i, __hbs) => {
+            require(`./utils/hbs/${hbs_}`).forEach((_hbs, i, __hbs) => {
                 if (typeof _hbs === 'function') {
                     hbs[__hbs[i - 1]] = _hbs;
                 }
