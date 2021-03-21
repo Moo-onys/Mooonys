@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html>
+
+    <head>
+        <style>
+            .ExternalClass {
+                width: 100%;
+                background: inherit;
+                background-color: inherit;
+            }
+
+            .ExternalClass p,
+            .ExternalClass ul,
+            .ExternalClass ol {
+                Margin: 0;
+            }
+
+            .undoreset div p,
+            .undoreset p {
+                margin-bottom: 20px;
+            }
+
+            div[class="aolmail_divbody"] {
+                overflow: auto;
+            }
+
+            [owa] #ac-footer {
+                padding: 20px 0px !important;
+                background: inherit;
+                background-color: inherit;
+            }
+        </style>
+        <style>
+            @media only screen and (max-width: 600px) {
+                .td_abandoned-cart img {
+                    display: block;
+                    padding-right: 0 !important;
+                    padding-bottom: 0 !important;
+                    width: 100% !important;
+                    max-width: 100% !important;
+                    height: auto !important;
+                }
+
+                body {
+                    padding: 0 !important;
+                    font-size: 1em !important;
+                }
+
+                * {
+                    -webkit-box-sizing: border-box;
+                    -moz-box-sizing: border-box;
+                    box-sizing: border-box;
+                }
+
+                *[class].divbody {
+                    -webkit-text-size-adjust: none !important;
+                    width: auto !important;
+                }
+
+                *[class].td_picture img {
+                    width: auto !important;
+                }
+
+                *[class].td_text {
+                    line-height: 110%;
+                }
+
+                *[class].td_button {
+                    width: auto;
+                }
+
+                * Collapse all block elements */ :not(.body) table {
+                    display: block !important;
+                    float: none !important;
+                    border-collapse: collapse !important;
+                    width: 100% !important;
+                    min-width: 100% !important;
+                    clear: both !important;
+                }
+
+                :not(.body) thead,
+                :not(.body) tbody,
+                :not(.body) tr {
+                    display: block !important;
+                    float: none !important;
+                    width: 100% !important;
+                }
+
+                :not(.body) th,
+                :not(.body) td,
+                :not(.body) p {
+                    display: block !important;
+                    float: none !important;
+                    width: 100% !important;
+                    clear: both !important;
+                }
+
+                ul,
+                ol {
+                    margin-left: 20px;
+                    margin-bottom: 10px;
+                    margin-top: 10px;
+                    -webkit-margin-before: 0;
+                    -webkit-margin-after: 0;
+                    -webkit-padding-start: 0;
+                }
+
+                *[class].spacer {
+                    height: auto !important;
+                }
+
+                a[hrefDdate] {
+                    color: inherit !important;
+                    text-decoration: none !important;
+                }
+
+                a[hrefDtelephone] {
+                    color: inherit !important;
+                    text-decoration: none !important;
+                }
+
+                a[hrefDaddress] {
+                    color: inherit !important;
+                    text-decoration: none !important;
+                }
+
+                a[hrefDemail] {
+                    color: inherit !important;
+                    text-decoration: none !important;
+                }
+
+                td[height="12"] {
+                    height: 12px !important;
+                    font-size: 12px !important;
+                    line-height: 12px !important;
+                }
+
+                .td_product>div {
+                    float: none !important;
+                    width: 100% !important;
+                    margin-bottom: 20px !important;
+                }
+
+                .td_product>div img {
+                    width: 75% !important;
+                }
+
+                /* Default social icons */
+                *[class].ac-social-icon-16 {
+                    width: 16px !important;
+                    height: 16px !important;
+                }
+
+                *[class].ac-social-icon-24 {
+                    width: 24px !important;
+                    height: 24px !important;
+                }
+
+                *[class].ac-social-icon-28 {
+                    width: 28px !important;
+                    height: 28px !important;
+                }
+
+                *[class].__ac_social_icons {
+                    margin-right: 0px !important;
+                }
+            }
+        </style>
+        <style>
+            @media only screen and (max-width: 320px) {
+                #layout-row2 img {
+                    width: 100% !important;
+                    height: auto !important;
+                    max-width: 320px !important;
+                }
+
+                #layout-row4 {
+                    max-height: 0px !important;
+                    font-size: 0px !important;
+                    display: none !important;
+                    visibility: hidden !important;
+                }
+
+                div.divbody {
+                    padding: 20px !important;
+                }
+
+                .td_rss .rss-item img.iphone_large_image {
+                    width: auto !important;
+                }
+
+                u+.body {
+                    display: table !important;
+                    width: 100vw !important;
+                    min-width: 100vw !important;
+                }
+
+                u+.body table {
+                    display: table !important;
+                    width: 100% !important;
+                    min-width: 100% !important;
+                }
+
+                u+.body td {
+                    display: block !important;
+                    width: 100% !important;
+                    min-width: 10% !important;
+                }
+
+                u+.body img {
+                    display: inline-block !important;
+                    margin: auto !important;
+                    width: auto !important;
+                    vertical-align: bottom !important;
+
+                }
+
+                u+.body center {
+                    display: block !important;
+                    margin: auto !important;
+                    width: 100% !important;
+                    min-width: 100% !important;
+                    text-align: center !important;
+                }
+
+                u+.body table._ac_social_table,
+                u+.body table._ac_social_table td,
+                u+.body table._ac_social_table div,
+                u+.body table._ac_social_table a {
+                    display: inline-block !important;
+                    margin: auto !important;
+                    width: auto !important;
+                    min-width: auto !important;
+                    text-align: center !important;
+                }
+
+                u+.body table._ac_social_table img {
+                    display: inline-block !important;
+                    margin: auto !important;
+                    width: 32px !important;
+                    min-width: 32px !important;
+                    max-width: 32px !important;
+                }
+
+
+            }
+
+            @media only screen and (max-width: 375px) {
+                #layout-row2 img {
+                    width: 100% !important;
+                    height: auto !important;
+                    max-width: 375px !important;
+                }
+
+                #layout-row4 {
+                    max-height: 0px !important;
+                    font-size: 0px !important;
+                    display: none !important;
+                    visibility: hidden !important;
+                }
+
+                div.divbody {
+                    padding: 20px !important;
+                }
+
+                .td_rss .rss-item img.iphone_large_image {
+                    width: auto !important;
+                }
+
+                u+.body {
+                    display: table !important;
+                    width: 100vw !important;
+                    min-width: 100vw !important;
+                }
+
+                u+.body table {
+                    display: table !important;
+                    width: 100% !important;
+                    min-width: 100% !important;
+                }
+
+                u+.body td {
+                    display: block !important;
+                    width: 100% !important;
+                    min-width: 100% !important;
+                }
+
+                u+.body img {
+                    display: inline-block !important;
+                    margin: auto !important;
+                    width: auto !important;
+                    vertical-align: bottom !important;
+                }
+
+                u+.body center {
+                    display: block !important;
+                    margin: auto !important;
+                    width: 100% !important;
+                    min-width: 100% !important;
+                    text-align: center !important;
+                }
+
+                u+.body table._ac_social_table,
+                u+.body table._ac_social_table td,
+                u+.body table._ac_social_table div,
+                u+.body table._ac_social_table a {
+                    display: inline-block !important;
+                    margin: auto !important;
+                    width: auto !important;
+                    min-width: auto !important;
+                    text-align: center !important;
+                }
+
+                u+.body table._ac_social_table img {
+                    display: inline-block !important;
+                    margin: auto !important;
+                    width: 32px !important;
+                    min-width: 32px !important;
+                    max-width: 32px !important;
+                }
+
+
+            }
+
+            @media only screen and (max-width: 414px) {
+                #layout-row2 img {
+                    width: 100% !important;
+                    height: auto !important;
+                    max-width: 414px !important;
+                }
+
+                #layout-row4 {
+                    max-height: 0px !important;
+                    font-size: 0px !important;
+                    display: none !important;
+                    visibility: hidden !important;
+                }
+
+                div.divbody {
+                    padding: 20px !important;
+                }
+
+                .td_rss .rss-item img.iphone_large_image {
+                    width: auto !important;
+                }
+
+                u+.body {
+                    display: table !important;
+                    width: 100vw !important;
+                    min-width: 100vw !important;
+                }
+
+                u+.body table {
+                    display: table !important;
+                    width: 100% !important;
+                    min-width: 100% !important;
+                }
+
+                u+.body td {
+                    display: block !important;
+                    width: 10% !important;
+                    min-width: 100% !important;
+                }
+
+                u+.body img {
+                    display: inline-block !important;
+                    margin: auto !important;
+                    width: auto !important;
+                    vertical-align: bottom !important;
+                }
+
+                u+.body center {
+                    display: block !important;
+                    margin: auto !important;
+                    width: 100% !important;
+                    min-width: 100% !important;
+                    text-align: center !important;
+                }
+
+                u+.body table._ac_social_table,
+                u+.body table._ac_social_table td,
+                u+.body table._ac_social_table div,
+                u+.body table._ac_social_table a {
+                    display: inline-block !important;
+                    margin: auto !important;
+                    width: auto !important;
+                    min-width: auto !important;
+                    text-align: center !important;
+                }
+
+                u+.body table._ac_social_table img {
+                    display: inline-block !important;
+                    margin: auto !important;
+                    width: 32px !important;
+                    min-width: 32px !important;
+                    max-width: 32px !important;
+                }
+
+
+            }
+
+            @media only screen and (max-width: 667px) {
+                #layout-row2 img {
+                    width: 100% !important;
+                    height: auto !important;
+                    max-width: 650px !important;
+                }
+
+                #layout-row4 {
+                    max-height: 0px !important;
+                    font-size: 0px !important;
+                    display: none !important;
+                    visibility: hidden !important;
+                }
+
+                div.divbody {
+                    padding: 20px !important;
+                }
+
+                .td_rss .rss-item img.iphone_large_image {
+                    width: auto !important;
+                }
+
+                u+.body {
+                    display: table !important;
+                    width: 100vw !important;
+                    min-width: 100vw !important;
+                }
+
+                u+.body table {
+                    display: table !important;
+                    width: 100% !important;
+                    min-width: 100% !important;
+                }
+
+                u+.body td {
+                    display: block !important;
+                    width: 100% !important;
+                    min-width: 100% !important;
+                }
+
+                u+.body img {
+                    display: inline-block !important;
+                    margin: auto !important;
+                    width: auto !important;
+                    vertical-align: bottom !important;
+                }
+
+                u+.body center {
+                    display: block !important;
+                    margin: auto !important;
+                    width: 100% !important;
+                    min-width: 100% !important;
+                    text-align: center !important;
+                }
+
+                u+.body table._ac_social_table,
+                u+.body table._ac_social_table td,
+                u+.body table._ac_social_table div,
+                u+.body table._ac_social_table a {
+                    display: inline-block !important;
+                    margin: auto !important;
+                    width: auto !important;
+                    min-width: auto !important;
+                    text-align: center !important;
+                }
+
+                u+.body table._ac_social_tableimg {
+                    display: inline-block !important;
+                    margin: auto !important;
+                    width: 32px !important;
+                    min-width: 32px !important;
+                    max-width: 32px !important;
+                }
+
+
+            }
+        </style>
+    </head>
+
+    <body id="ac-designer" class="body" style="font-family: Arial; line-height: 1.1; margin: 0px;
+        background-color: #FFFFFF; width: 100%; text-align: center;">
+        <div class="divbody" style="margin: 0px; outline: none; padding: 0px; color: #000000; font-family: arial;
+            line-height: 1.1; width: 100%; background-color: #FFFFFF; background: #FFFFFF; text-align: center;">
+            <table class="template-table" border="0" cellpadding="0" cellspacing="0" width="100%" align="left" style="font-size:14px; min-width: auto;  -mso-table-lspace: 0pt;  -mso-table-rspace: 0pt;
+                background-color: #FFFFFF; background: #FFFFFF;">
+                <tr>
+                    <td align="center" valign="top" width="100%">
+                        <table class="template-table" border="0" cellpadding="0" cellspacing="0" width="650"
+                            bgcolor="#FFFFFF" style="font-size: 14px; min-width: auto;  -mso-table-lspace: 0pt;
+                             -mso-table-lspace: 0pt; max-width: 650px;">
+                            <tr>
+                                <td id="layout_table_4251c1c7dc8259a96834570d eac3309392a 382" valign="top"
+                                    align="center" width="650">
+                                    <table cellpadding="0" cellspacing="0" border="0" class="layout
+                                        layout-table root-table" width="650" style="font-size: 14px; min-width:
+                                        100%;  -mso-table-lspace: 0pt;  -mso-table-rspace: 0pt;">
+                                        <tr>
+                                            <td id="layout-row-margin4" valign="top">
+                                                <table width="100%" border="0" cellpadding="0" cellspacing="0" style="font-size: 14px; min-width: 100%;  -mso-table-lspace:
+                                                    0pt; -mso-table-rspace: 0pt;">
+                                                    <tr id="layout-row4" class="layout layout-rowwidget
+                                                        _widget_spacer ">
+                                                        <td id=" layout-row-padding4" valign="top">
+                                                            <table width="100%" border="0" cellpadding="0"
+                                                                cellspacing="0" style="font-size: 14px; min-width:
+                                                            100%;  -mso-table-lspace: 0pt;  -mso-table-rspace:0pt;">
+                                                                <tr>
+                                                                    <td valign="top" height="30">
+                                                                        <div class="spacer" style="margin: 0; outline: none;
+                                                                padding: 0; height: 30px;">
+                                                                            <table cellpadding="0" cellspacing=" 0"
+                                                                                border="0" width="100%" style="font-size:
+                                                                    14px; min-width: 100%; -mso-table-lspace: 0pt;
+                                                                     -mso-table-rspace: 0pt;">
+                                                                                <tr>
+                                                                                    <td class="spacer-body" valign="top"
+                                                                                        height="30" width="650"></td>
+
+                                                                                </tr>
+                                                                            </table>
+                                                                        </div>
+                                                                    </td>
+                                                                </tr>
+                                                            </table>
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td id="layout-row-margin2" valign="top">
+                                                <table width="100%" border="0" cellpadding="0" cellspacing="0" style="font-size: 14px; min-width: 100%;  -mso-table-lspace: 0pt;
+                                                     -mso-table-rspace: 0pt;">
+                                                    <tr id="layout-row2" class="layout layout-row widget
+                                                        _widget_picture " align=" center">
+                                                        <td id="layout-row-padding2" valign="top">
+                                                            <table width="100%" border="0" cellpadding="0"
+                                                                cellspacing="0"
+                                                                style="font-size: 14px; min-width:
+                                                                100%;  -mso-table-lspace: 0pt;  -mso-table-rspace: 0pt;">
+                                                                <tr>
+                                                                    <td class="image-td" align="center" valign="top"
+                                                                        width="650">
+                                                                        <img src="https://www.mooonys.co/utils/img/jpg/favicon.jpg"
+                                                                            alt="" width="225" style="display:block; border: none;
+                                                                outline: none; border-radius: 50%; width: 225px; opacity: 1; max-width:
+                                                                100%;">
+                                                                    </td>
+                                                                </tr>
+                                                            </table>
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td id="layout-row-margin3" valign="top">
+                                                <table width="100%" border="0" cellpadding="0" cellspacing="0" style="font-size:
+                            14px; min-width: 100%;  -mso-table-lspace: 0pt;  -mso-table-rspace: 0pt;">
+                                                    <tr id="layout-row3"
+                                                        class="layout layout-row widget _widget_spacer ">
+                                                        <td id="layout-row-padding3" valign="top">
+                                                            <table width="100%" border="0" cellpadding="0"
+                                                                cellspacing="0" style="font-size: 14px; min-width: 100%;  -mso-table-lspace: 0pt;  -mso-table-rspace:
+                                    0pt;">
+                                                                <tr>
+                                                                    <td valign="top" height="30">
+                                                                        <div class="spacer" style="margin: 0; outline: none; padding: 0;
+                                                height: 30px;">
+                                                                            <table cellpadding="0" cellspacing="0"
+                                                                                border="0" width="100%" style="font-size: 14px; min-width: 100%;  -mso-table-lspace: 0pt;
+                                                     -mso-table-rspace: 0pt;">
+                                                                                <tr>
+                                                                                    <td class="spacer-body" valign="top"
+                                                                                        height="30" width="650"></td>
+                                                                                </tr>
+                                                                            </table>
+                                                                        </div>
+                                                                    </td>
+                                                                </tr>
+                                                            </table>
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td id="layout-row-margin5" valign="top" style="padding: 0;">
+                                                <table width="100%" border="0" cellpadding="0" cellspacing="0"
+                                                    style="font-size: 14px; min-width: 100%;  -mso-table-lspace: 0pt;  -mso-table-rspace: 0pt; border-collapse: initial !important;">
+                                                    <tr id="layout-row5"
+                                                        class="layoutlayout-row widget _widget_text style5" style="margin:
+                            0; padding: 0;">
+                                                        <td id="layout-row-padding5" valign="top" style="padding: 0;">
+                                                            <table width="100%" border="0" cellpadding="0"
+                                                                cellspacing="0" style="font-size: 14px; min-width: 100%;  -mso-table-lspace: 0pt;  -mso-table-rspace:
+                                    0pt;">
+                                                                <tr>
+                                                                    <td id="text_div5" class="td_text td_block"
+                                                                        valign="top" align="left" width="650" style="line-height: 140%; margin: 0; outline: none;
+                                            padding: 0; color: inherit; font-size: 12px; font-weight: inherit;
+                                            line-height: 1.4; text-decoration: inherit; font-family: Arial;
+                                             -mso-line-height-rule: exactly;">
+                                                                        <div style="line-height: 140%; margin: 0; outline: none;padding: 0;
+                                                font-size: 17px; line-height: 1.4; -mso-line-height-rule: exactly;"
+                                                                            data-line-height="1.4">
+                                                                            <div
+                                                                                style="margin: 0; outline: none; padding: 0;">
+                                                                                <span style="color: inherit; font-size: inherit; font-weight:bold;
+                                                        line-height: inherit; text-decoration: inherit;" class="">Thank
+                                                                                    you
+                                                                                    for registering on our site,
+                                                                                    {{fullname}}.</span></div>
+                                                                        </div>
+                                                                    </td>
+                                                                </tr>
+                                                            </table>
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td id="layout-row-margin1" valign="top">
+                                                <table width="100%" border="0" cellpadding="0" cellspacing="0" style="font-size:14px;
+                        min-width: 100%;  -mso-table-lspace: 0pt;  -mso-table-rspace: 0pt;">
+                                                    <tr id="layout-row1" class="layout layout-row widget _widget_text "
+                                                        style=" margin: 0; padding: 0;">
+                                                        <td id="layout-row-padding1" valign="top">
+                                                            <table width="100%" border="0" cellpadding="0"
+                                                                cellspacing="0" style="font-size: 14px; min-width: 100%;  -mso-table-lspace: 0pt;
+                                     -mso-table-rspace: 0pt;">
+                                                                <tr>
+                                                                    <td id="text_div1" class="td_text td_block"
+                                                                        valign="top" align=" left" width="650" style="line-height: 140%; margin: 0; outline: none; padding: 0; color:
+                                inherit; font-size: 12px; font-weight: inherit; line-height: 1.4; text-decoration:
+                                inherit; font-family: Arial;  -mso-line-height-rule: exactly;">
+                                                                        <div style="line-height: 140%; margin: 0; outline: none; padding: 0; font-size: 12px;
+                                    line-height: 1.4;  -mso-line-height-rule: exactly;" data-line-height="1.4">
+                                                                            <div
+                                                                                style="margin: 0;outline: none; padding: 0;">
+                                                                                <p style="margin: 0; outline: none; padding: 0; color:inherit; font-size:
+                                            inherit; font-weight: inherit; line-height: inherit; text-decoration:
+                                            inherit;">Below you will find some information about your account with us,
+                                                                                    and some information on us as a
+                                                                                    team and
+                                                                                    company and anything you might want
+                                                                                    to
+                                                                                    know.<br><br><span style="color: inherit;
+                                                font-size:inherit; font-weight: bold; line-height: inherit;
+                                                text-decoration: inherit;" class="">Do not share any of this
+                                                                                        information with
+                                                                                        anyone else that
+                                                                                        you
+                                                                                        don't trust.</span><br><br><span
+                                                                                        style="color: inherit; font-size:
+                                                inherit; font-weight: normal; line-height: inherit; text-decoration:
+                                                inherit;" class="">{{username}}<br>{{email}}<br>
+                                                                                        <br><b
+                                                                                            style="margin: 0; outline: none;">What
+                                                                                            are we about?</b><br>
+                                                                                        Mooonys
+                                                                                        was formed
+                                                                                        with the idea
+                                                                                        of collabo
+                                                                                        rating and acting in order with
+                                                                                        another brand,
+                                                                                        <a href="https://codyhouse.co/"
+                                                                                            data-ac-default-color="1"
+                                                                                            style="margin: 0; outline: none; padding:
+                                                0; color: #045FB4; text-decoration: underline;"><span style="
+                                                    font-size: inherit; font-weight: inherit; line-height: inherit;
+                                                    text-decoration: inherit;">CodyHouse</span></a> to create
+                                                                                        more adaptive and dynamic
+                                                                                        JavaScript
+                                                                                        to go along
+                                                                                        with there
+                                                                                        framework and collections of
+                                                                                        custom
+                                                                                        UI
+                                                                                        components.<br><br><b style="margin: 0;
+                                                outline:none; padding: 0;">Are you interested?</b><br> Mooonys is
+                                                                                        always looking for people to tag
+                                                                                        along with the
+                                                                                        project and help
+                                                                                        us do some
+                                                                                        fun and interesting work for our
+                                                                                        clients and if
+                                                                                        you are
+                                                                                        interested we are
+                                                                                        hiring new collaborators all the
+                                                                                        time and would
+                                                                                        love you to
+                                                                                        join
+                                                                                        us.<br><br><b
+                                                                                            style="margin: 0; outline: none; padding: 0;">Where
+                                                                                            can
+                                                                                            you find
+                                                                                            more?</b><br> Mooonys is not
+                                                                                        just primarly
+                                                                                        based and worked upon
+                                                                                        within GitHub,
+                                                                                        but we have our own website
+                                                                                        where
+                                                                                        you can get
+                                                                                        more information
+                                                                                        on other
+                                                                                        questions you might have, may I
+                                                                                        suggest you
+                                                                                        check out our <a
+                                                                                            href="https://www.mooonys.co/legals/frequently-asked-questions"
+                                                                                            data-ac-default-color="1"
+                                                                                            style="margin: 0; outline: none; padding:
+                                                0; color: #045FB4; text-decoration: underline;"><span style="
+                                                    font-size: inherit; font-weight: inherit; line-height: inherit;
+                                                    text-decoration: inherit;">FAQ</span></a>.<br><br><b
+                                                                                            style="margin: 0; outline: none; padding: 0;">Do
+                                                                                            you
+                                                                                            want to get
+                                                                                            in touch?</b><br> Mooonys is
+                                                                                        currently
+                                                                                        working on perfecting our
+                                                                                        support
+                                                                                        and contacting
+                                                                                        methods
+                                                                                        and
+                                                                                        production but soon or
+                                                                                        if not already you can contact
+                                                                                        us by
+                                                                                        sending an
+                                                                                        email to
+                                                                                        this address.<br>
+                                                                                        <a href="mailto:contact-us@mooonys.co"
+                                                                                            data-ac-default-color="1"
+                                                                                            style="margin: 0; outline: none; padding: 0; color: #045FB4;
+                                                text-decoration:underline;"><span style=" font-size: inherit;
+                                                    font-weight: inherit; line-height: inherit; text-decoration:
+                                                    inherit;">contact-us@mooonys.co
+                                                                                            </span></a>
+                                                                                </p>
+                                                                                <p style="margin: 0; outline: none; padding: 0; color: inherit;
+                                            font-size: inherit; font-weight: inherit; line-height: inherit;
+                                            text-decoration: inherit;"><br> You can also get in touch with our
+                                                                                    representatives for any help by
+                                                                                    sending an email
+                                                                                    to this
+                                                                                    address.<br><a
+                                                                                        href="mailto:help-me@mooonys.co"
+                                                                                        data-ac-default-color="1" style="margin: 0;outline: none; padding: 0; color: #045FB4;
+                                                text-decoration: underline;">
+                                                                                        <s pan style=" font-size: inherit; font-weight: inherit;
+                                                    line-height: inherit; text-decoration: inherit;">
+                                                                                            help-me@mooonys.co</span>
+                                                                                    </a>
+                                                                                </p>
+                                                                            </div>
+                                                                        </div>
+                                                                    </td>
+                                                                </tr>
+                                                            </table>
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div id="ac-footer"
+            style="clear:both;background-color:inherit;background:inherit;min-width:100%; -mso-table-lspace:0pt; -mso-table-rspace:0pt;padding:20px;color:#000000;font-size:11px;font-family:arial,helvetica,sans-serif;line-height:140%;line-height:1.4;text-align:center;box-sizing:border-box;">
+            <center><span
+                    style="font-size:11px;font-family:arial,helvetica,sans-serif;font-weight:normal;text-decoration:none;outline:none;"></span><br>
+                <br><a href=""
+                    style="font-size:11px;font-family:arial,helvetica,sans-serif;font-weight:bold;text-decoration:underline;"><span
+                        style="font-weight:bold;text-decoration:underline;">Unsubscribe</span></a><br><br>
+            </center>
+        </div><br clear="all" />
+    </body>
+
+</html>

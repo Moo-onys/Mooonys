@@ -21,7 +21,8 @@
       "packagerConfig": {
         "icon": "utils/img/Mooonys.icns"
       },
-      "makers": [{
+      "makers": [
+        {
           "name": "@electron-forge/maker-squirrel",
           "config": {
             "name": "Mooonys"
