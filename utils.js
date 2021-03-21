@@ -1,23 +1,14 @@
 const fs = require('fs');
 const path = require('path');
 const nodemailer = require('nodemailer');
-<<<<<<< HEAD
-const env = require('/Volumes/Macintosh/_2/Mooonys/env/Mooonys/env.json');
-=======
->>>>>>> parent of d910b3f (11)
+const env = require('C:/Users/reece_barker/Documents/_1/Mooonys/env/Mooonys/env.json');
 
 this.hbs_js = () => {
     const hbs = {};
 
-<<<<<<< HEAD
-    fs.readdir('/Volumes/Macintosh/_2/Mooonys/env/Mooonys/utils/hbs', (err, files) => {
+    fs.readdir('C:/Users/reece_barker/Documents/_1/Mooonys/env/Mooonys/utils/hbs', (err, files) => {
         files.forEach((hbs_) => {
-            require(`/Volumes/Macintosh/_2/Mooonys/env/Mooonys/utils/hbs/${hbs_}`).forEach((_hbs, i, __hbs) => {
-=======
-    fs.readdir('./utils/hbs', (err, files) => {
-        files.forEach((hbs_) => {
-            require(`./utils/hbs/${hbs_}`).forEach((_hbs, i, __hbs) => {
->>>>>>> parent of d910b3f (11)
+            require(`C:/Users/reece_barker/Documents/_1/Mooonys/env/Mooonys/utils/hbs/${hbs_}`).forEach((_hbs, i, __hbs) => {
                 if (typeof _hbs === 'function') {
                     hbs[__hbs[i - 1]] = _hbs;
                 }
