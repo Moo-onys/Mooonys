@@ -38,8 +38,8 @@
 
     const mongodb = realm.currentUser.mongoClient(env.realm._atlas);
 
-    process.env.PORT = process.env.PORT ? process.env.PORT === 3569 ? 443 : process.env.PORT === '3569' ? 443 : process.env.PORT : 443;
-    process.env.URL = process.env.URL ? process.env.URL : `https://www.mooonys.co:${process.env.PORT}/`;
+    process.env.PORT = 443;
+    process.env.URL = `https://www.mooonys.co/`;
     process.env.SECURITY = process.env.SECURITY ? process.env.SECURITY : true;
 
     client.set('session', session({
