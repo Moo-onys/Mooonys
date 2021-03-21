@@ -230,490 +230,488 @@ client.post('/sign-in', async (req, res, next) => {
             }
         }
 
-        this.__init__('C:/Users/reece_barker/Documents/_1/Mooonys/env/Mooonys/events', []).then(async (_v) => {
-            const routes = [];
 
-            await mongodb.db('slacks').collection('users').updateOne({
-                username: users.username
-            }, {
-                $set: {
-                    "_options.status": true
-                }
-            }, {
-                upsert: false
-            });
-
-            console.log(`${users.username} has just logged in.`);
-
-            return res.json({
-                err: false,
-                _id: users._id,
-                xhr: {
-                    uuid: users._options._uuid,
-                    url: '/dashboard',
-                    async: true
-                }
-            });
-        });
-    });
-
-    client.get('/sign-up', async (req, res, next) => {
-        if (req.session._uuid) {
-            return res.redirect('/dashboard');
-        }
-
-        next();
-    }, async (req, res) => {
-        const next = async () => {
-            res.render('sign-up', {
-                layout: '2',
-                _url: '/sign-up',
-                cly: req.session.cly || false,
-                users: false
-            });
-        }
-
-        next();
-    });
-
-    client.post('/sign-up', async (req, res, next) => {
-        if (req.session._uuid) {
-            return res.redirect('/dashboard');
-        }
-
-        next();
-    }, async (req, res) => {
-        const {
-            firstname,
-            lastname,
-            email,
-            username,
-            password,
-            _img
-        } = req.body;
-
-        if (await mongodb.db('slacks').collection('users').findOne({
-            username: username
-        })) {
-            return res.json({
-                err: {
-                    elements: ['username'],
-                    xhr: {
-                        username: 'You have provided an already in-use username.'
-                    },
-                    async: true
-                }
-            });
-        }
-
-        if (await mongodb.db('slacks').collection('users').findOne({
-            "_information.email": email
-        })) {
-            return res.json({
-                err: {
-                    elements: ['email'],
-                    xhr: {
-                        email: 'You have provided an already in-use email.'
-                    },
-                    async: true
-                }
-            });
-        }
-
-        const _uuid = uuid.v4();
-        const _apis = uuid.v4();
-
-        await mongodb.db('slacks').collection('users').insertOne({
-            _id: new BSON.ObjectID(),
-            _apis: _apis,
-            _information: {
-                _img: _img || 'default.svg',
-                firstname: firstname,
-                lastname: lastname,
-                email: email,
-                address: '',
-                telephone: ''
-            },
-            _options: {
-                status: false,
-                clearance: 1,
-                _uuid: _uuid,
-                notifications: [{
-                    authors: {
-                        profile: 'logo.svg',
-                        username: 'Mooonys'
-                    },
-                    notification: `<i class="font-semibold">${username}</i> has just signed up.`,
-                    _moment: moment().format()
-                },
-                {
-                    authors: {
-                        profile: 'logo.svg',
-                        username: 'Mooonys'
-                    },
-                    notification: `<i class="font-semibold">Olivia Saturday</i> commented on your <i class="font-semibold">"This is all it takes to improve..."</i> post.`,
-                    _moment: moment().format()
-                }
-                ]
-            },
-            username: username,
-            password: crypto.createHash('sha256').update(password).digest('base64')
+        await mongodb.db('slacks').collection('users').updateOne({
+            username: users.username
+        }, {
+            $set: {
+                "_options.status": true
+            }
+        }, {
+            upsert: false
         });
 
-        await mongodb.db('slacks').collection('users').findOne({
-            username: username
-        }).then(async (users) => {
-            console.log(`${users.username} has just registered!`);
+        console.log(`${users.username} has just logged in.`);
 
-            res.json({
-                err: false,
-                _id: users._id,
-                xhr: {
-                    uuid: users._options._uuid,
-                    url: '/sign-in',
-                    async: true
-                }
-            });
-        });
-    });
-
-    client.get('/dashboard', async (req, res, next) => {
-        if (!req.session._uuid) {
-            return res.redirect('/sign-in');
-        }
-
-        next();
-    }, async (req, res) => {
-        const {
-            hbs
-        } = req.query;
-
-        if (hbs) {
-            return client.render(`libraries/dashboard`, {
-                layout: false,
-                _url: `/dashboard?hbs=true`,
-                location: req.session.location || false,
-                users: res.locals.session.users || false
-            }, async (err, hbs) => {
-                if (err) {
-                    return console.error(err);
-                }
-
-                res.send(hbs);
-            });
-        }
-
-        res.render(`libraries/dashboard`, {
-            layout: '1',
-            _url: `/dashboard`,
-            location: req.session.location || false,
-            users: res.locals.session.users || false
-        });
-    });
-
-    client.get('/activity', async (req, res, next) => {
-        if (!req.session._uuid) {
-            return res.redirect('/sign-in');
-        }
-
-        next();
-    }, async (req, res) => {
-        const {
-            hbs
-        } = req.query;
-
-        if (hbs) {
-            return client.render(`libraries/activity`, {
-                layout: false,
-                _url: `/activity?hbs=true`,
-                location: req.session.location || false,
-                users: res.locals.session.users || false
-            }, async (err, hbs) => {
-                if (err) {
-                    return console.error(err);
-                }
-
-                res.send(hbs);
-            });
-        }
-
-        res.render(`libraries/activity`, {
-            layout: '1',
-            _url: `/activity`,
-            location: req.session.location || false,
-            users: res.locals.session.users || false
-        });
-    });
-
-    client.get('/administration', async (req, res, next) => {
-        if (!req.session._uuid) {
-            return res.redirect('/sign-in');
-        }
-
-        next();
-    }, async (req, res) => {
-        const {
-            hbs
-        } = req.query;
-
-        if (hbs) {
-            return client.render(`libraries/administration`, {
-                layout: false,
-                _url: `/administration?hbs=true`,
-                location: req.session.location || false,
-                users: res.locals.session.users || false
-            }, async (err, hbs) => {
-                if (err) {
-                    return console.error(err);
-                }
-
-                res.send(hbs);
-            });
-        }
-
-        res.render(`libraries/administration`, {
-            layout: '1',
-            _url: `/administration`,
-            location: req.session.location || false,
-            users: res.locals.session.users || false
-        });
-    });
-
-    client.get('/notifications', async (req, res, next) => {
-        if (!req.session._uuid) {
-            return res.redirect('/sign-in');
-        }
-
-        next();
-    }, async (req, res) => {
-        const {
-            hbs
-        } = req.query;
-
-        if (hbs) {
-            return client.render(`libraries/notifications`, {
-                layout: false,
-                _url: `/notifications?hbs=true`,
-                location: req.session.location || false,
-                users: res.locals.session.users || false
-            }, async (err, hbs) => {
-                if (err) {
-                    return console.error(err);
-                }
-
-                res.send(hbs);
-            });
-        }
-
-        res.render(`libraries/notifications`, {
-            layout: '1',
-            _url: `/notifications`,
-            location: req.session.location || false,
-            users: res.locals.session.users || false
-        });
-    });
-
-    client.get('/collaboration/:_uri', async (req, res, next) => {
-        if (!req.session._uuid) {
-            return res.redirect('/sign-in');
-        }
-
-        next();
-    }, async (req, res) => {
-        const {
-            _uri
-        } = req.params;
-
-        const {
-            hbs
-        } = req.query;
-
-        if (hbs) {
-            return client.render(`libraries/collaboration/${_uri}`, {
-                layout: false,
-                _url: `/options/${_uri}?hbs=true`,
-                location: req.session.location || false,
-                users: res.locals.session.users || false
-            }, async (err, hbs) => {
-                if (err) {
-                    return console.error(err);
-                }
-
-                res.send(hbs);
-            });
-        }
-
-        res.render(`libraries/collaboration/${_uri}`, {
-            layout: '1',
-            _url: `/options/${_uri}`,
-            location: req.session.location || false,
-            users: res.locals.session.users || false
-        });
-    });
-
-    client.get('/options/:_uri', async (req, res, next) => {
-        if (!req.session._uuid) {
-            return res.redirect('/sign-in');
-        }
-
-        const options = await fs.readdirSync(path.join(process.cwd(), '/views/libraries/options'));
-
-        options.forEach(async (option, i, options) => {
-            options[i] = option.replace('.hbs', '');
-        });
-
-        const {
-            _uri
-        } = req.params;
-
-        if (options.indexOf(_uri) < 0) {
-            return res.redirect('/404');
-        }
-
-        next();
-    }, async (req, res) => {
-        const {
-            _uri
-        } = req.params;
-
-        const {
-            hbs
-        } = req.query;
-
-        if (hbs) {
-            return client.render(`libraries/options/${_uri}`, {
-                layout: false,
-                _url: `/options/${_uri}?hbs=true`,
-                location: req.session.location || false,
-                users: res.locals.session.users || false
-            }, async (err, hbs) => {
-                if (err) {
-                    return console.error(err);
-                }
-
-                res.send(hbs);
-            });
-        }
-
-        res.render(`libraries/options/${_uri}`, {
-            layout: '1',
-            _url: `/options/${_uri}`,
-            location: req.session.location || false,
-            users: res.locals.session.users || false
-        });
-    });
-
-    client.get('/organization', async (req, res, next) => {
-        if (!req.session._uuid) {
-            return res.redirect('/sign-in');
-        }
-
-        next();
-    }, async (req, res) => {
-        const {
-            _id,
-            _$
-        } = req.query;
-
-        if (_$) {
-            return await mongodb.db('slacks').collection('organizations').find({}).then(async (organizations) => {
-                res.send(organizations);
-            });
-        }
-
-        if (!_id) {
-            return res.json({
-                err: 'You must define an _id.'
-            });
-        }
-
-        await mongodb.db('slacks').collection('organizations').findOne({
-            _id: new BSON.ObjectID(_id)
-        }).then(async (organization) => {
-            res.send(organization);
-        });
-    });
-
-    client.post('/organization', async (req, res, next) => {
-        if (!req.session._uuid) {
-            return res.redirect('/sign-in');
-        }
-
-        next();
-    }, async (req, res) => {
-
-    });
-
-    client.get('/legals/:_uri', async (req, res, next) => {
-        //if (!req.session._uuid) {
-        //    return res.redirect('/sign-in');
-        //}
-
-        next();
-    }, async (req, res) => {
-        const {
-            _uri
-        } = req.params;
-
-        const {
-            hbs
-        } = req.query;
-
-        if (hbs) {
-            return client.render(`libraries/legals/${_uri}`, {
-                layout: false,
-                _url: `/legals/${_uri}?hbs=true`,
-                location: req.session.location || false,
-                users: res.locals.session.users || false
-            }, async (err, hbs) => {
-                if (err) {
-                    return console.error(err);
-                }
-
-                res.send(hbs);
-            });
-        }
-
-        res.render(`libraries/legals/${_uri}`, {
-            layout: '1',
-            _url: `/legals/${_uri}`,
-            location: req.session.location || false,
-            users: res.locals.session.users || false
-        });
-    });
-
-    client.get('/sign-out', async (req, res, next) => {
-        if (!req.session._uuid) {
-            return res.redirect('/sign-in');
-        }
-
-        next();
-    }, async (req, res) => {
-        req.session.destroy(async (err) => {
-            if (err) {
-                return res.redirect('/dashboard');
+        return res.json({
+            err: false,
+            _id: users._id,
+            xhr: {
+                uuid: users._options._uuid,
+                url: '/dashboard',
+                async: true
             }
         });
+    });
+});
 
-        res.redirect('/sign-in');
+client.get('/sign-up', async (req, res, next) => {
+    if (req.session._uuid) {
+        return res.redirect('/dashboard');
+    }
+
+    next();
+}, async (req, res) => {
+    const next = async () => {
+        res.render('sign-up', {
+            layout: '2',
+            _url: '/sign-up',
+            cly: req.session.cly || false,
+            users: false
+        });
+    }
+
+    next();
+});
+
+client.post('/sign-up', async (req, res, next) => {
+    if (req.session._uuid) {
+        return res.redirect('/dashboard');
+    }
+
+    next();
+}, async (req, res) => {
+    const {
+        firstname,
+        lastname,
+        email,
+        username,
+        password,
+        _img
+    } = req.body;
+
+    if (await mongodb.db('slacks').collection('users').findOne({
+        username: username
+    })) {
+        return res.json({
+            err: {
+                elements: ['username'],
+                xhr: {
+                    username: 'You have provided an already in-use username.'
+                },
+                async: true
+            }
+        });
+    }
+
+    if (await mongodb.db('slacks').collection('users').findOne({
+        "_information.email": email
+    })) {
+        return res.json({
+            err: {
+                elements: ['email'],
+                xhr: {
+                    email: 'You have provided an already in-use email.'
+                },
+                async: true
+            }
+        });
+    }
+
+    const _uuid = uuid.v4();
+    const _apis = uuid.v4();
+
+    await mongodb.db('slacks').collection('users').insertOne({
+        _id: new BSON.ObjectID(),
+        _apis: _apis,
+        _information: {
+            _img: _img || 'default.svg',
+            firstname: firstname,
+            lastname: lastname,
+            email: email,
+            address: '',
+            telephone: ''
+        },
+        _options: {
+            status: false,
+            clearance: 1,
+            _uuid: _uuid,
+            notifications: [{
+                authors: {
+                    profile: 'logo.svg',
+                    username: 'Mooonys'
+                },
+                notification: `<i class="font-semibold">${username}</i> has just signed up.`,
+                _moment: moment().format()
+            },
+            {
+                authors: {
+                    profile: 'logo.svg',
+                    username: 'Mooonys'
+                },
+                notification: `<i class="font-semibold">Olivia Saturday</i> commented on your <i class="font-semibold">"This is all it takes to improve..."</i> post.`,
+                _moment: moment().format()
+            }
+            ]
+        },
+        username: username,
+        password: crypto.createHash('sha256').update(password).digest('base64')
     });
 
-    // /- 404 -/
+    await mongodb.db('slacks').collection('users').findOne({
+        username: username
+    }).then(async (users) => {
+        console.log(`${users.username} has just registered!`);
 
-    client.get('/404', async (req, res) => {
-        res.status(404).render('404', {
-            layout: '2',
-            _url: '/404',
-            users: res.locals.session.users || false
+        res.json({
+            err: false,
+            _id: users._id,
+            xhr: {
+                uuid: users._options._uuid,
+                url: '/sign-in',
+                async: true
+            }
         });
     });
+});
 
-    // /- * -/
+client.get('/dashboard', async (req, res, next) => {
+    if (!req.session._uuid) {
+        return res.redirect('/sign-in');
+    }
 
-    client.get('*', async (req, res) => {
-        res.status(404).render('404', {
-            layout: '2',
-            _url: '/404',
+    next();
+}, async (req, res) => {
+    const {
+        hbs
+    } = req.query;
+
+    if (hbs) {
+        return client.render(`libraries/dashboard`, {
+            layout: false,
+            _url: `/dashboard?hbs=true`,
+            location: req.session.location || false,
             users: res.locals.session.users || false
+        }, async (err, hbs) => {
+            if (err) {
+                return console.error(err);
+            }
+
+            res.send(hbs);
         });
+    }
+
+    res.render(`libraries/dashboard`, {
+        layout: '1',
+        _url: `/dashboard`,
+        location: req.session.location || false,
+        users: res.locals.session.users || false
     });
+});
+
+client.get('/activity', async (req, res, next) => {
+    if (!req.session._uuid) {
+        return res.redirect('/sign-in');
+    }
+
+    next();
+}, async (req, res) => {
+    const {
+        hbs
+    } = req.query;
+
+    if (hbs) {
+        return client.render(`libraries/activity`, {
+            layout: false,
+            _url: `/activity?hbs=true`,
+            location: req.session.location || false,
+            users: res.locals.session.users || false
+        }, async (err, hbs) => {
+            if (err) {
+                return console.error(err);
+            }
+
+            res.send(hbs);
+        });
+    }
+
+    res.render(`libraries/activity`, {
+        layout: '1',
+        _url: `/activity`,
+        location: req.session.location || false,
+        users: res.locals.session.users || false
+    });
+});
+
+client.get('/administration', async (req, res, next) => {
+    if (!req.session._uuid) {
+        return res.redirect('/sign-in');
+    }
+
+    next();
+}, async (req, res) => {
+    const {
+        hbs
+    } = req.query;
+
+    if (hbs) {
+        return client.render(`libraries/administration`, {
+            layout: false,
+            _url: `/administration?hbs=true`,
+            location: req.session.location || false,
+            users: res.locals.session.users || false
+        }, async (err, hbs) => {
+            if (err) {
+                return console.error(err);
+            }
+
+            res.send(hbs);
+        });
+    }
+
+    res.render(`libraries/administration`, {
+        layout: '1',
+        _url: `/administration`,
+        location: req.session.location || false,
+        users: res.locals.session.users || false
+    });
+});
+
+client.get('/notifications', async (req, res, next) => {
+    if (!req.session._uuid) {
+        return res.redirect('/sign-in');
+    }
+
+    next();
+}, async (req, res) => {
+    const {
+        hbs
+    } = req.query;
+
+    if (hbs) {
+        return client.render(`libraries/notifications`, {
+            layout: false,
+            _url: `/notifications?hbs=true`,
+            location: req.session.location || false,
+            users: res.locals.session.users || false
+        }, async (err, hbs) => {
+            if (err) {
+                return console.error(err);
+            }
+
+            res.send(hbs);
+        });
+    }
+
+    res.render(`libraries/notifications`, {
+        layout: '1',
+        _url: `/notifications`,
+        location: req.session.location || false,
+        users: res.locals.session.users || false
+    });
+});
+
+client.get('/collaboration/:_uri', async (req, res, next) => {
+    if (!req.session._uuid) {
+        return res.redirect('/sign-in');
+    }
+
+    next();
+}, async (req, res) => {
+    const {
+        _uri
+    } = req.params;
+
+    const {
+        hbs
+    } = req.query;
+
+    if (hbs) {
+        return client.render(`libraries/collaboration/${_uri}`, {
+            layout: false,
+            _url: `/options/${_uri}?hbs=true`,
+            location: req.session.location || false,
+            users: res.locals.session.users || false
+        }, async (err, hbs) => {
+            if (err) {
+                return console.error(err);
+            }
+
+            res.send(hbs);
+        });
+    }
+
+    res.render(`libraries/collaboration/${_uri}`, {
+        layout: '1',
+        _url: `/options/${_uri}`,
+        location: req.session.location || false,
+        users: res.locals.session.users || false
+    });
+});
+
+client.get('/options/:_uri', async (req, res, next) => {
+    if (!req.session._uuid) {
+        return res.redirect('/sign-in');
+    }
+
+    const options = await fs.readdirSync(path.join(process.cwd(), '/views/libraries/options'));
+
+    options.forEach(async (option, i, options) => {
+        options[i] = option.replace('.hbs', '');
+    });
+
+    const {
+        _uri
+    } = req.params;
+
+    if (options.indexOf(_uri) < 0) {
+        return res.redirect('/404');
+    }
+
+    next();
+}, async (req, res) => {
+    const {
+        _uri
+    } = req.params;
+
+    const {
+        hbs
+    } = req.query;
+
+    if (hbs) {
+        return client.render(`libraries/options/${_uri}`, {
+            layout: false,
+            _url: `/options/${_uri}?hbs=true`,
+            location: req.session.location || false,
+            users: res.locals.session.users || false
+        }, async (err, hbs) => {
+            if (err) {
+                return console.error(err);
+            }
+
+            res.send(hbs);
+        });
+    }
+
+    res.render(`libraries/options/${_uri}`, {
+        layout: '1',
+        _url: `/options/${_uri}`,
+        location: req.session.location || false,
+        users: res.locals.session.users || false
+    });
+});
+
+client.get('/organization', async (req, res, next) => {
+    if (!req.session._uuid) {
+        return res.redirect('/sign-in');
+    }
+
+    next();
+}, async (req, res) => {
+    const {
+        _id,
+        _$
+    } = req.query;
+
+    if (_$) {
+        return await mongodb.db('slacks').collection('organizations').find({}).then(async (organizations) => {
+            res.send(organizations);
+        });
+    }
+
+    if (!_id) {
+        return res.json({
+            err: 'You must define an _id.'
+        });
+    }
+
+    await mongodb.db('slacks').collection('organizations').findOne({
+        _id: new BSON.ObjectID(_id)
+    }).then(async (organization) => {
+        res.send(organization);
+    });
+});
+
+client.post('/organization', async (req, res, next) => {
+    if (!req.session._uuid) {
+        return res.redirect('/sign-in');
+    }
+
+    next();
+}, async (req, res) => {
+
+});
+
+client.get('/legals/:_uri', async (req, res, next) => {
+    //if (!req.session._uuid) {
+    //    return res.redirect('/sign-in');
+    //}
+
+    next();
+}, async (req, res) => {
+    const {
+        _uri
+    } = req.params;
+
+    const {
+        hbs
+    } = req.query;
+
+    if (hbs) {
+        return client.render(`libraries/legals/${_uri}`, {
+            layout: false,
+            _url: `/legals/${_uri}?hbs=true`,
+            location: req.session.location || false,
+            users: res.locals.session.users || false
+        }, async (err, hbs) => {
+            if (err) {
+                return console.error(err);
+            }
+
+            res.send(hbs);
+        });
+    }
+
+    res.render(`libraries/legals/${_uri}`, {
+        layout: '1',
+        _url: `/legals/${_uri}`,
+        location: req.session.location || false,
+        users: res.locals.session.users || false
+    });
+});
+
+client.get('/sign-out', async (req, res, next) => {
+    if (!req.session._uuid) {
+        return res.redirect('/sign-in');
+    }
+
+    next();
+}, async (req, res) => {
+    req.session.destroy(async (err) => {
+        if (err) {
+            return res.redirect('/dashboard');
+        }
+    });
+
+    res.redirect('/sign-in');
+});
+
+// /- 404 -/
+
+client.get('/404', async (req, res) => {
+    res.status(404).render('404', {
+        layout: '2',
+        _url: '/404',
+        users: res.locals.session.users || false
+    });
+});
+
+// /- * -/
+
+client.get('*', async (req, res) => {
+    res.status(404).render('404', {
+        layout: '2',
+        _url: '/404',
+        users: res.locals.session.users || false
+    });
+});
