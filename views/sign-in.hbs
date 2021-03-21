@@ -1,21 +1,21 @@
 <div class="bg-artwork__1 min-height-100vh flex flex-center padding-sm">
     <form method="POST" action="/sign-in" class="bg radius-md shadow-lg padding-lg max-width-xs">
         <div class="text-center margin-bottom-sm">
-            <h1>Signin</h1>
+            <h1>Sign-in</h1>
         </div>
 
         <div class="grid gap-xs">
             <div class="col-6@xs">
                 <button class="btn btn--subtle width-100%">
                     <i class="fab icon margin-right-xxxs fa-twitter"></i>
-                    <span>Signin with Twitter</span>
+                    <span>n° Sign-in with Twitter</span>
                 </button>
             </div>
 
             <div class="col-6@xs">
                 <button class="btn btn--subtle width-100%">
                     <i class="fab icon margin-right-xxxs fa-github"></i>
-                    <span>Signin with Github</span>
+                    <span>n° Sign-in with Github</span>
                 </button>
             </div>
         </div>
@@ -51,7 +51,7 @@
         <div class="margin-bottom-xs">
             <button type="submit"
                 class="btn btn--primary sign-in__btn btn--form btn--preserve-width btn--md width-100%">
-                <span class="btn__content-a">Signin</span>
+                <span class="btn__content-a">Sign-in</span>
                 <span class="btn__content-b">
                     <svg class="icon icon--is-spinning" aria-hidden="true" viewBox="0 0 16 16">
                         <title>Loading</title>
@@ -65,7 +65,7 @@
         </div>
 
         <div class="text-center">
-            <p class="text-sm">Don't have an account? <a href="/sign-up">Signup</a></p>
+            <p class="text-sm">Don't have an account? <a href="/sign-up">Sign-up</a></p>
         </div>
     </form>
 </div>
@@ -124,42 +124,40 @@
                     } = args;
 
                     if (err) {
-                        return await (async (err) => {
-                            const {
-                                elements,
-                                xhr,
-                                async
-                            } = err;
+                        const {
+                            elements,
+                            async
+                        } = err;
 
-                            if (async) {
-                                return await elements.forEach(async (_id, i, elements) => {
-                                    if (!document.querySelector(_id)) {
-                                        $('[type=submit]').toggleClass('btn--state-b');
-
-                                        return;
-                                    }
-
-                                    const element = document.querySelector(_id);
-
-                                    element.classList.add('form-control--error');
-
-                                    element.addEventListener('focus', async (e) => {
-                                        if (e.target.closest('input').classList.contains('form-control--error')) {
-                                            e.target.closest('input').classList.remove('form-control--error');
-                                        }
-                                    });
-
-                                    if (xhr) {
-                                        element.setAttribute('placeholder', xhr[_id]);
-                                    }
-
-                                    $('[type=submit]').toggleClass('btn--state-b');
-                                });
-                            }
-
-                            elements.forEach((_id, i, elements) => {
+                        if (async) {
+                            elements.forEach(async (_id, i) => {
                                 if (!document.querySelector(_id)) {
-                                    $('[type=submit]').toggleClass('btn--state-b');
+                                    $('[type=submit]').removeClass('btn--state-b');
+
+                                    return;
+                                }
+
+                                const element = document.querySelector(_id);
+
+                                element.classList.add('form-control--error');
+
+                                element.addEventListener('focus', async (e) => {
+                                    if (e.target.closest('input').classList.contains('form-control--error')) {
+                                        e.target.closest('input').classList.remove('form-control--error');
+                                    }
+                                });
+
+                                if (err.xhr) {
+                                    element.setAttribute('placeholder', err.xhr[_id.slice(1, _id.length)]);
+                                    element.value = '';
+                                }
+
+                                $('[type=submit]').removeClass('btn--state-b');
+                            });
+                        } else {
+                            elements.forEach((_id, i) => {
+                                if (!document.querySelector(_id)) {
+                                    $('[type=submit]').removeClass('btn--state-b');
 
                                     return;
                                 }
@@ -174,36 +172,37 @@
                                     }
                                 });
 
-                                if (xhr) {
-                                    element.setAttribute('placeholder', xhr[_id]);
+                                if (err.xhr) {
+                                    element.setAttribute('placeholder', err.xhr[_id.slice(1, _id.length)]);
+                                    element.value = '';
+                                }
+
+                                $('[type=submit]').removeClass('btn--state-b');
+                            });
+                        }
+                    } else {
+                        localStorage.setItem('_id', _id);
+
+                        if (xhr) {
+                            const {
+                                uuid,
+                                url,
+                                async
+                            } = xhr;
+
+                            if (uuid) {
+                                sessionStorage.setItem('uuid', uuid);
+
+                                if (async) {
+                                    $('[type=submit]').toggleClass('btn--state-b');
+
+                                    return window.location.replace(url);
                                 }
 
                                 $('[type=submit]').toggleClass('btn--state-b');
-                            });
-                        })(err);
-                    }
 
-                    localStorage.setItem('_id', _id);
-
-                    if (xhr) {
-                        const {
-                            uuid,
-                            url,
-                            async
-                        } = xhr;
-
-                        if (uuid) {
-                            sessionStorage.setItem('uuid', uuid);
-
-                            if (async) {
-                                $('[type=submit]').toggleClass('btn--state-b');
-
-                                return await window.location.replace(url);
+                                window.location.replace(url);
                             }
-
-                            $('[type=submit]').toggleClass('btn--state-b');
-
-                            window.location.replace(url);
                         }
                     }
                 }
