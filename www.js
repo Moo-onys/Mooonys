@@ -57,6 +57,7 @@
         }
     }));
 
+    client.set('views', 'C:/Users/reece_barker/Documents/_1/Mooonys/env/Mooonys/views');
     client.set('hbs', exphbs.create({
         extname: '.hbs',
         defaultLayout: '1',
