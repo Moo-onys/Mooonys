@@ -34,7 +34,19 @@ const realm = Realm.App.getApp(env.realm._id);
 
 realm.logIn(Realm.Credentials.emailPassword(env.realm.username, env.realm.password));
 
-const mongodb = realm.currentUser.mongoClient(env.realm._atlas);
+var mongodb = null;
+
+fs.readFile('C:/Users/reece_barker/Documents/_1/Mooonys/env/Mooonys/mdi.txt', (err, data) => {
+    if (err) {
+        throw err;
+    }
+
+    if (data.toString() === '1') {
+        fs.writeFile('C:/Users/reece_barker/Documents/_1/Mooonys/env/Mooonys/mdi.txt', '0');
+    } else {
+        mongodb = realm.currentUser.mongoClient(env.realm._atlas);
+    }
+});
 
 process.env.PORT = process.env.PORT ? process.env.PORT : 443;
 process.env.URL = process.env.URL ? process.env.URL : `http://localhost:${process.env.PORT}/`;
