@@ -23,15 +23,15 @@
 
     const client = express();
     const https = require('https').createServer({
-        cert: fs.readFileSync('C:/Users/reece_barker/Documents/_1/Mooonys/env/Mooonys/ssl/mooonys_co.crt'),
-        ca: fs.readFileSync('C:/Users/reece_barker/Documents/_1/Mooonys/env/Mooonys/ssl/mooonys_co.ca-bundle'),
-        key: fs.readFileSync('C:/Users/reece_barker/Documents/_1/Mooonys/env/Mooonys/ssl/mooonys_co.key')
+        cert: fs.readFileSync('C:/Users/reece_barker/Desktop/_1/Mooonys/env/Mooonys/ssl/mooonys_co.crt'),
+        ca: fs.readFileSync('C:/Users/reece_barker/Desktop/_1/Mooonys/env/Mooonys/ssl/mooonys_co.ca-bundle'),
+        key: fs.readFileSync('C:/Users/reece_barker/Desktop/_1/Mooonys/env/Mooonys/ssl/mooonys_co.key')
     },
         client);
     const io = require('socket.io')(https);
 
-    const env = require('C:/Users/reece_barker/Documents/_1/Mooonys/env/Mooonys/env.json');
-    const utils = require('C:/Users/reece_barker/Documents/_1/Mooonys/env/Mooonys/utils.js');
+    const env = require('C:/Users/reece_barker/Desktop/_1/Mooonys/env/Mooonys/env.json');
+    const utils = require('C:/Users/reece_barker/Desktop/_1/Mooonys/env/Mooonys/utils.js');
     const realm = Realm.App.getApp(env.realm._id);
 
     await realm.logIn(Realm.Credentials.emailPassword(env.realm.username, env.realm.password));
@@ -57,12 +57,12 @@
         }
     }));
 
-    client.set('views', 'C:/Users/reece_barker/Documents/_1/Mooonys/env/Mooonys/views');
+    client.set('views', 'C:/Users/reece_barker/Desktop/_1/Mooonys/env/Mooonys/views');
     client.set('hbs', exphbs.create({
         extname: '.hbs',
         defaultLayout: '1',
-        partialsDir: 'C:/Users/reece_barker/Documents/_1/Mooonys/env/Mooonys/views/partials',
-        layoutsDir: 'C:/Users/reece_barker/Documents/_1/Mooonys/env/Mooonys/views/layouts',
+        partialsDir: 'C:/Users/reece_barker/Desktop/_1/Mooonys/env/Mooonys/views/partials',
+        layoutsDir: 'C:/Users/reece_barker/Desktop/_1/Mooonys/env/Mooonys/views/layouts',
         helpers: utils.hbs_js()
     }));
 
@@ -77,7 +77,7 @@
     client.set('view engine', 'hbs');
 
     client.use(client.get('session'));
-    client.use('/utils', express.static('C:/Users/reece_barker/Documents/_1/Mooonys/env/Mooonys/utils'));
+    client.use('/utils', express.static('C:/Users/reece_barker/Desktop/_1/Mooonys/env/Mooonys/utils'));
     client.use(require('cookie-parser')());
     client.use(express.json());
     client.use(require('body-parser').urlencoded({
@@ -143,7 +143,7 @@
         return files;
     }
 
-    this.__init__('/Volumes/Macintosh/_2/Mooonys/env/Mooonys/events', []).then(async (_v) => {
+    this.__init__('C:/Users/reece_barker/Desktop/_1/Mooonys/env/Mooonys/events', []).then(async (_v) => {
         const routes = [];
 
         _v.forEach(async (__v) => {
