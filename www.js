@@ -32,8 +32,8 @@ const env = require('C:/Users/reece_barker/Desktop/_1/Mooonys/env/Mooonys/env.js
 const utils = require('C:/Users/reece_barker/Desktop/_1/Mooonys/env/Mooonys/utils.js');
 const realm = Realm.App.getApp(env.realm._id);
 
-realm.logIn(Realm.Credentials.emailPassword(env.realm.username, env.realm.password)).then(async () => {
-    this.mongodb = realm.currentUser.mongoClient(env.realm._atlas);
+realm.logIn(Realm.Credentials.emailPassword(env.realm.username, env.realm.password)).then(async (user) => {
+    this.mongodb = user.mongoClient(env.realm._atlas);
 });
 
 process.env.PORT = 443;
