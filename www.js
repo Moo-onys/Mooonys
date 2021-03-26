@@ -74,6 +74,8 @@ client.engine('hbs', client.get('hbs').engine);
 client.set('trust proxy', 1);
 client.set('view engine', 'hbs');
 
+const _ev = [];
+
 client.use(client.get('session'));
 client.use('/utils', express.static('C:/Users/reece_barker/Desktop/_1/Mooonys/env/Mooonys/utils'));
 client.use(require('cookie-parser')());
@@ -84,6 +86,9 @@ client.use(require('body-parser').urlencoded({
 
 client.use(async (req, res, next) => {
     req.io = io;
+    req.env = env;
+    req.mongodb = this.mongodb;
+    req.utils = utils;
 
     next();
 });
@@ -141,24 +146,26 @@ this.__init__ = async (dir, files) => {
     return files;
 }
 
-this.__init__('C:/Users/reece_barker/Desktop/_1/Mooonys/env/Mooonys/events', []).then(async (_v) => {
+this.__init__('C:/Users/reece_barker/Desktop/_1/Mooonys/env/Mooonys/events', _ev).then(async (_v) => {
     const routes = [];
 
-    _v.forEach(async (__v) => {
-        const v = require(__v);
-        routes.push(v.$.path);
-        client.use(v.$.path, v.$.router);
-    });
+    (async () => {
+        _v.forEach(async (__v) => {
+            const v = require(__v);
+            routes.push(v.$.path);
+            client.use(v.$.path, v.$.router);
+        });
+    })().then(async () => {
+        client.get('*', async (req, res, next) => {
+            if (routes.indexOf(req.path) >= 0) return;
 
-    client.get('*', async (req, res, next) => {
-        if (routes.indexOf(req.path) >= 0) return;
-
-        next();
-    }, async (req, res) => {
-        res.status(404).render('404', {
-            layout: '2',
-            _url: '/404',
-            users: res.locals.session.users || false
+            next();
+        }, async (req, res) => {
+            res.status(404).render('404', {
+                layout: '2',
+                _url: '/404',
+                users: res.locals.session.users || false
+            });
         });
     });
 });
@@ -204,24 +211,4 @@ client.get('/sign-out', async (req, res, next) => {
     });
 
     res.redirect('/sign-in');
-});
-
-// /- 404 -/
-
-client.get('/404', async (req, res) => {
-    res.status(404).render('404', {
-        layout: '2',
-        _url: '/404',
-        users: res.locals.session.users || false
-    });
-});
-
-// /- * -/
-
-client.get('*', async (req, res) => {
-    res.status(404).render('404', {
-        layout: '2',
-        _url: '/404',
-        users: res.locals.session.users || false
-    });
 });

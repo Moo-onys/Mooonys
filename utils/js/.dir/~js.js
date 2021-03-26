@@ -1151,6 +1151,63 @@ function initAlertEvent(element) {
 		}
 	}
 }());
+// File#: _1_btn-slide-fx
+// Usage: codyhouse.co/license
+(function() {
+  var BtnSlideFx = function(element) {
+		this.element = element;
+    this.hover = false; 
+		btnSlideFxEvents(this);
+	};
+
+  function btnSlideFxEvents(btn) {
+    btn.element.addEventListener('mouseenter', function(event){ // detect mouse hover
+      btn.hover = true;
+      triggerBtnSlideFxAnimation(btn.element, 'from');
+    });
+    btn.element.addEventListener('mouseleave', function(event){ // detect mouse leave
+      btn.hover = false;
+      triggerBtnSlideFxAnimation(btn.element, 'to');
+    });
+    btn.element.addEventListener('transitionend', function(event){ // reset btn classes at the end of enter/leave animation
+      resetBtnSlideFxAnimation(btn.element);
+    });
+  };
+
+  function getEnterDirection(element, event) { // return mouse movement direction
+    var deltaLeft = Math.abs(element.getBoundingClientRect().left - event.clientX),
+      deltaRight = Math.abs(element.getBoundingClientRect().right - event.clientX),
+      deltaTop = Math.abs(element.getBoundingClientRect().top - event.clientY),
+      deltaBottom = Math.abs(element.getBoundingClientRect().bottom - event.clientY);
+    var deltaXDir = (deltaLeft < deltaRight) ? 'left' : 'right',
+      deltaX = (deltaLeft < deltaRight) ? deltaLeft : deltaRight,
+      deltaYDir = (deltaTop < deltaBottom) ? 'top' : 'bottom',
+      deltaY = (deltaTop < deltaBottom) ? deltaTop : deltaBottom;
+    return (deltaX < deltaY) ? deltaXDir : deltaYDir;
+  };
+  
+  function triggerBtnSlideFxAnimation(element, direction) { // trigger animation -> apply in/out and direction classes
+    var inStep = (direction == 'from') ? '-out' : '',
+      outStep = (direction == 'from') ? '' : '-out';
+    Util.removeClass(element, 'btn-slide-fx-hover'+inStep);
+    resetBtnSlideFxAnimation(element);
+    Util.addClass(element, 'btn--slide-fx-'+direction+'-'+getEnterDirection(element, event)); // set direction 
+    setTimeout(function(){Util.addClass(element, 'btn-slide-fx-animate');}, 5); // add transition
+    setTimeout(function(){Util.addClass(element, 'btn-slide-fx-hover'+outStep);}, 10); // trigger transition
+  };
+
+  function resetBtnSlideFxAnimation(element) { // remove animation classes
+    Util.removeClass(element, 'btn--slide-fx-from-left btn--slide-fx-from-right btn--slide-fx-from-bottom btn--slide-fx-from-top btn--slide-fx-to-left btn--slide-fx-to-right btn--slide-fx-to-bottom btn--slide-fx-to-top btn-slide-fx-animate');
+  };
+
+	//initialize the BtnSlideFx objects
+	var btnSlideFx = document.getElementsByClassName('js-btn--slide-fx');
+	if( btnSlideFx.length > 0 ) {
+		for( var i = 0; i < btnSlideFx.length; i++) {
+      (function(i){new BtnSlideFx(btnSlideFx[i]);})(i);
+		}
+  }
+}());
 // File#: _1_chameleonic-header
 // Usage: codyhouse.co/license
 (function() {
@@ -1339,6 +1396,138 @@ function initAlertEvent(element) {
 	if( characterCounts.length > 0 ) {
 		for( var i = 0; i < characterCounts.length; i++) {
 			(function(i){new CharacterCount(characterCounts[i]);})(i);
+		}
+	};
+}());
+// File#: _1_choice-accordion
+// Usage: codyhouse.co/license
+(function() {
+  var ChoiceAccordion = function(element) {
+    this.element = element;
+    this.btns = this.element.getElementsByClassName('js-choice-accordion__btn');
+    this.inputs = getChoiceInput(this);
+    this.contents = getChoiceContent(this);
+    this.isRadio = this.inputs[0].type == 'radio';
+    this.animateHeight = (this.element.getAttribute('data-animation') == 'on');
+    initAccordion(this);
+    resetCheckedStatus(this, false); // set initial classes
+    initChoiceAccordionEvent(this); // add listeners
+  };
+
+  function getChoiceInput(element) { // store input elements in an object property
+    var inputs = [],
+      fallbacks = element.element.getElementsByClassName('js-choice-accordion__fallback');
+    for(var i = 0; i < fallbacks.length; i++) {
+      inputs.push(fallbacks[i].getElementsByTagName('input')[0]);
+    }
+    return inputs;
+  }
+
+  function getChoiceContent(element) { // store content elements in an object property
+    var contents = [];
+    for(var i = 0; i < element.btns.length; i++) {
+      var content = Util.getChildrenByClassName(element.btns[i].parentNode, 'js-choice-accordion__panel');
+      if(content.length > 0 ) contents.push(content[0]);
+      else  contents.push(false);
+    }
+    return contents;
+  }
+
+  function initAccordion(element) { //set initial aria attributes
+		for( var i = 0; i < element.inputs.length; i++) {
+      if(!element.contents[i]) return; // no content to trigger
+      var isOpen = element.inputs[i].checked,
+        id = element.inputs[i].getAttribute('id');
+      if(!id) id = 'choice-accordion-header-'+i;
+      
+      Util.setAttributes(element.inputs[i], {'aria-expanded': isOpen, 'aria-controls': 'choice-accordion-content-'+i, 'id': id});
+      Util.setAttributes(element.contents[i], {'aria-labelledby': id, 'id': 'choice-accordion-content-'+i});
+      Util.toggleClass(element.contents[i], 'is-hidden', !isOpen);
+		}
+  };
+
+  function initChoiceAccordionEvent(choiceAcc) {
+    choiceAcc.element.addEventListener('click', function(event){ // update status on click
+      if(Util.getIndexInArray(choiceAcc.inputs, event.target) > -1) return; // triggered by change in input element -> will be detected by the 'change' event
+
+      var selectedBtn = event.target.closest('.js-choice-accordion__btn');
+      if(!selectedBtn) return;
+      
+      var index = Util.getIndexInArray(choiceAcc.btns, selectedBtn);
+      if(choiceAcc.isRadio && choiceAcc.inputs[index].checked) { // radio input already checked
+        choiceAcc.inputs[index].focus(); // move focus to input element
+        return; 
+      }
+
+      choiceAcc.inputs[index].checked = !choiceAcc.inputs[index].checked;
+      choiceAcc.inputs[index].dispatchEvent(new CustomEvent('change')); // trigger change event
+      choiceAcc.inputs[index].focus(); // move focus to input element
+    });
+
+    for(var i = 0; i < choiceAcc.btns.length; i++) {(function(i){ // change + focus events
+      choiceAcc.inputs[i].addEventListener('change', function(event){
+        choiceAcc.isRadio ? resetCheckedStatus(choiceAcc, true) : resetSingleStatus(choiceAcc, i, true);
+      });
+
+      choiceAcc.inputs[i].addEventListener('focus', function(event){
+        resetFocusStatus(choiceAcc, i, true);
+      });
+
+      choiceAcc.inputs[i].addEventListener('blur', function(event){
+        resetFocusStatus(choiceAcc, i, false);
+      });
+    })(i);}
+  };
+
+  function resetCheckedStatus(choiceAcc, bool) {
+    for(var i = 0; i < choiceAcc.btns.length; i++) {
+      resetSingleStatus(choiceAcc, i, bool);
+    }
+  };
+
+  function resetSingleStatus(choiceAcc, index, bool) { // toggle .choice-accordion__btn--checked class
+    Util.toggleClass(choiceAcc.btns[index], 'choice-accordion__btn--checked', choiceAcc.inputs[index].checked);
+    if(bool) resetSingleContent(choiceAcc, index, choiceAcc.inputs[index].checked); // no need to run this when component is initialized
+  };
+
+  function resetFocusStatus(choiceAcc, index, bool) { // toggle .choice-accordion__btn--focus class
+    Util.toggleClass(choiceAcc.btns[index], 'choice-accordion__btn--focus', bool);
+  };
+
+  function resetSingleContent(choiceAcc, index, bool) { // show accordion content
+    var input = choiceAcc.inputs[index],
+      content = choiceAcc.contents[index];
+
+		if(bool && content) Util.removeClass(content, 'is-hidden');
+		input.setAttribute('aria-expanded', bool);
+
+		if(choiceAcc.animateHeight && content) {
+			//store initial and final height - animate accordion content height
+			var initHeight = !bool ? content.offsetHeight: 0,
+				finalHeight = !bool ? 0 : content.offsetHeight;
+    }
+
+		if(window.requestAnimationFrame && choiceAcc.animateHeight && !reducedMotion && content) {
+			Util.setHeight(initHeight, finalHeight, content, 200, function(){
+				resetContentVisibility(content, bool);
+			});
+		} else {
+			resetContentVisibility(content, bool);
+		}
+  };
+
+	function resetContentVisibility(content, bool) {
+    if(!content) return;
+		Util.toggleClass(content, 'is-hidden', !bool);
+		content.removeAttribute("style");
+	};
+
+  //initialize the ChoiceAccordions objects
+  var choiceAccordion = document.getElementsByClassName('js-choice-accordion'),
+    reducedMotion = Util.osHasReducedMotion();
+	if( choiceAccordion.length > 0 ) {
+		for( var i = 0; i < choiceAccordion.length; i++) {
+			(function(i){new ChoiceAccordion(choiceAccordion[i]);})(i);
 		}
 	};
 }());
@@ -2355,6 +2544,128 @@ function initAlertEvent(element) {
     		initial = (countUp[i].getAttribute('data-countup-start')) ? countUp[i].getAttribute('data-countup-start') : 0;
     	new CountUp({element: countUp[i], separator : separator, duration: duration, decimal: decimal, initial: initial});
     })(i);}
+  }
+}());
+// File#: _1_cross-table
+// Usage: codyhouse.co/license
+(function() {
+  var CrossTables = function(element) {
+    this.element = element;
+    this.header = this.element.getElementsByClassName('js-cross-table__header')[0];
+    this.body = this.element.getElementsByClassName('js-cross-table__body')[0];
+    this.headerItems = this.header.getElementsByClassName('cross-table__cell');
+    this.rows = this.body.getElementsByClassName('cross-table__row');
+    this.rowSections = this.element.getElementsByClassName('js-cross-table__row--w-full');
+    this.singleLayoutClass = 'cross-table--cards';
+    initCrossTable(this);
+  };
+
+  function initCrossTable(table) {
+    // create additional table content + set proper roles
+    setTableRoles(table);
+    addTableContent(table);
+
+    // custom event emitted when window is resized
+    table.element.addEventListener('update-cross-table', function(event){
+      checkTableLayour(table);
+    });
+  };
+
+  function checkTableLayour(table) {
+    var layout = getComputedStyle(table.element, ':before').getPropertyValue('content').replace(/\'|"/g, '');
+    Util.toggleClass(table.element, table.singleLayoutClass, layout != 'expanded'); // reset table class
+    resetTableLayout(table, layout); // reset table style
+  };
+
+  function resetTableLayout(table, layout) {
+    // reset style based on layout state
+    if(table.rowSections.length == 0) return;
+    if(layout == 'expanded') {
+      table.body.removeAttribute('style');
+      for(var i = 0; i < table.rowSections.length; i++) {
+        table.rowSections[i].removeAttribute('style'); 
+      }
+    } else {
+      table.body.setAttribute('style', 'padding-top:'+table.rowSections[0].offsetHeight+'px');
+      for(var i = 0; i < table.rowSections.length; i++) {
+        table.rowSections[i].setAttribute('style', 'left:'+table.rowSections[i].nextElementSibling.offsetLeft+'px');
+      }
+    }
+  };
+
+  function setTableRoles(table) {
+    // table
+    table.element.setAttribute('role', 'table');
+    // body and header
+    table.header.setAttribute('role', 'rowgroup');
+    table.body.setAttribute('role', 'rowgroup');
+    // tr, th, td
+    var trElements = table.element.getElementsByTagName('tr');
+    for(var i=0; i < trElements.length; i++) {
+      trElements[i].setAttribute('role', 'row');
+    }
+    var thElements = table.element.getElementsByTagName('th');
+    for(var i=0; i < thElements.length; i++) {
+      thElements[i].setAttribute('role', 'rowheader');
+    }
+    var tdElements = table.element.getElementsByTagName('td');
+    for(var i=0; i < tdElements.length; i++) {
+      tdElements[i].setAttribute('role', 'cell');
+    }
+  };
+
+  function addTableContent(table) {
+    // store header labels
+    var headerLables = [];
+    for(var i = 0; i < table.headerItems.length; i++) {
+      var headerLabelEl = table.headerItems[i].getElementsByClassName('js-cross-table__label'),
+        headerLabel = (headerLabelEl.length > 0 ) ? headerLabelEl[0].innerHTML : table.headerItems[i].innerHTML;
+      headerLables.push(headerLabel);
+    }
+    // insert label inside each cell - viible in crads layout only
+    for(var i = 0; i < table.rows.length; i++) {
+      if( !Util.hasClass(table.rows[i], 'js-cross-table__row--w-full') ) {
+        var cells = table.rows[i].children;
+        for(var j = 1; j < headerLables.length; j++) {
+          if(cells[j]) {
+            cells[j].innerHTML = '<span aria-hidden="true" class="cross-table__label">'+headerLables[j]+':</span> <span>'+cells[j].innerHTML+'</span>';
+          }
+        }
+      }
+    }
+  };
+
+  var crossTables = document.getElementsByClassName('js-cross-table');
+  if( crossTables.length > 0 ) {
+    var j = 0,
+    crossTablesArray = [];
+    for( var i = 0; i < crossTables.length; i++) {
+      var beforeContent = getComputedStyle(crossTables[i], ':before').getPropertyValue('content');
+      if(beforeContent && beforeContent !='' && beforeContent !='none') {
+        (function(i){ crossTablesArray.push(new CrossTables(crossTables[i]));})(i);
+        j = j + 1;
+      }
+    }
+
+    if(j > 0) {
+      var resizingId = false,
+        customEvent = new CustomEvent('update-cross-table');
+      // reset table layout on resize
+      window.addEventListener('resize', function(event){
+        clearTimeout(resizingId);
+        resizingId = setTimeout(doneResizing, 300);
+      });
+
+      function doneResizing() {
+        for( var i = 0; i < crossTablesArray.length; i++) {
+          (function(i){crossTablesArray[i].element.dispatchEvent(customEvent)})(i);
+        };
+      };
+
+      (window.requestAnimationFrame) // init table layout
+        ? window.requestAnimationFrame(doneResizing)
+        : doneResizing();
+    }
   }
 }());
 // File#: _1_custom-select
@@ -5140,6 +5451,294 @@ function initContactMap(wrapper) {
     for( var i = 0; i < immerseSections.length; i++) Util.addClass(immerseSections[i], 'immerse-section-tr--disabled');
   }
 }());
+// File#: _1_infinite-scroll
+// Usage: codyhouse.co/license
+(function() {
+  var InfiniteScroll = function(opts) {
+    this.options = Util.extend(InfiniteScroll.defaults, opts);
+    this.element = this.options.element;
+    this.loader = document.getElementsByClassName('js-infinite-scroll__loader');
+    this.loadBtn = document.getElementsByClassName('js-infinite-scroll__btn');
+    this.loading = false;
+    this.currentPageIndex = this.element.getAttribute('data-current-page') ? parseInt(this.element.getAttribute('data-current-page')) : 0;
+    this.index = this.currentPageIndex;
+    initLoad(this);
+  };
+
+  function initLoad(infiniteScroll) {
+    setPathValues(infiniteScroll); // get dynamic content paths
+
+    getTresholdPixel(infiniteScroll);
+    
+    if(infiniteScroll.options.container) { // get container of dynamic content
+      infiniteScroll.container = infiniteScroll.element.querySelector(infiniteScroll.options.container);
+    }
+    
+    if((!infiniteScroll.options.loadBtn || infiniteScroll.options.loadBtnDelay) && infiniteScroll.loadBtn.length > 0) { // hide load more btn
+      Util.addClass(infiniteScroll.loadBtn[0], 'sr-only');
+    }
+
+    if(!infiniteScroll.options.loadBtn || infiniteScroll.options.loadBtnDelay) {
+      if(intersectionObserverSupported) { // check element scrolling
+        initObserver(infiniteScroll);
+      } else {
+        infiniteScroll.scrollEvent = handleEvent.bind(infiniteScroll);
+        window.addEventListener('scroll', infiniteScroll.scrollEvent);
+      }
+    }
+    
+    initBtnEvents(infiniteScroll); // listen for click on load Btn
+    
+    if(!infiniteScroll.options.path) { // content has been loaded using a custom function
+      infiniteScroll.element.addEventListener('loaded-new', function(event){
+        contentWasLoaded(infiniteScroll, event.detail.path, event.detail.checkNext); // reset element
+        // emit 'content-loaded' event -> this could be useful when new content needs to be initialized
+      infiniteScroll.element.dispatchEvent(new CustomEvent('content-loaded', {detail: event.detail.path}));
+      });
+    }
+  };
+
+  function setPathValues(infiniteScroll) { // path can be strin or comma-separated list
+    if(!infiniteScroll.options.path) return;
+    var split = infiniteScroll.options.path.split(',');
+    if(split.length > 1) {
+      infiniteScroll.options.path = [];
+      for(var i = 0; i < split.length; i++) infiniteScroll.options.path.push(split[i].trim());
+    }
+  };
+
+  function getTresholdPixel(infiniteScroll) { // get the threshold value in pixels - will be used only if intersection observer is not supported
+    infiniteScroll.thresholdPixel = infiniteScroll.options.threshold.indexOf('px') > -1 ? parseInt(infiniteScroll.options.threshold.replace('px', '')) : parseInt(window.innerHeight*parseInt(infiniteScroll.options.threshold.replace('%', ''))/100);
+  };
+
+  function initObserver(infiniteScroll) { // intersection observer supported
+    // append an element to the bottom of the container that will be observed
+    var observed = document.createElement("div");
+    Util.setAttributes(observed, {'aria-hidden': 'true', 'class': 'js-infinite-scroll__observed', 'style': 'width: 100%; height: 1px; margin-top: -1px; visibility: hidden;'});
+    infiniteScroll.element.appendChild(observed);
+
+    infiniteScroll.observed = infiniteScroll.element.getElementsByClassName('js-infinite-scroll__observed')[0];
+
+    var config = {rootMargin: '0px 0px '+infiniteScroll.options.threshold+' 0px'};
+    infiniteScroll.observer = new IntersectionObserver(observerLoadContent.bind(infiniteScroll), config);
+    infiniteScroll.observer.observe(infiniteScroll.observed);
+  };
+
+  function observerLoadContent(entry) { 
+    if(this.loading) return;
+    if(entry[0].intersectionRatio > 0) loadMore(this);
+  };
+
+  function handleEvent(event) { // handle click/scroll events
+    switch(event.type) {
+      case 'click': {
+        initClick(this, event); // click on load more button
+        break;
+      }
+      case 'scroll': { // triggered only if intersection onserver is not supported
+        initScroll(this);
+        break;
+      }
+    }
+  };
+
+  function initScroll(infiniteScroll) { // listen to scroll event (only if intersectionObserver is not supported)
+    (!window.requestAnimationFrame) ? setTimeout(checkLoad.bind(infiniteScroll)) : window.requestAnimationFrame(checkLoad.bind(infiniteScroll));
+  };
+
+  function initBtnEvents(infiniteScroll) { // load more button events - click + focus (for keyboard accessibility)
+    if(infiniteScroll.loadBtn.length == 0) return;
+    infiniteScroll.clickEvent = handleEvent.bind(infiniteScroll);
+    infiniteScroll.loadBtn[0].addEventListener('click', infiniteScroll.clickEvent);
+    
+    if(infiniteScroll.options.loadBtn && !infiniteScroll.options.loadBtnDelay) {
+      Util.removeClass(infiniteScroll.loadBtn[0], 'sr-only');
+      if(infiniteScroll.loader.length > 0 ) Util.addClass(infiniteScroll.loader[0], 'is-hidden');
+    }
+
+    // toggle class sr-only if link is in focus/loses focus
+    infiniteScroll.loadBtn[0].addEventListener('focusin', function(){
+      if(Util.hasClass(infiniteScroll.loadBtn[0], 'sr-only')) {
+        Util.addClass(infiniteScroll.loadBtn[0], 'js-infinite-scroll__btn-focus');
+        Util.removeClass(infiniteScroll.loadBtn[0], 'sr-only');
+      }
+    });
+    infiniteScroll.loadBtn[0].addEventListener('focusout', function(){
+      if(Util.hasClass(infiniteScroll.loadBtn[0], 'js-infinite-scroll__btn-focus')) {
+        Util.removeClass(infiniteScroll.loadBtn[0], 'js-infinite-scroll__btn-focus');
+        Util.addClass(infiniteScroll.loadBtn[0], 'sr-only');
+      }
+    });
+  };
+
+  function initClick(infiniteScroll, event) { // click on 'Load More' button
+    event.preventDefault();
+    Util.addClass(infiniteScroll.loadBtn[0], 'sr-only');
+    loadMore(infiniteScroll);
+  };
+
+  function checkLoad() { // while scrolling -> check if we need to load new content (only if intersectionObserver is not supported)
+    if(this.loading) return;
+    if(!needLoad(this)) return;
+    loadMore(this);
+  };
+
+  function loadMore(infiniteScroll) { // new conten needs to be loaded
+    infiniteScroll.loading = true;
+    if(infiniteScroll.loader.length > 0) Util.removeClass(infiniteScroll.loader[0], 'is-hidden');
+    var moveFocus = false;
+    if(infiniteScroll.loadBtn.length > 0 ) moveFocus = Util.hasClass(infiniteScroll.loadBtn[0], 'js-infinite-scroll__btn-focus');
+    // check if need to add content or user has custom load function
+    if(infiniteScroll.options.path) {
+      contentBasicLoad(infiniteScroll, moveFocus); // load content
+    } else {
+      emitCustomEvents(infiniteScroll, 'load-new', moveFocus); // user takes care of loading content
+    }
+  };
+
+  function contentBasicLoad(infiniteScroll, moveFocus) {
+    var filePath = getFilePath(infiniteScroll);
+    // load file content
+    getNewContent(filePath, function(content){
+      var checkNext = insertNewContent(infiniteScroll, content, moveFocus);
+      contentWasLoaded(infiniteScroll, filePath, checkNextPageAvailable(infiniteScroll, checkNext));
+      // emit 'content-loaded' event -> this could be useful when new content needs to be initialized
+      infiniteScroll.element.dispatchEvent(new CustomEvent('content-loaded', {detail: filePath}));
+    });
+  };
+
+  function getFilePath(infiniteScroll) { // get path of the file to load
+    return (Array.isArray(infiniteScroll.options.path)) 
+      ? infiniteScroll.options.path[infiniteScroll.index]
+      : infiniteScroll.options.path.replace('{n}', infiniteScroll.index+1);
+  };
+
+  function getNewContent(path, cb) {
+    var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function() {
+      if (this.readyState == 4 && this.status == 200) cb(this.responseText);
+    };
+    xhttp.open("GET", path, true);
+    xhttp.send();
+  };
+
+  function insertNewContent(infiniteScroll, content, moveFocus) {
+    var next = false;
+    if(infiniteScroll.options.container) {
+      var div = document.createElement("div");
+      div.innerHTML = content;
+      var wrapper = div.querySelector(infiniteScroll.options.container);
+      if(wrapper) {
+        content = wrapper.innerHTML;
+        next = wrapper.getAttribute('data-path');
+      }
+    }
+    var lastItem = false;
+    if(moveFocus) lastItem = getLastChild(infiniteScroll);
+    if(infiniteScroll.container) {
+      infiniteScroll.container.insertAdjacentHTML('beforeend', content);
+    } else {
+      (infiniteScroll.loader.length > 0) 
+        ? infiniteScroll.loader[0].insertAdjacentHTML('beforebegin', content)
+        : infiniteScroll.element.insertAdjacentHTML('beforeend', content);
+    }
+    if(moveFocus && lastItem) Util.moveFocus(lastItem);
+
+    return next;
+  };
+
+  function getLastChild(infiniteScroll) {
+    if(infiniteScroll.container) return infiniteScroll.container.lastElementChild;
+    if(infiniteScroll.loader.length > 0) return infiniteScroll.loader[0].previousElementSibling;
+    return infiniteScroll.element.lastElementChild;
+  };
+
+  function checkNextPageAvailable(infiniteScroll, checkNext) { // check if there's still content to be loaded
+    if(Array.isArray(infiniteScroll.options.path)) {
+      return infiniteScroll.options.path.length > infiniteScroll.index + 1;
+    }
+    return checkNext;
+  };
+
+  function contentWasLoaded(infiniteScroll, url, checkNext) { // new content has been loaded - reset status 
+    if(infiniteScroll.loader.length > 0) Util.addClass(infiniteScroll.loader[0], 'is-hidden'); // hide loader
+    
+    if(infiniteScroll.options.updateHistory && url) { // update browser history
+      var pageArray = location.pathname.split('/'),
+        actualPage = pageArray[pageArray.length - 1] ;
+      if( actualPage != url && history.pushState ) window.history.replaceState({path: url},'',url);
+    }
+    
+    if(!checkNext) { // no need to load additional pages - remove scroll listening and/or click listening
+      removeScrollEvents(infiniteScroll);
+      if(infiniteScroll.clickEvent) {
+        infiniteScroll.loadBtn[0].removeEventListener('click', infiniteScroll.clickEvent);
+        Util.addClass(infiniteScroll.loadBtn[0], 'is-hidden');
+        Util.removeClass(infiniteScroll.loadBtn[0], 'sr-only');
+      }
+    }
+    
+    if(checkNext && infiniteScroll.options.loadBtn) { // check if we need to switch from scrolling to click -> add/remove proper listener
+      if(!infiniteScroll.options.loadBtnDelay) {
+        Util.removeClass(infiniteScroll.loadBtn[0], 'sr-only');
+      } else if(infiniteScroll.index - infiniteScroll.currentPageIndex + 1 >= infiniteScroll.options.loadBtnDelay && infiniteScroll.loadBtn.length > 0) {
+        removeScrollEvents(infiniteScroll);
+        Util.removeClass(infiniteScroll.loadBtn[0], 'sr-only');
+      }
+    }
+
+    if(checkNext && infiniteScroll.loadBtn.length > 0 && Util.hasClass(infiniteScroll.loadBtn[0], 'js-infinite-scroll__btn-focus')) { // keyboard accessibility
+      Util.removeClass(infiniteScroll.loadBtn[0], 'sr-only');
+    }
+
+    infiniteScroll.index = infiniteScroll.index + 1;
+    infiniteScroll.loading = false;
+  };
+
+  function removeScrollEvents(infiniteScroll) {
+    if(infiniteScroll.scrollEvent) window.removeEventListener('scroll', infiniteScroll.scrollEvent);
+    if(infiniteScroll.observer) infiniteScroll.observer.unobserve(infiniteScroll.observed);
+  };
+
+  function needLoad(infiniteScroll) { // intersectionObserverSupported not supported -> check if threshold has been reached
+    return infiniteScroll.element.getBoundingClientRect().bottom - window.innerHeight <= infiniteScroll.thresholdPixel;
+  };
+
+  function emitCustomEvents(infiniteScroll, eventName, moveFocus) { // applicable when user takes care of loading new content
+		var event = new CustomEvent(eventName, {detail: {index: infiniteScroll.index+1, moveFocus: moveFocus}});
+		infiniteScroll.element.dispatchEvent(event);
+	};
+
+  InfiniteScroll.defaults = {
+    element : '',
+    path : false, // path of files to be loaded: set to comma-separated list or string (should include {n} to be replaced by integer index). If not set, user will take care of loading new content
+    container: false, // Append new content to this element. Additionally, when loaded a new page, only content of the element will be appended
+    threshold: '200px', // distance between viewport and scroll area for loading new content
+    updateHistory: false, // push new url to browser history
+    loadBtn: false, // use a button to load more content
+    loadBtnDelay: false // set to an integer if you want the load more button to be visible only after a number of loads on scroll - loadBtn needs to be 'on'
+  };
+
+  window.InfiniteScroll = InfiniteScroll;
+
+  //initialize the InfiniteScroll objects
+  var infiniteScroll = document.getElementsByClassName('js-infinite-scroll'),
+    intersectionObserverSupported = ('IntersectionObserver' in window && 'IntersectionObserverEntry' in window && 'intersectionRatio' in window.IntersectionObserverEntry.prototype);
+
+  if( infiniteScroll.length > 0) {
+    for( var i = 0; i < infiniteScroll.length; i++) {
+      (function(i){
+        var path = infiniteScroll[i].getAttribute('data-path') ? infiniteScroll[i].getAttribute('data-path') : false,
+        container = infiniteScroll[i].getAttribute('data-container') ? infiniteScroll[i].getAttribute('data-container') : false,
+        updateHistory = ( infiniteScroll[i].getAttribute('data-history') && infiniteScroll[i].getAttribute('data-history') == 'on') ? true : false,
+        loadBtn = ( infiniteScroll[i].getAttribute('data-load-btn') && infiniteScroll[i].getAttribute('data-load-btn') == 'on') ? true : false,
+        loadBtnDelay = infiniteScroll[i].getAttribute('data-load-btn-delay') ? infiniteScroll[i].getAttribute('data-load-btn-delay') : false,
+        threshold = infiniteScroll[i].getAttribute('data-threshold') ? infiniteScroll[i].getAttribute('data-threshold') : '200px';
+        new InfiniteScroll({element: infiniteScroll[i], path : path, container : container, updateHistory: updateHistory, loadBtn: loadBtn, loadBtnDelay: loadBtnDelay, threshold: threshold});
+      })(i);
+    }
+  };
+}());
 // File#: _1_language-picker
 // Usage: codyhouse.co/license
 (function () {
@@ -5722,6 +6321,172 @@ function initContactMap(wrapper) {
 		}
 	};
 }());
+// File#: _1_masonry
+// Usage: codyhouse.co/license
+
+(function() {
+  var Masonry = function(element) {
+    this.element = element;
+    this.list = this.element.getElementsByClassName('js-masonry__list')[0];
+    this.items = this.element.getElementsByClassName('js-masonry__item');
+    this.activeColumns = 0;
+    this.colStartWidth = 0; // col min-width (defined in CSS using --masonry-col-auto-size variable)
+    this.colWidth = 0; // effective column width
+    this.colGap = 0;
+    // store col heights and items
+    this.colHeights = [];
+    this.colItems = [];
+    // flex full support
+    this.flexSupported = checkFlexSupported(this.items[0]);
+    getGridLayout(this); // get initial grid params
+    setGridLayout(this); // set grid params (width of elements)
+    initMasonryLayout(this); // init gallery layout
+  };
+
+  function checkFlexSupported(item) {
+    var itemStyle = window.getComputedStyle(item);
+    return itemStyle.getPropertyValue('flex-basis') != 'auto';
+  };
+
+  function getGridLayout(grid) { // this is used to get initial grid details (width/grid gap)
+    var itemStyle = window.getComputedStyle(grid.items[0]);
+    if( grid.colStartWidth == 0) {
+      grid.colStartWidth = parseFloat(itemStyle.getPropertyValue('width'));
+    }
+    grid.colGap = parseFloat(itemStyle.getPropertyValue('margin-right'));
+  };
+
+  function setGridLayout(grid) { // set width of items in the grid
+    var containerWidth = parseFloat(window.getComputedStyle(grid.element).getPropertyValue('width'));
+    grid.activeColumns = parseInt((containerWidth + grid.colGap)/(grid.colStartWidth+grid.colGap));
+    if(grid.activeColumns == 0) grid.activeColumns = 1;
+    grid.colWidth = parseFloat((containerWidth - (grid.activeColumns - 1)*grid.colGap)/grid.activeColumns);
+    for(var i = 0; i < grid.items.length; i++) {
+      grid.items[i].style.width = grid.colWidth+'px'; // reset items width
+    }
+  };
+
+  function initMasonryLayout(grid) {
+    if(grid.flexSupported) {
+      checkImgLoaded(grid); // reset layout when images are loaded
+    } else {
+      Util.addClass(grid.element, 'masonry--loaded'); // make sure the gallery is visible
+    }
+
+    grid.element.addEventListener('masonry-resize', function(){ // window has been resized -> reset masonry layout
+      getGridLayout(grid);
+      setGridLayout(grid);
+      if(grid.flexSupported) layItems(grid); 
+    });
+
+    grid.element.addEventListener('masonry-reset', function(event){ // reset layout (e.g., new items added to the gallery)
+      if(grid.flexSupported) checkImgLoaded(grid); 
+    });
+  };
+
+  function layItems(grid) {
+    Util.addClass(grid.element, 'masonry--loaded'); // make sure the gallery is visible
+    grid.colHeights = [];
+    grid.colItems = [];
+
+    // grid layout has already been set -> update container height and order of items
+    for(var j = 0; j < grid.activeColumns; j++) {
+      grid.colHeights.push(0); // reset col heights
+      grid.colItems[j] = []; // reset items order
+    }
+    
+    for(var i = 0; i < grid.items.length; i++) {
+      var minHeight = Math.min.apply( Math, grid.colHeights ),
+        index = grid.colHeights.indexOf(minHeight);
+      if(grid.colItems[index]) grid.colItems[index].push(i);
+      grid.items[i].style.flexBasis = 0; // reset flex basis before getting height
+      var itemHeight = grid.items[i].getBoundingClientRect().height || grid.items[i].offsetHeight || 1;
+      grid.colHeights[index] = grid.colHeights[index] + grid.colGap + itemHeight;
+    }
+
+    // reset height of container
+    var masonryHeight = Math.max.apply( Math, grid.colHeights ) + 5;
+    grid.list.style.cssText = 'height: '+ masonryHeight + 'px;';
+
+    // go through elements and set flex order
+    var order = 0;
+    for(var i = 0; i < grid.colItems.length; i++) {
+      for(var j = 0; j < grid.colItems[i].length; j++) {
+        grid.items[grid.colItems[i][j]].style.order = order;
+        order = order + 1;
+      }
+      // change flex-basis of last element of each column, so that next element shifts to next col
+      var lastItemCol = grid.items[grid.colItems[i][grid.colItems[i].length - 1]];
+      lastItemCol.style.flexBasis = masonryHeight - grid.colHeights[i] + lastItemCol.getBoundingClientRect().height - 5 + 'px';
+    }
+
+    // emit custom event when grid has been reset
+    grid.element.dispatchEvent(new CustomEvent('masonry-laid'));
+  };
+
+  function checkImgLoaded(grid) {
+    var imgs = grid.list.getElementsByTagName('img');
+
+    function countLoaded() {
+      var setTimeoutOn = false;
+      for(var i = 0; i < imgs.length; i++) {
+        if(!imgs[i].complete) {
+          setTimeoutOn = true;
+          break;
+        } else if (typeof imgs[i].naturalHeight !== "undefined" && imgs[i].naturalHeight == 0) {
+          setTimeoutOn = true;
+          break;
+        }
+      }
+
+      if(!setTimeoutOn) {
+        layItems(grid);
+      } else {
+        setTimeout(function(){
+          countLoaded();
+        }, 100);
+      }
+    };
+
+    if(imgs.length == 0) {
+      layItems(grid); // no need to wait -> no img available
+    } else {
+      countLoaded();
+    }
+  };
+
+  //initialize the Masonry objects
+  var masonries = document.getElementsByClassName('js-masonry'), 
+    flexSupported = Util.cssSupports('flex-basis', 'auto'),
+    masonriesArray = [];
+
+  if( masonries.length > 0) {
+    for( var i = 0; i < masonries.length; i++) {
+      if(!flexSupported) {
+        Util.addClass(masonries[i], 'masonry--loaded'); // reveal gallery
+      } else {
+        (function(i){masonriesArray.push(new Masonry(masonries[i]));})(i); // init Masonry Layout
+      }
+    }
+
+    if(!flexSupported) return;
+
+    // listen to window resize -> reorganize items in gallery
+    var resizingId = false,
+      customEvent = new CustomEvent('masonry-resize');
+      
+    window.addEventListener('resize', function() {
+      clearTimeout(resizingId);
+      resizingId = setTimeout(doneResizing, 500);
+    });
+
+    function doneResizing() {
+      for( var i = 0; i < masonriesArray.length; i++) {
+        (function(i){masonriesArray[i].element.dispatchEvent(customEvent)})(i);
+      };
+    };
+  };
+}());
 // File#: _1_menu
 // Usage: codyhouse.co/license
 (function () {
@@ -6294,6 +7059,172 @@ function initContactMap(wrapper) {
 		}
 	}
 }());
+// File#: _1_off-canvas-content
+// Usage: codyhouse.co/license
+(function() {
+	var OffCanvas = function(element) {
+		this.element = element;
+		this.wrapper = document.getElementsByClassName('js-off-canvas')[0];
+		this.main = document.getElementsByClassName('off-canvas__main')[0];
+		this.triggers = document.querySelectorAll('[aria-controls="'+this.element.getAttribute('id')+'"]');
+		this.closeBtn = this.element.getElementsByClassName('js-off-canvas__close-btn');
+		this.selectedTrigger = false;
+		this.firstFocusable = null;
+		this.lastFocusable = null;
+		this.animating = false;
+		initOffCanvas(this);
+	};	
+
+	function initOffCanvas(panel) {
+		panel.element.setAttribute('aria-hidden', 'true');
+		for(var i = 0 ; i < panel.triggers.length; i++) { // listen to the click on off-canvas content triggers
+			panel.triggers[i].addEventListener('click', function(event){
+				panel.selectedTrigger = event.currentTarget;
+				event.preventDefault();
+				togglePanel(panel);
+			});
+		}
+
+		// listen to the triggerOpenPanel event -> open panel without a trigger button
+		panel.element.addEventListener('triggerOpenPanel', function(event){
+			if(event.detail) panel.selectedTrigger = event.detail;
+			openPanel(panel);
+		});
+		// listen to the triggerClosePanel event -> open panel without a trigger button
+		panel.element.addEventListener('triggerClosePanel', function(event){
+			closePanel(panel);
+		});
+	};
+
+	function togglePanel(panel) {
+		var status = (panel.element.getAttribute('aria-hidden') == 'true') ? 'close' : 'open';
+		if(status == 'close') openPanel(panel);
+		else closePanel(panel);
+	};
+
+	function openPanel(panel) {
+		if(panel.animating) return; // already animating
+		emitPanelEvents(panel, 'openPanel', '');
+		panel.animating = true;
+		panel.element.setAttribute('aria-hidden', 'false');
+		Util.addClass(panel.wrapper, 'off-canvas--visible');
+		getFocusableElements(panel);
+		var transitionEl = panel.element;
+		if(panel.closeBtn.length > 0 && !Util.hasClass(panel.closeBtn[0], 'js-off-canvas__a11y-close-btn')) transitionEl = 	panel.closeBtn[0];
+		transitionEl.addEventListener('transitionend', function cb(){
+			// wait for the end of transition to move focus and update the animating property
+			panel.animating = false;
+			Util.moveFocus(panel.element);
+			transitionEl.removeEventListener('transitionend', cb);
+		});
+		if(!transitionSupported) panel.animating = false;
+		initPanelEvents(panel);
+	};
+
+	function closePanel(panel, bool) {
+		if(panel.animating) return;
+		panel.animating = true;
+		panel.element.setAttribute('aria-hidden', 'true');
+		Util.removeClass(panel.wrapper, 'off-canvas--visible');
+		panel.main.addEventListener('transitionend', function cb(){
+			panel.animating = false;
+			if(panel.selectedTrigger) panel.selectedTrigger.focus();
+			setTimeout(function(){panel.selectedTrigger = false;}, 10);
+			panel.main.removeEventListener('transitionend', cb);
+		});
+		if(!transitionSupported) panel.animating = false;
+		cancelPanelEvents(panel);
+		emitPanelEvents(panel, 'closePanel', bool);
+	};
+
+	function initPanelEvents(panel) { //add event listeners
+		panel.element.addEventListener('keydown', handleEvent.bind(panel));
+		panel.element.addEventListener('click', handleEvent.bind(panel));
+	};
+
+	function cancelPanelEvents(panel) { //remove event listeners
+		panel.element.removeEventListener('keydown', handleEvent.bind(panel));
+		panel.element.removeEventListener('click', handleEvent.bind(panel));
+	};
+
+	function handleEvent(event) {
+		switch(event.type) {
+			case 'keydown':
+				initKeyDown(this, event);
+				break;
+			case 'click':
+				initClick(this, event);
+				break;
+		}
+	};
+
+	function initClick(panel, event) { // close panel when clicking on close button
+		if( !event.target.closest('.js-off-canvas__close-btn')) return;
+		event.preventDefault();
+		closePanel(panel, 'close-btn');
+	};
+
+	function initKeyDown(panel, event) {
+		if( event.keyCode && event.keyCode == 27 || event.key && event.key == 'Escape' ) {
+			//close off-canvas panel on esc
+			closePanel(panel, 'key');
+		} else if( event.keyCode && event.keyCode == 9 || event.key && event.key == 'Tab' ) {
+			//trap focus inside panel
+			trapFocus(panel, event);
+		}
+	};
+
+	function trapFocus(panel, event) {
+		if( panel.firstFocusable == document.activeElement && event.shiftKey) {
+			//on Shift+Tab -> focus last focusable element when focus moves out of panel
+			event.preventDefault();
+			panel.lastFocusable.focus();
+		}
+		if( panel.lastFocusable == document.activeElement && !event.shiftKey) {
+			//on Tab -> focus first focusable element when focus moves out of panel
+			event.preventDefault();
+			panel.firstFocusable.focus();
+		}
+	};
+
+	function getFocusableElements(panel) { //get all focusable elements inside the off-canvas content
+		var allFocusable = panel.element.querySelectorAll('[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), button:not([disabled]), iframe, object, embed, [tabindex]:not([tabindex="-1"]), [contenteditable], audio[controls], video[controls], summary');
+		getFirstVisible(panel, allFocusable);
+		getLastVisible(panel, allFocusable);
+	};
+
+	function getFirstVisible(panel, elements) { //get first visible focusable element inside the off-canvas content
+		for(var i = 0; i < elements.length; i++) {
+			if( elements[i].offsetWidth || elements[i].offsetHeight || elements[i].getClientRects().length ) {
+				panel.firstFocusable = elements[i];
+				return true;
+			}
+		}
+	};
+
+	function getLastVisible(panel, elements) { //get last visible focusable element inside the off-canvas content
+		for(var i = elements.length - 1; i >= 0; i--) {
+			if( elements[i].offsetWidth || elements[i].offsetHeight || elements[i].getClientRects().length ) {
+				panel.lastFocusable = elements[i];
+				return true;
+			}
+		}
+	};
+
+	function emitPanelEvents(panel, eventName, target) { // emit custom event
+		var event = new CustomEvent(eventName, {detail: target});
+		panel.element.dispatchEvent(event);
+	};
+
+	//initialize the OffCanvas objects
+	var offCanvas = document.getElementsByClassName('js-off-canvas__panel'),
+		transitionSupported = Util.cssSupports('transition');
+	if( offCanvas.length > 0 ) {
+		for( var i = 0; i < offCanvas.length; i++) {
+			(function(i){new OffCanvas(offCanvas[i]);})(i);
+		}
+	}
+}());
 // File#: _1_overscroll-section
 // Usage: codyhouse.co/license
 (function() {
@@ -6425,6 +7356,188 @@ function initContactMap(wrapper) {
       };
     };
 	}
+}());
+// File#: _1_page-transition
+// Usage: codyhouse.co/license
+(function() {
+  var PageTransition = function(opts) {
+    if(!('CSS' in window) || !CSS.supports('color', 'var(--color)')) return;
+    this.element = document.getElementsByClassName('js-page-trans')[0];
+    this.options = Util.extend(PageTransition.defaults , opts);
+    this.cachedPages = [];
+    this.anchors = false;
+    this.clickFunctions = [];
+    this.animating = false;
+    this.newContent = false;
+    this.containerClass = 'js-page-trans__content';
+    this.containers = [];
+    initSrRegion(this);
+    pageTrInit(this);
+    initBrowserHistory(this);
+  };
+
+  function initSrRegion(element) {
+    var liveRegion = document.createElement('p');
+    Util.setAttributes(liveRegion, {'class': 'sr-only', 'role': 'alert', 'aria-live': 'polite', 'id': 'page-trans-sr-live'});
+    element.element.appendChild(liveRegion);
+    element.srLive = document.getElementById('page-trans-sr-live');
+  };
+
+  function pageTrInit(element) { // bind click events
+    element.anchors = document.getElementsByClassName('js-page-trans-link');
+    for(var i = 0; i < element.anchors.length; i++) {
+      (function(i){
+        element.clickFunctions[i] = function(event) {
+          event.preventDefault();
+          element.updateBrowserHistory = true;
+          bindClick(element, element.anchors[i].getAttribute('href'));
+        };
+
+        element.anchors[i].addEventListener('click', element.clickFunctions[i]);
+      })(i);
+    }
+  };
+
+  function bindClick(element, link) {
+    if(element.animating) return;
+    element.animating = true;
+    element.link = link; 
+    // most of those links will be removed from the page
+    unbindClickEvents(element);
+    loadPageContent(element); 
+    // code that should run before the leaving animation
+    if(element.options.beforeLeave) element.options.beforeLeave(element.link);
+    // announce to SR new content is being loaded
+    element.srLive.textContent = element.options.srLoadingMessage;
+    // leaving animation
+    if(!element.options.leaveAnimation) return;
+    element.containers.push(element.element.getElementsByClassName(element.containerClass)[0]);
+    element.options.leaveAnimation(element.containers[0], element.link, function(){
+      leavingAnimationComplete(element, true);
+    });
+  };
+
+  function unbindClickEvents(element) {
+    for(var i = 0; i < element.anchors.length; i++) {
+      element.anchors[i].removeEventListener('click', element.clickFunctions[i]);
+    }
+  };
+
+  function loadPageContent(element) {
+    element.newContent = false;
+    var pageCache = getCachedPage(element);
+    if(pageCache) {
+      element.newContent = pageCache;
+    } else {
+      if(element.options.loadFunction) { // use a custom function to load your data
+        element.options.loadFunction(element.link, function(data){
+          element.newContent = data;
+          element.cachedPages.push({link: element.link, content: element.newContent});
+        });
+      } else {
+        // load page content
+        var xmlHttp = new XMLHttpRequest();
+        xmlHttp.onreadystatechange = function() {
+          if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
+            element.newContent = getContainerHTML(element, xmlHttp.responseText);
+            element.cachedPages.push({link: element.link, content: element.newContent});
+          }
+        };
+        xmlHttp.open('GET', element.link);
+        xmlHttp.send();
+      }
+    }
+  };
+
+  function leavingAnimationComplete(element, triggerProgress) {
+    if(element.newContent) {
+      // new content has already been created
+      triggerEnteringProcess(element);
+    } else {
+      // new content is not available yet
+      if(triggerProgress && element.options.progressAnimation) element.options.progressAnimation(element.link);
+      setTimeout(function(){
+        leavingAnimationComplete(element, false);
+      }, 200);
+    }
+  };
+
+  function getCachedPage(element) {
+    var cachedContent = false;
+    for(var i = 0; i < element.cachedPages.length; i++) {
+      if(element.cachedPages[i].link == element.link) {
+        cachedContent = element.cachedPages[i].content;
+        break;
+      }
+    }
+    return cachedContent;
+  };
+
+  function getContainerHTML(element, content) {
+    var template = document.createElement('div');
+    template.innerHTML = content;
+    return template.getElementsByClassName(element.containerClass)[0].outerHTML;
+  };
+
+  function triggerEnteringProcess(element) {
+    if(element.updateBrowserHistory) updateBrowserHistory(element);
+    // inject new content
+    element.containers[0].insertAdjacentHTML('afterend', element.newContent);
+    element.containers = element.element.getElementsByClassName(element.containerClass);
+    if(element.options.beforeEnter) element.options.beforeEnter(element.containers[0], element.containers[1], element.link);
+    if(!element.options.enterAnimation) return; // entering animation
+    element.options.enterAnimation(element.containers[0], element.containers[1], element.link, function(){
+      // move focus to new cntent
+      Util.moveFocus(element.containers[1]);
+      // remove old content
+      element.containers[0].remove();
+      if(element.options.afterEnter) element.options.afterEnter(element.containers[1], element.link);
+      pageTrInit(element); // bind click event to new anchor elements
+      resetPageTransition(element);
+      // announce to SR new content is available
+      element.srLive.textContent = element.options.srLoadedMessage;
+    });
+  };
+
+  function resetPageTransition(element) {
+    // remove old content
+    element.newContent = false;
+    element.animating = false;
+    element.containers = [];
+    element.link = false;
+  };
+
+  function updateBrowserHistory(element) {
+    if(window.history.state && window.history.state == element.link) return;
+    window.history.pushState({path: element.link},'',element.link);
+  };
+
+  function initBrowserHistory(element) {
+    setTimeout(function() {
+      window.addEventListener('popstate', function(event) {
+        element.updateBrowserHistory = false;
+        if(event.state && event.state.path) {
+          bindClick(element, event.state.path);
+        } else {
+          bindClick(element, document.location);
+        }
+      });
+    }, 10);
+  };
+
+  PageTransition.defaults = {
+    beforeLeave: false, // run before the leaving animation is triggered
+    leaveAnimation: false,
+    progressAnimation: false,
+    beforeEnter: false, // run before enterAnimation (after new content has been added to the page)
+    enterAnimation: false,
+    afterEnter: false,
+    loadFunction: false,
+    srLoadingMessage: 'New content is being loaded',
+    srLoadedMessage: 'New content has been loaded' 
+  };
+
+  window.PageTransition = PageTransition;
 }());
 // File#: _1_parallax-image
 // Usage: codyhouse.co/license
@@ -6560,6 +7673,41 @@ function initContactMap(wrapper) {
 			(function(i){new Password(passwords[i]);})(i);
 		}
 	};
+}());
+// File#: _1_percentage-bar
+// Usage: codyhouse.co/license
+(function() {
+  var PercentageBar = function(element) {
+    this.element = element;
+    this.bar = this.element.getElementsByClassName('js-pct-bar__bg');
+    this.percentages = this.element.getElementsByClassName('js-pct-bar__value');
+    initPercentageBar(this);
+  };
+
+  function initPercentageBar(bar) {
+    if(bar.bar.length < 1) return;
+    var content = '';
+    for(var i = 0; i < bar.percentages.length; i++) {
+      var customClass = bar.percentages[i].getAttribute('data-pct-bar-bg'),
+        customStyle = bar.percentages[i].getAttribute('data-pct-bar-style'),
+        percentage = bar.percentages[i].textContent;
+      
+      if(!customStyle) customStyle = '';
+      if(!customClass) customClass = '';
+      content = content + '<div class="pct-bar__fill js-pct-bar__fill '+customClass+'" style="flex-basis: '+percentage+';'+customStyle+'"></div>';
+    }
+    bar.bar[0].innerHTML = content;
+  }
+
+  window.PercentageBar = PercentageBar;
+
+  //initialize the PercentageBar objects
+  var percentageBar = document.getElementsByClassName('js-pct-bar');
+  if( percentageBar.length > 0 ) {
+		for( var i = 0; i < percentageBar.length; i++) {
+			(function(i){new PercentageBar(percentageBar[i]);})(i);
+    }
+	}
 }());
 // File#: _1_pie-chart
 // Usage: codyhouse.co/license
@@ -7846,6 +8994,176 @@ function initContactMap(wrapper) {
 		}
 	};
 }());
+// File#: _1_reading-progressbar
+// Usage: codyhouse.co/license
+(function() {
+  var readingIndicator = document.getElementsByClassName('js-reading-progressbar')[0],
+		readingIndicatorContent = document.getElementsByClassName('js-reading-content')[0];
+  
+  if( readingIndicator && readingIndicatorContent) {
+    var progressInfo = [],
+      progressEvent = false,
+      progressFallback = readingIndicator.getElementsByClassName('js-reading-progressbar__fallback')[0],
+      progressIsSupported = 'value' in readingIndicator;
+
+    progressInfo['height'] = readingIndicatorContent.offsetHeight;
+    progressInfo['top'] = readingIndicatorContent.getBoundingClientRect().top;
+    progressInfo['window'] = window.innerHeight;
+    progressInfo['class'] = 'reading-progressbar--is-active';
+    
+    //init indicator
+    setProgressIndicator();
+    // wait for font to be loaded - reset progress bar
+    if(document.fonts) {
+      document.fonts.ready.then(function() {
+        triggerReset();
+      });
+    }
+    // listen to window resize - update progress
+    window.addEventListener('resize', function(event){
+      triggerReset();
+    });
+
+    //listen to the window scroll event - update progress
+    window.addEventListener('scroll', function(event){
+      if(progressEvent) return;
+      progressEvent = true;
+      (!window.requestAnimationFrame) ? setTimeout(function(){setProgressIndicator();}, 250) : window.requestAnimationFrame(setProgressIndicator);
+    });
+    
+    function setProgressIndicator() {
+      progressInfo['top'] = readingIndicatorContent.getBoundingClientRect().top;
+      if(progressInfo['height'] <= progressInfo['window']) {
+        // short content - hide progress indicator
+        Util.removeClass(readingIndicator, progressInfo['class']);
+        progressEvent = false;
+        return;
+      }
+      // get new progress and update element
+      Util.addClass(readingIndicator, progressInfo['class']);
+      var value = (progressInfo['top'] >= 0) ? 0 : 100*(0 - progressInfo['top'])/(progressInfo['height'] - progressInfo['window']);
+      readingIndicator.setAttribute('value', value);
+      if(!progressIsSupported && progressFallback) progressFallback.style.width = value+'%';
+      progressEvent = false;
+    };
+
+    function triggerReset() {
+      if(progressEvent) return;
+      progressEvent = true;
+      (!window.requestAnimationFrame) ? setTimeout(function(){resetProgressIndicator();}, 250) : window.requestAnimationFrame(resetProgressIndicator);
+    };
+
+    function resetProgressIndicator() {
+      progressInfo['height'] = readingIndicatorContent.offsetHeight;
+      progressInfo['window'] = window.innerHeight;
+      setProgressIndicator();
+    };
+  }
+}());
+// File#: _1_repeater
+// Usage: codyhouse.co/license
+(function() {
+  var Repeater = function(element) {
+    this.element = element;
+    this.blockWrapper = this.element.getElementsByClassName('js-repeater__list');
+    if(this.blockWrapper.length < 1) return;
+    this.blocks = false;
+    getBlocksList(this);
+    this.firstBlock = false;
+    this.addNew = this.element.getElementsByClassName('js-repeater__add');
+    this.cloneClass = this.element.getAttribute('data-repeater-class');
+    this.inputName = this.element.getAttribute('data-repeater-input-name');
+    initRepeater(this);
+  };
+
+  function initRepeater(element) {
+    if(element.addNew.length < 1 || element.blocks.length < 1 || element.blockWrapper.length < 1 ) return;
+    element.firstBlock = element.blocks[0].cloneNode(true);
+    
+    // detect click on a Remove button
+    element.element.addEventListener('click', function(event) {
+      var deleteBtn = event.target.closest('.js-repeater__remove');
+      if(deleteBtn) {
+        event.preventDefault();
+        removeBlock(element, deleteBtn);
+      }
+    });
+
+    // detect click on Add button
+    element.addNew[0].addEventListener('click', function(event) {
+      event.preventDefault();
+      addBlock(element);
+    });
+  };
+
+  function addBlock(element) {
+    if(element.blocks.length > 0) {
+      var clone = element.blocks[element.blocks.length - 1].cloneNode(true),
+        nameToReplace = element.inputName.replace('[n]', '['+(element.blocks.length - 1)+']'),
+        newName = element.inputName.replace('[n]', '['+element.blocks.length+']');
+    } else {
+      var clone =  element.firstBlock.cloneNode(true),
+      nameToReplace = element.inputName.replace('[n]', '[0]'),
+      newName = element.inputName.replace('[n]', '[0]');
+    }
+    
+    if(element.cloneClass) Util.addClass(clone, element.cloneClass);
+    // modify name/for/id attributes
+    updateBlockAttrs(clone, nameToReplace, newName, true);
+
+    element.blockWrapper[0].appendChild(clone);
+    // update blocks list
+    getBlocksList(element)
+  };
+
+  function removeBlock(element, trigger) {
+    var block = trigger.closest('.js-repeater__item');
+    if(block) {
+      var index = Util.getIndexInArray(element.blocks, block);
+      block.remove();
+      // update blocks list
+      getBlocksList(element);
+      // need to reset all blocks after that -> name/for/id values
+      for(var i = index; i < element.blocks.length; i++) {
+        updateBlockAttrs(element.blocks[i], element.inputName.replace('[n]', '['+(i+1)+']'), element.inputName.replace('[n]', '['+i+']'));
+      }
+    }
+  };
+
+  function updateBlockAttrs(block, nameToReplace, newName, reset) {
+    var nameElements = block.querySelectorAll('[name^="'+nameToReplace+'"]'),
+      forElements = block.querySelectorAll('[for^="'+nameToReplace+'"]'),
+      idElements = block.querySelectorAll('[id^="'+nameToReplace+'"]');
+
+    for(var i = 0; i < nameElements.length; i++) {
+      var nameAttr = nameElements[i].getAttribute('name');
+      nameElements[i].setAttribute('name', nameAttr.replace(nameToReplace, newName));
+      if(reset && nameElements[i].value) nameElements[i].value = '';
+    }
+
+    for(var i = 0; i < forElements.length; i++) {
+      var forAttr = forElements[i].getAttribute('for');
+      forElements[i].setAttribute('for', forAttr.replace(nameToReplace, newName));
+    }
+
+    for(var i = 0; i < idElements.length; i++) {
+      var idAttr = idElements[i].getAttribute('id');
+      idElements[i].setAttribute('id', idAttr.replace(nameToReplace, newName));
+    }
+  };
+
+  function getBlocksList(element) {
+    element.blocks = Util.getChildrenByClassName(element.blockWrapper[0], 'js-repeater__item');
+  };
+
+  //initialize the Repeater objects
+	var repeater = document.getElementsByClassName('js-repeater');
+	if( repeater.length > 0 ) {
+		for( var i = 0; i < repeater.length; i++) {
+			(function(i){new Repeater(repeater[i]);})(i);
+		}
+	};
+}());
 // File#: _1_responsive-sidebar
 // Usage: codyhouse.co/license
 (function() {
@@ -8034,6 +9352,179 @@ function initContactMap(wrapper) {
     };
 	}
 }());
+// File#: _1_reveal-effects
+// Usage: codyhouse.co/license
+(function() {
+	var fxElements = document.getElementsByClassName('reveal-fx');
+	var intersectionObserverSupported = ('IntersectionObserver' in window && 'IntersectionObserverEntry' in window && 'intersectionRatio' in window.IntersectionObserverEntry.prototype);
+	if(fxElements.length > 0) {
+		// deactivate effect if Reduced Motion is enabled
+		if (Util.osHasReducedMotion() || !intersectionObserverSupported) {
+			fxRemoveClasses();
+			return;
+		}
+		//on small devices, do not animate elements -> reveal all
+		if( fxDisabled(fxElements[0]) ) {
+			fxRevealAll();
+			return;
+		}
+
+		var fxRevealDelta = 120; // amount (in pixel) the element needs to enter the viewport to be revealed - if not custom value (data-reveal-fx-delta)
+		
+		var viewportHeight = window.innerHeight,
+			fxChecking = false,
+			fxRevealedItems = [],
+			fxElementDelays = fxGetDelays(), //elements animation delay
+			fxElementDeltas = fxGetDeltas(); // amount (in px) the element needs enter the viewport to be revealed (default value is fxRevealDelta) 
+		
+		
+		// add event listeners
+		window.addEventListener('load', fxReveal);
+		window.addEventListener('resize', fxResize);
+		window.addEventListener('restartAll', fxRestart);
+
+		// observe reveal elements
+		var observer = [];
+		initObserver();
+
+		function initObserver() {
+			for(var i = 0; i < fxElements.length; i++) {
+				observer[i] = new IntersectionObserver(
+					function(entries, observer) { 
+						if(entries[0].isIntersecting) {
+							fxRevealItemObserver(entries[0].target);
+							observer.unobserve(entries[0].target);
+						}
+					}, 
+					{rootMargin: "0px 0px -"+fxElementDeltas[i]+"px 0px"}
+				);
+	
+				observer[i].observe(fxElements[i]);
+			}
+		};
+
+		function fxRevealAll() { // reveal all elements - small devices
+			for(var i = 0; i < fxElements.length; i++) {
+				Util.addClass(fxElements[i], 'reveal-fx--is-visible');
+			}
+		};
+
+		function fxResize() { // on resize - check new window height and reveal visible elements
+			if(fxChecking) return;
+			fxChecking = true;
+			(!window.requestAnimationFrame) ? setTimeout(function(){fxReset();}, 250) : window.requestAnimationFrame(fxReset);
+		};
+
+		function fxReset() {
+			viewportHeight = window.innerHeight;
+			fxReveal();
+		};
+
+		function fxReveal() { // reveal visible elements
+			for(var i = 0; i < fxElements.length; i++) {(function(i){
+				if(fxRevealedItems.indexOf(i) != -1 ) return; //element has already been revelead
+				if(fxElementIsVisible(fxElements[i], i)) {
+					fxRevealItem(i);
+					fxRevealedItems.push(i);
+				}})(i); 
+			}
+			fxResetEvents(); 
+			fxChecking = false;
+		};
+
+		function fxRevealItem(index) {
+			if(fxElementDelays[index] && fxElementDelays[index] != 0) {
+				// wait before revealing element if a delay was added
+				setTimeout(function(){
+					Util.addClass(fxElements[index], 'reveal-fx--is-visible');
+				}, fxElementDelays[index]);
+			} else {
+				Util.addClass(fxElements[index], 'reveal-fx--is-visible');
+			}
+		};
+
+		function fxRevealItemObserver(item) {
+			var index = Util.getIndexInArray(fxElements, item);
+			if(fxRevealedItems.indexOf(index) != -1 ) return; //element has already been revelead
+			fxRevealItem(index);
+			fxRevealedItems.push(index);
+			fxResetEvents(); 
+			fxChecking = false;
+		};
+
+		function fxGetDelays() { // get anmation delays
+			var delays = [];
+			for(var i = 0; i < fxElements.length; i++) {
+				delays.push( fxElements[i].getAttribute('data-reveal-fx-delay') ? parseInt(fxElements[i].getAttribute('data-reveal-fx-delay')) : 0);
+			}
+			return delays;
+		};
+
+		function fxGetDeltas() { // get reveal delta
+			var deltas = [];
+			for(var i = 0; i < fxElements.length; i++) {
+				deltas.push( fxElements[i].getAttribute('data-reveal-fx-delta') ? parseInt(fxElements[i].getAttribute('data-reveal-fx-delta')) : fxRevealDelta);
+			}
+			return deltas;
+		};
+
+		function fxDisabled(element) { // check if elements need to be animated - no animation on small devices
+			return !(window.getComputedStyle(element, '::before').getPropertyValue('content').replace(/'|"/g, "") == 'reveal-fx');
+		};
+
+		function fxElementIsVisible(element, i) { // element is inside viewport
+			return (fxGetElementPosition(element) <= viewportHeight - fxElementDeltas[i]);
+		};
+
+		function fxGetElementPosition(element) { // get top position of element
+			return element.getBoundingClientRect().top;
+		};
+
+		function fxResetEvents() { 
+			if(fxElements.length > fxRevealedItems.length) return;
+			// remove event listeners if all elements have been revealed
+			window.removeEventListener('load', fxReveal);
+			window.removeEventListener('resize', fxResize);
+		};
+
+		function fxRemoveClasses() {
+			// Reduced Motion on or Intersection Observer not supported
+			while(fxElements[0]) {
+				// remove all classes starting with 'reveal-fx--'
+				var classes = fxElements[0].getAttribute('class').split(" ").filter(function(c) {
+					return c.lastIndexOf('reveal-fx--', 0) !== 0;
+				});
+				fxElements[0].setAttribute('class', classes.join(" ").trim());
+				Util.removeClass(fxElements[0], 'reveal-fx');
+			}
+		};
+
+		function fxRestart() {
+      // restart the reveal effect -> hide all elements and re-init the observer
+      if (Util.osHasReducedMotion() || !intersectionObserverSupported || fxDisabled(fxElements[0])) {
+        return;
+      }
+      // check if we need to add the event listensers back
+      if(fxElements.length <= fxRevealedItems.length) {
+        window.addEventListener('load', fxReveal);
+        window.addEventListener('resize', fxResize);
+      }
+      // remove observer and reset the observer array
+      for(var i = 0; i < observer.length; i++) {
+        if(observer[i]) observer[i].disconnect();
+      }
+      observer = [];
+      // remove visible class
+      for(var i = 0; i < fxElements.length; i++) {
+        Util.removeClass(fxElements[i], 'reveal-fx--is-visible');
+      }
+      // reset fxRevealedItems array
+      fxRevealedItems = [];
+      // restart observer
+      initObserver();
+    };
+	}
+}());
 // File#: _1_revealing-section
 // Usage: codyhouse.co/license
 (function() {
@@ -8149,6 +9640,347 @@ function initContactMap(wrapper) {
       };
     };
 	}
+}());
+// File#: _1_row-table
+// Usage: codyhouse.co/license
+(function() {
+	var RowTable = function(element) {
+    this.element = element;
+    this.headerRows = this.element.getElementsByTagName('thead')[0].getElementsByTagName('th');
+    this.tableRows = this.element.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
+    this.collapsedLayoutClass = 'row-table--collapsed';
+    this.mainRowCellClass = 'row-table__th-inner';
+    initTable(this);
+  };
+
+  function initTable(table) {
+    checkTableLayour(table); // switch from a collapsed to an expanded layout
+
+    // create additional table content
+    addTableContent(table);
+
+    // custom event emitted when window is resized
+    table.element.addEventListener('update-row-table', function(event){
+      checkTableLayour(table);
+    });
+
+    // mobile version - listent to click/key enter on the row -> expand it
+    table.element.addEventListener('click', function(event){
+      revealRowDetails(table, event);
+    });
+    table.element.addEventListener('keydown', function(event){
+      if(event.keyCode && event.keyCode == 13 || event.key && event.key.toLowerCase() == 'enter') {
+        revealRowDetails(table, event);
+      }
+    });
+  };
+
+  function checkTableLayour(table) {
+    var layout = getComputedStyle(table.element, ':before').getPropertyValue('content').replace(/\'|"/g, '');
+    Util.toggleClass(table.element, table.collapsedLayoutClass, layout == 'expanded');
+  };
+
+  function addTableContent(table) {
+    // for the expanded version, add a ul with list of details for each table row
+    for(var i = 0; i < table.tableRows.length; i++) {
+      var content = '';
+      var cells = table.tableRows[i].getElementsByClassName('row-table__cell');
+      for(var j = 0; j < cells.length; j++) {
+        if(j == 0 ) {
+          Util.addClass(cells[j], 'js-'+table.mainRowCellClass);
+          var cellLabel = cells[j].getElementsByClassName('row-table__th-inner');
+          if(cellLabel.length > 0 ) cellLabel[0].innerHTML = cellLabel[0].innerHTML + '<i class="row-table__th-icon" aria-hidden="true"></i>'
+        } else {
+          content = content + '<li class="row-table__item"><span class="row-table__label">'+table.headerRows[j].innerHTML+':</span><span>'+cells[j].innerHTML+'</span></li>';
+        }
+      }
+      content = '<ul class="row-table__list" aria-hidden="true">'+content+'</ul>';
+      cells[0].innerHTML = '<input type="text" class="row-table__input" aria-hidden="true">'+cells[0].innerHTML + content;
+    }
+  };
+
+  function revealRowDetails(table, event) {
+    if(!event.target.closest('.js-'+table.mainRowCellClass) || event.target.closest('.row-table__list')) return;
+    var row = event.target.closest('.js-'+table.mainRowCellClass);
+    Util.toggleClass(row, 'row-table__cell--show-list', !Util.hasClass(row, 'row-table__cell--show-list'));
+  };
+
+  //initialize the RowTable objects
+	var rowTables = document.getElementsByClassName('js-row-table');
+	if( rowTables.length > 0 ) {
+    var j = 0,
+    rowTablesArray = [];
+		for( var i = 0; i < rowTables.length; i++) {
+      var beforeContent = getComputedStyle(rowTables[i], ':before').getPropertyValue('content');
+      if(beforeContent && beforeContent !='' && beforeContent !='none') {
+        (function(i){rowTablesArray.push(new RowTable(rowTables[i]));})(i);
+        j = j + 1;
+      }
+    }
+    
+    if(j > 0) {
+      var resizingId = false,
+        customEvent = new CustomEvent('update-row-table');
+      window.addEventListener('resize', function(event){
+        clearTimeout(resizingId);
+        resizingId = setTimeout(doneResizing, 300);
+      });
+
+      function doneResizing() {
+        for( var i = 0; i < rowTablesArray.length; i++) {
+          (function(i){rowTablesArray[i].element.dispatchEvent(customEvent)})(i);
+        };
+      };
+
+      (window.requestAnimationFrame) // init table layout
+        ? window.requestAnimationFrame(doneResizing)
+        : doneResizing();
+    }
+	}
+}());
+// File#: _1_scrolling-animations
+// Usage: codyhouse.co/license
+(function() {
+  var ScrollFx = function(element, scrollableSelector) {
+    this.element = element;
+    this.options = [];
+    this.boundingRect = this.element.getBoundingClientRect();
+    this.windowHeight = window.innerHeight;
+    this.scrollingFx = [];
+    this.animating = [];
+    this.deltaScrolling = [];
+    this.observer = [];
+    this.scrollableSelector = scrollableSelector; // if the scrollable element is not the window 
+    this.scrollableElement = false;
+    initScrollFx(this);
+    // ToDo - option to pass two selectors to target the element start and stop animation scrolling values -> to be used for sticky/fixed elements
+  };
+
+  function initScrollFx(element) {
+    // do not animate if reduced motion is on
+    if(Util.osHasReducedMotion()) return;
+    // get scrollable element
+    setScrollableElement(element);
+    // get animation params
+    var animation = element.element.getAttribute('data-scroll-fx');
+    if(animation) {
+      element.options.push(extractAnimation(animation));
+    } else {
+      getAnimations(element, 1);
+    }
+    // set Intersection Observer
+    initObserver(element);
+    // update params on resize
+    initResize(element);
+  };
+
+  function setScrollableElement(element) {
+    if(element.scrollableSelector) element.scrollableElement = document.querySelector(element.scrollableSelector);
+  };
+
+  function initObserver(element) {
+    for(var i = 0; i < element.options.length; i++) {
+      (function(i){
+        element.scrollingFx[i] = false;
+        element.deltaScrolling[i] = getDeltaScrolling(element, i);
+        element.animating[i] = false;
+
+        element.observer[i] = new IntersectionObserver(
+          function(entries, observer) { 
+            scrollFxCallback(element, i, entries, observer);
+          },
+          {
+            rootMargin: (element.options[i][5] -100)+"% 0px "+(0 - element.options[i][4])+"% 0px"
+          }
+        );
+    
+        element.observer[i].observe(element.element);
+
+        // set initial value
+        animateScrollFx.bind(element, i)();
+      })(i);
+    }
+  };
+
+  function scrollFxCallback(element, index, entries, observer) {
+		if(entries[0].isIntersecting) {
+      if(element.scrollingFx[index]) return; // listener for scroll event already added
+      // reset delta
+      resetDeltaBeforeAnim(element, index);
+      triggerAnimateScrollFx(element, index);
+    } else {
+      if(!element.scrollingFx[index]) return; // listener for scroll event already removed
+      window.removeEventListener('scroll', element.scrollingFx[index]);
+      element.scrollingFx[index] = false;
+    }
+  };
+
+  function triggerAnimateScrollFx(element, index) {
+    element.scrollingFx[index] = animateScrollFx.bind(element, index);
+    (element.scrollableElement)
+      ? element.scrollableElement.addEventListener('scroll', element.scrollingFx[index])
+      : window.addEventListener('scroll', element.scrollingFx[index]);
+  };
+
+  function animateScrollFx(index) {
+    // if window scroll is outside the proper range -> return
+    if(getScrollY(this) < this.deltaScrolling[index][0]) {
+      setCSSProperty(this, index, this.options[index][1]);
+      return;
+    }
+    if(getScrollY(this) > this.deltaScrolling[index][1]) {
+      setCSSProperty(this, index, this.options[index][2]);
+      return;
+    }
+    if(this.animating[index]) return;
+    this.animating[index] = true;
+    window.requestAnimationFrame(updatePropertyScroll.bind(this, index));
+  };
+
+  function updatePropertyScroll(index) { // get value
+    // check if this is a theme value or a css property
+    if(isNaN(this.options[index][1])) {
+      // this is a theme value to update
+      (getScrollY(this) >= this.deltaScrolling[index][1]) 
+        ? setCSSProperty(this, index, this.options[index][2])
+        : setCSSProperty(this, index, this.options[index][1]);
+    } else {
+      // this is a CSS property
+      var value = this.options[index][1] + (this.options[index][2] - this.options[index][1])*(getScrollY(this) - this.deltaScrolling[index][0])/(this.deltaScrolling[index][1] - this.deltaScrolling[index][0]);
+      // update css property
+      setCSSProperty(this, index, value);
+    }
+    
+    this.animating[index] = false;
+  };
+
+  function setCSSProperty(element, index, value) {
+    if(isNaN(value)) {
+      // this is a theme value that needs to be updated
+      setThemeValue(element, value);
+      return;
+    }
+    if(element.options[index][0] == '--scroll-fx-skew' || element.options[index][0] == '--scroll-fx-scale') {
+      // set 2 different CSS properties for the transformation on both x and y axis
+      element.element.style.setProperty(element.options[index][0]+'-x', value+element.options[index][3]);
+      element.element.style.setProperty(element.options[index][0]+'-y', value+element.options[index][3]);
+    } else {
+      // set single CSS property
+      element.element.style.setProperty(element.options[index][0], value+element.options[index][3]);
+    }
+  };
+
+  function setThemeValue(element, value) {
+    // if value is different from the theme in use -> update it
+    if(element.element.getAttribute('data-theme') != value) {
+      Util.addClass(element.element, 'scroll-fx--theme-transition');
+      element.element.offsetWidth;
+      element.element.setAttribute('data-theme', value);
+      element.element.addEventListener('transitionend', function cb(){
+        element.element.removeEventListener('transitionend', cb);
+        Util.removeClass(element.element, 'scroll-fx--theme-transition');
+      });
+    }
+  };
+
+  function getAnimations(element, index) {
+    var option = element.element.getAttribute('data-scroll-fx-'+index);
+    if(option) {
+      // multiple animations for the same element - iterate through them
+      element.options.push(extractAnimation(option));
+      getAnimations(element, index+1);
+    } 
+    return;
+  };
+
+  function extractAnimation(option) {
+    var array = option.split(',').map(function(item) {
+      return item.trim();
+    });
+    var propertyOptions = getPropertyValues(array[1], array[2]);
+    var animation = [getPropertyLabel(array[0]), propertyOptions[0], propertyOptions[1], propertyOptions[2], parseInt(array[3]), parseInt(array[4])];
+    return animation;
+  };
+
+  function getPropertyLabel(property) {
+    var propertyCss = '--scroll-fx-';
+    for(var i = 0; i < property.length; i++) {
+      propertyCss = (property[i] == property[i].toUpperCase())
+        ? propertyCss + '-'+property[i].toLowerCase()
+        : propertyCss +property[i];
+    }
+    if(propertyCss == '--scroll-fx-rotate') {
+      propertyCss = '--scroll-fx-rotate-z';
+    } else if(propertyCss == '--scroll-fx-translate') {
+      propertyCss = '--scroll-fx-translate-x';
+    }
+    return propertyCss;
+  };
+
+  function getPropertyValues(val1, val2) {
+    var nbVal1 = parseFloat(val1), 
+      nbVal2 = parseFloat(val2),
+      unit = val1.replace(nbVal1, '');
+    if(isNaN(nbVal1)) {
+      // property is a theme value
+      nbVal1 = val1;
+      nbVal2 = val2;
+      unit = '';
+    }
+    return [nbVal1, nbVal2, unit];
+  };
+
+  function getDeltaScrolling(element, index) {
+    // this retrieve the max and min scroll value that should trigger the animation
+    var topDelta = getScrollY(element) - (element.windowHeight - (element.windowHeight + element.boundingRect.height)*element.options[index][4]/100) + element.boundingRect.top,
+      bottomDelta = getScrollY(element) - (element.windowHeight - (element.windowHeight + element.boundingRect.height)*element.options[index][5]/100) + element.boundingRect.top;
+    return [topDelta, bottomDelta];
+  };
+
+  function initResize(element) {
+    var resizingId = false;
+    window.addEventListener('resize', function() {
+      clearTimeout(resizingId);
+      resizingId = setTimeout(resetResize.bind(element), 500);
+    });
+    // emit custom event -> elements have been initialized
+    var event = new CustomEvent('scrollFxReady');
+		element.element.dispatchEvent(event);
+  };
+
+  function resetResize() {
+    // on resize -> make sure to update all scrolling delta values
+    this.boundingRect = this.element.getBoundingClientRect();
+    this.windowHeight = window.innerHeight;
+    for(var i = 0; i < this.deltaScrolling.length; i++) {
+      this.deltaScrolling[i] = getDeltaScrolling(this, i);
+      animateScrollFx.bind(this, i)();
+    }
+    // emit custom event -> elements have been resized
+    var event = new CustomEvent('scrollFxResized');
+		this.element.dispatchEvent(event);
+  };
+
+  function resetDeltaBeforeAnim(element, index) {
+    element.boundingRect = element.element.getBoundingClientRect();
+    element.windowHeight = window.innerHeight;
+    element.deltaScrolling[index] = getDeltaScrolling(element, index);
+  };
+
+  function getScrollY(element) {
+    if(!element.scrollableElement) return window.scrollY;
+    return element.scrollableElement.scrollTop;
+  }
+
+  window.ScrollFx = ScrollFx;
+
+  var scrollFx = document.getElementsByClassName('js-scroll-fx');
+  for(var i = 0; i < scrollFx.length; i++) {
+    (function(i){
+      var scrollableElement = scrollFx[i].getAttribute('data-scrollable-element');
+      new ScrollFx(scrollFx[i], scrollableElement);
+    })(i);
+  }
 }());
 // File#: _1_side-navigation-v2
 // Usage: codyhouse.co/license
@@ -8283,6 +10115,425 @@ function initContactMap(wrapper) {
 		}
   }
 }());
+// File#: _1_slider
+// Usage: codyhouse.co/license
+(function() {
+	var Slider = function(element) {
+		this.element = element;
+		this.rangeWrapper = this.element.getElementsByClassName('slider__range');
+		this.rangeInput = this.element.getElementsByClassName('slider__input');
+		this.value = this.element.getElementsByClassName('js-slider__value'); 
+		this.floatingValue = this.element.getElementsByClassName('js-slider__value--floating'); 
+		this.rangeMin = this.rangeInput[0].getAttribute('min');
+		this.rangeMax = this.rangeInput[0].getAttribute('max');
+		this.sliderWidth = window.getComputedStyle(this.element.getElementsByClassName('slider__range')[0]).getPropertyValue('width');
+		this.thumbWidth = getComputedStyle(this.element).getPropertyValue('--slide-thumb-size');
+		this.isInputVar = (this.value[0].tagName.toLowerCase() == 'input');
+		this.isFloatingVar = this.floatingValue.length > 0;
+		if(this.isFloatingVar) {
+			this.floatingValueLeft = window.getComputedStyle(this.floatingValue[0]).getPropertyValue('left');
+		}
+		initSlider(this);
+	};
+
+	function initSlider(slider) {
+		updateLabelValues(slider);// update label/input value so that it is the same as the input range
+		updateLabelPosition(slider, false); // update label position if floating variation
+		updateRangeColor(slider, false); // update range bg color
+		checkRangeSupported(slider); // hide label/input value if input range is not supported
+		
+		// listen to change in the input range
+		for(var i = 0; i < slider.rangeInput.length; i++) {
+			(function(i){
+				slider.rangeInput[i].addEventListener('input', function(event){
+					updateSlider(slider, i);
+				});
+				slider.rangeInput[i].addEventListener('change', function(event){ // fix issue on IE where input event is not emitted
+					updateSlider(slider, i);
+				});
+			})(i);
+		}
+
+		// if there's an input text, listen for changes in value, validate it and then update slider
+		if(slider.isInputVar) {
+			for(var i = 0; i < slider.value.length; i++) {
+				(function(i){
+					slider.value[i].addEventListener('change', function(event){
+						updateRange(slider, i);
+					});
+				})(i);
+			}
+		}
+
+		// native <input> element has been updated (e.g., form reset) -> update custom appearance
+		slider.element.addEventListener('slider-updated', function(event){
+			for(var i = 0; i < slider.value.length; i++) {updateSlider(slider, i);}
+		});
+
+		// custom events - emitted if slider has allows for multi-values
+		slider.element.addEventListener('inputRangeLimit', function(event){
+			updateLabelValues(slider);
+			updateLabelPosition(slider, event.detail);
+		});
+	};
+
+	function updateSlider(slider, index) {
+		updateLabelValues(slider);
+		updateLabelPosition(slider, index);
+		updateRangeColor(slider, index);
+	};
+
+	function updateLabelValues(slider) {
+		for(var i = 0; i < slider.rangeInput.length; i++) {
+			slider.isInputVar ? slider.value[i].value = slider.rangeInput[i].value : slider.value[i].textContent = slider.rangeInput[i].value;
+		}
+	};
+
+	function updateLabelPosition(slider, index) {
+		if(!slider.isFloatingVar) return;
+		var i = index ? index : 0,
+			j = index ? index + 1: slider.rangeInput.length;
+		for(var k = i; k < j; k++) {
+			var percentage = (slider.rangeInput[k].value - slider.rangeMin)/(slider.rangeMax - slider.rangeMin);
+			slider.floatingValue[k].style.left = 'calc(0.5 * '+slider.floatingValueLeft+' + '+percentage+' * ( '+slider.sliderWidth+' - '+slider.floatingValueLeft+' ))';
+		}
+	};
+
+	function updateRangeColor(slider, index) {
+		if(slider.rangeInput.length > 1) {slider.element.dispatchEvent(new CustomEvent('updateRange', {detail: index}));return;}
+		var percentage = parseInt((slider.rangeInput[0].value - slider.rangeMin)/(slider.rangeMax - slider.rangeMin)*100),
+			fill = 'calc('+percentage+'*('+slider.sliderWidth+' - 0.5*'+slider.thumbWidth+')/100)',
+			empty = 'calc('+slider.sliderWidth+' - '+percentage+'*('+slider.sliderWidth+' - 0.5*'+slider.thumbWidth+')/100)';
+
+		slider.rangeWrapper[0].style.setProperty('--slider-fill-value', fill);
+		slider.rangeWrapper[0].style.setProperty('--slider-empty-value', empty);
+	};
+
+	function updateRange(slider, index) {
+		var newValue = parseFloat(slider.value[index].value);
+		if(isNaN(newValue)) {
+			slider.value[index].value = slider.rangeInput[index].value;
+			return;
+		} else {
+			if(newValue < slider.rangeMin) newValue = slider.rangeMin;
+			if(newValue > slider.rangeMax) newValue = slider.rangeMax;
+			slider.rangeInput[index].value = newValue;
+			var inputEvent = new Event('change');
+			slider.rangeInput[index].dispatchEvent(inputEvent);
+		}
+	};
+
+	function checkRangeSupported(slider) {
+		var input = document.createElement("input");
+		input.setAttribute("type", "range");
+		Util.toggleClass(slider.element, 'slider--range-not-supported', input.type !== "range");
+	};
+
+	//initialize the Slider objects
+	var sliders = document.getElementsByClassName('js-slider');
+	if( sliders.length > 0 ) {
+		for( var i = 0; i < sliders.length; i++) {
+			(function(i){new Slider(sliders[i]);})(i);
+		}
+	}
+}());
+// File#: _1_sliding-panels
+// Usage: codyhouse.co/license
+(function() {
+  var SlidingPanels = function(element) {
+    this.element = element;
+    this.itemsList = this.element.getElementsByClassName('js-s-panels__projects-list');
+    this.items = this.itemsList[0].getElementsByClassName('js-s-panels__project-preview');
+    this.navigationToggle = this.element.getElementsByClassName('js-s-panels__nav-control');
+    this.navigation = this.element.getElementsByClassName('js-s-panels__nav-wrapper');
+    this.transitionLayer = this.element.getElementsByClassName('js-s-panels__overlay-layer');
+    this.selectedSection = false; // will be used to store the visible project content section
+    this.animating = false;
+    // aria labels for the navigationToggle button
+    this.toggleAriaLabels = ['Toggle navigation', 'Close Project'];
+    initSlidingPanels(this);
+  };
+
+  function initSlidingPanels(element) {
+    // detect click on toggle menu
+    if(element.navigationToggle.length > 0 && element.navigation.length > 0) {
+      element.navigationToggle[0].addEventListener('click', function(event) {
+        if(element.animating) return;
+        
+        // if project is open -> close project
+        if(closeProjectIfVisible(element)) return;
+        
+        // toggle navigation
+        var openNav = Util.hasClass(element.navigation[0], 'is-hidden');
+        toggleNavigation(element, openNav);
+      });
+    }
+
+    // open project
+    element.element.addEventListener('click', function(event) {
+      if(element.animating) return;
+
+      var link = event.target.closest('.js-s-panels__project-control');
+      if(!link) return;
+      event.preventDefault();
+      openProject(element, event.target.closest('.js-s-panels__project-preview'), link.getAttribute('href').replace('#', ''));
+    });
+  };
+
+  // check if there's a visible project to close and close it
+  function closeProjectIfVisible(element) {
+    var visibleProject = element.element.getElementsByClassName('s-panels__project-preview--selected');
+    if(visibleProject.length > 0) {
+      element.animating = true;
+      closeProject(element);
+      return true;
+    }
+
+    return false;
+  };
+
+  function toggleNavigation(element, openNavigation) {
+    element.animating = true;
+    if(openNavigation) Util.removeClass(element.navigation[0], 'is-hidden');
+    slideProjects(element, openNavigation, false, function(){
+      element.animating = false;
+      if(!openNavigation) Util.addClass(element.navigation[0], 'is-hidden');
+    });
+    Util.toggleClass(element.navigationToggle[0], 's-panels__nav-control--arrow-down', openNavigation);
+  };
+
+  function openProject(element, project, id) {
+    element.animating = true;
+    var projectIndex = Util.getIndexInArray(element.items, project);
+    // hide navigation
+    Util.removeClass(element.itemsList[0], 'bg-opacity-0');
+    // expand selected projects
+    Util.addClass(project, 's-panels__project-preview--selected');
+    // hide remaining projects
+    slideProjects(element, true, projectIndex, function() {
+      // reveal section content
+      element.selectedSection = document.getElementById(id);
+      if(element.selectedSection) Util.removeClass(element.selectedSection, 'is-hidden');
+      element.animating = false;
+      // trigger a custom event - this can be used to init the project content (if required)
+		  element.element.dispatchEvent(new CustomEvent('slidingPanelOpen', {detail: projectIndex}));
+    });
+    // modify toggle button appearance
+    Util.addClass(element.navigationToggle[0], 's-panels__nav-control--close');
+    // modify toggle button aria-label
+    element.navigationToggle[0].setAttribute('aria-label', element.toggleAriaLabels[1]);
+  };
+
+  function closeProject(element) {
+    // remove transitions from projects
+    toggleTransitionProjects(element, true);
+    // hide navigation
+    Util.removeClass(element.itemsList[0], 'bg-opacity-0');
+    // reveal transition layer
+    Util.addClass(element.transitionLayer[0], 's-panels__overlay-layer--visible');
+    // wait for end of transition layer effect
+    element.transitionLayer[0].addEventListener('transitionend', function cb(event) {
+      if(event.propertyName != 'opacity') return;
+      element.transitionLayer[0].removeEventListener('transitionend', cb);
+      // update projects classes
+      resetProjects(element);
+
+      setTimeout(function(){
+        // hide transition layer
+        Util.removeClass(element.transitionLayer[0], 's-panels__overlay-layer--visible');
+        // reveal projects
+        slideProjects(element, false, false, function() {
+          Util.addClass(element.itemsList[0], 'bg-opacity-0');
+          element.animating = false;
+        });
+      }, 200);
+    });
+
+    // modify toggle button appearance
+    Util.removeClass(element.navigationToggle[0], 's-panels__nav-control--close');
+    // modify toggle button aria-label
+    element.navigationToggle[0].setAttribute('aria-label', element.toggleAriaLabels[0]);
+  };
+
+  function slideProjects(element, openNav, exclude, cb) {
+    // projects will slide out in a random order
+    var randomList = getRandomList(element.items.length, exclude);
+    for(var i = 0; i < randomList.length; i++) {(function(i){
+      setTimeout(function(){
+        Util.toggleClass(element.items[randomList[i]], 's-panels__project-preview--hide', openNav);
+        toggleProjectAccessibility(element.items[randomList[i]], openNav);
+        if(cb && i == randomList.length - 1) {
+          // last item to be animated -> execute callback function at the end of the animation
+          element.items[randomList[i]].addEventListener('transitionend', function cbt() {
+            if(event.propertyName != 'transform') return;
+            if(cb) cb();
+            element.items[randomList[i]].removeEventListener('transitionend', cbt);
+          });
+        }
+      }, i*100);
+    })(i);}
+  };
+
+  function toggleTransitionProjects(element, bool) {
+    // remove transitions from project elements
+    for(var i = 0; i < element.items.length; i++) {
+      Util.toggleClass(element.items[i], 's-panels__project-preview--no-transition', bool);
+    }
+  };
+
+  function resetProjects(element) {
+    // reset projects classes -> remove selected/no-transition class + add hide class
+    for(var i = 0; i < element.items.length; i++) {
+      Util.removeClass(element.items[i], 's-panels__project-preview--selected s-panels__project-preview--no-transition');
+      Util.addClass(element.items[i], 's-panels__project-preview--hide');
+    }
+
+    // hide project content
+    if(element.selectedSection) Util.addClass(element.selectedSection, 'is-hidden');
+    element.selectedSection = false;
+  };
+
+  function getRandomList(maxVal, exclude) {
+    // get list of random integer from 0 to (maxVal - 1) excluding (exclude) if defined
+    var uniqueRandoms = [];
+    var randomArray = [];
+    
+    function makeUniqueRandom() {
+      // refill the array if needed
+      if (!uniqueRandoms.length) {
+        for (var i = 0; i < maxVal; i++) {
+          if(exclude === false || i != exclude) uniqueRandoms.push(i);
+        }
+      }
+      var index = Math.floor(Math.random() * uniqueRandoms.length);
+      var val = uniqueRandoms[index];
+      // now remove that value from the array
+      uniqueRandoms.splice(index, 1);
+      return val;
+    }
+
+    for(var j = 0; j < maxVal; j++) {
+      randomArray.push(makeUniqueRandom());
+    }
+
+    return randomArray;
+  };
+
+  function toggleProjectAccessibility(project, bool) {
+    bool ? project.setAttribute('aria-hidden', 'true') : project.removeAttribute('aria-hidden');
+    var link = project.getElementsByClassName('js-s-panels__project-control');
+    if(link.length > 0) {
+      bool ? link[0].setAttribute('tabindex', '-1') : link[0].removeAttribute('tabindex');
+    }
+  };
+
+  //initialize the SlidingPanels objects
+	var slidingPanels = document.getElementsByClassName('js-s-panels');
+	if( slidingPanels.length > 0 ) {
+		for( var i = 0; i < slidingPanels.length; i++) {
+			(function(i){new SlidingPanels(slidingPanels[i]);})(i);
+		}
+	}
+}());
+// File#: _1_smooth-scrolling
+// Usage: codyhouse.co/license
+(function() {
+	var SmoothScroll = function(element) {
+		if(!('CSS' in window) || !CSS.supports('color', 'var(--color-var)')) return;
+		this.element = element;
+		this.scrollDuration = parseInt(this.element.getAttribute('data-duration')) || 300;
+		this.dataElementY = this.element.getAttribute('data-scrollable-element-y') || this.element.getAttribute('data-scrollable-element') || this.element.getAttribute('data-element');
+		this.scrollElementY = this.dataElementY ? document.querySelector(this.dataElementY) : window;
+		this.dataElementX = this.element.getAttribute('data-scrollable-element-x');
+		this.scrollElementX = this.dataElementY ? document.querySelector(this.dataElementX) : window;
+		this.initScroll();
+	};
+
+	SmoothScroll.prototype.initScroll = function() {
+		var self = this;
+
+		//detect click on link
+		this.element.addEventListener('click', function(event){
+			event.preventDefault();
+			var targetId = event.target.closest('.js-smooth-scroll').getAttribute('href').replace('#', ''),
+				target = document.getElementById(targetId),
+				targetTabIndex = target.getAttribute('tabindex'),
+				windowScrollTop = self.scrollElementY.scrollTop || document.documentElement.scrollTop;
+
+			// scroll vertically
+			if(!self.dataElementY) windowScrollTop = window.scrollY || document.documentElement.scrollTop;
+
+			var scrollElementY = self.dataElementY ? self.scrollElementY : false;
+
+			var fixedHeight = self.getFixedElementHeight(); // check if there's a fixed element on the page
+			Util.scrollTo(target.getBoundingClientRect().top + windowScrollTop - fixedHeight, self.scrollDuration, function() {
+				// scroll horizontally
+				self.scrollHorizontally(target, fixedHeight);
+				//move the focus to the target element - don't break keyboard navigation
+				Util.moveFocus(target);
+				history.pushState(false, false, '#'+targetId);
+				self.resetTarget(target, targetTabIndex);
+			}, scrollElementY);
+		});
+	};
+
+	SmoothScroll.prototype.scrollHorizontally = function(target, delta) {
+    var scrollEl = this.dataElementX ? this.scrollElementX : false;
+    var windowScrollLeft = this.scrollElementX ? this.scrollElementX.scrollLeft : document.documentElement.scrollLeft;
+    var final = target.getBoundingClientRect().left + windowScrollLeft - delta,
+      duration = this.scrollDuration;
+
+    var element = scrollEl || window;
+    var start = element.scrollLeft || document.documentElement.scrollLeft,
+      currentTime = null;
+
+    if(!scrollEl) start = window.scrollX || document.documentElement.scrollLeft;
+		// return if there's no need to scroll
+    if(Math.abs(start - final) < 5) return;
+        
+    var animateScroll = function(timestamp){
+      if (!currentTime) currentTime = timestamp;        
+      var progress = timestamp - currentTime;
+      if(progress > duration) progress = duration;
+      var val = Math.easeInOutQuad(progress, start, final-start, duration);
+      element.scrollTo({
+				left: val,
+			});
+      if(progress < duration) {
+        window.requestAnimationFrame(animateScroll);
+      }
+    };
+
+    window.requestAnimationFrame(animateScroll);
+  };
+
+	SmoothScroll.prototype.resetTarget = function(target, tabindex) {
+		if( parseInt(target.getAttribute('tabindex')) < 0) {
+			target.style.outline = 'none';
+			!tabindex && target.removeAttribute('tabindex');
+		}	
+	};
+
+	SmoothScroll.prototype.getFixedElementHeight = function() {
+		var scrollElementY = this.dataElementY ? this.scrollElementY : document.documentElement;
+    var fixedElementDelta = parseInt(getComputedStyle(scrollElementY).getPropertyValue('scroll-padding'));
+		if(isNaN(fixedElementDelta) ) { // scroll-padding not supported
+			fixedElementDelta = 0;
+			var fixedElement = document.querySelector(this.element.getAttribute('data-fixed-element'));
+			if(fixedElement) fixedElementDelta = parseInt(fixedElement.getBoundingClientRect().height);
+		}
+		return fixedElementDelta;
+	};
+	
+	//initialize the Smooth Scroll objects
+	var smoothScrollLinks = document.getElementsByClassName('js-smooth-scroll');
+	if( smoothScrollLinks.length > 0 && !Util.cssSupports('scroll-behavior', 'smooth') && window.requestAnimationFrame) {
+		// you need javascript only if css scroll-behavior is not supported
+		for( var i = 0; i < smoothScrollLinks.length; i++) {
+			(function(i){new SmoothScroll(smoothScrollLinks[i]);})(i);
+		}
+	}
+}());
 // File#: _1_social-sharing
 // Usage: codyhouse.co/license
 (function() {
@@ -8339,6 +10590,145 @@ function initContactMap(wrapper) {
       (function(i){initSocialShare(socialShare[i])})(i);
     }
   }
+}());
+// File#: _1_stacking-cards
+// Usage: codyhouse.co/license
+(function() {
+  var StackCards = function(element) {
+    this.element = element;
+    this.items = this.element.getElementsByClassName('js-stack-cards__item');
+    this.scrollingFn = false;
+    this.scrolling = false;
+    initStackCardsEffect(this); 
+    initStackCardsResize(this); 
+  };
+
+  function initStackCardsEffect(element) { // use Intersection Observer to trigger animation
+    setStackCards(element); // store cards CSS properties
+		var observer = new IntersectionObserver(stackCardsCallback.bind(element), { threshold: [0, 1] });
+		observer.observe(element.element);
+  };
+
+  function initStackCardsResize(element) { // detect resize to reset gallery
+    element.element.addEventListener('resize-stack-cards', function(){
+      setStackCards(element);
+      animateStackCards.bind(element);
+    });
+  };
+  
+  function stackCardsCallback(entries) { // Intersection Observer callback
+    if(entries[0].isIntersecting) {
+      if(this.scrollingFn) return; // listener for scroll event already added
+      stackCardsInitEvent(this);
+    } else {
+      if(!this.scrollingFn) return; // listener for scroll event already removed
+      window.removeEventListener('scroll', this.scrollingFn);
+      this.scrollingFn = false;
+    }
+  };
+  
+  function stackCardsInitEvent(element) {
+    element.scrollingFn = stackCardsScrolling.bind(element);
+    window.addEventListener('scroll', element.scrollingFn);
+  };
+
+  function stackCardsScrolling() {
+    if(this.scrolling) return;
+    this.scrolling = true;
+    window.requestAnimationFrame(animateStackCards.bind(this));
+  };
+
+  function setStackCards(element) {
+    // store wrapper properties
+    element.marginY = getComputedStyle(element.element).getPropertyValue('--stack-cards-gap');
+    getIntegerFromProperty(element); // convert element.marginY to integer (px value)
+    element.elementHeight = element.element.offsetHeight;
+
+    // store card properties
+    var cardStyle = getComputedStyle(element.items[0]);
+    element.cardTop = Math.floor(parseFloat(cardStyle.getPropertyValue('top')));
+    element.cardHeight = Math.floor(parseFloat(cardStyle.getPropertyValue('height')));
+
+    // store window property
+    element.windowHeight = window.innerHeight;
+
+    // reset margin + translate values
+    if(isNaN(element.marginY)) {
+      element.element.style.paddingBottom = '0px';
+    } else {
+      element.element.style.paddingBottom = (element.marginY*(element.items.length - 1))+'px';
+    }
+
+    for(var i = 0; i < element.items.length; i++) {
+      if(isNaN(element.marginY)) {
+        element.items[i].style.transform = 'none;';
+      } else {
+        element.items[i].style.transform = 'translateY('+element.marginY*i+'px)';
+      }
+    }
+  };
+
+  function getIntegerFromProperty(element) {
+    var node = document.createElement('div');
+    node.setAttribute('style', 'opacity:0; visbility: hidden;position: absolute; height:'+element.marginY);
+    element.element.appendChild(node);
+    element.marginY = parseInt(getComputedStyle(node).getPropertyValue('height'));
+    element.element.removeChild(node);
+  };
+
+  function animateStackCards() {
+    if(isNaN(this.marginY)) { // --stack-cards-gap not defined - do not trigger the effect
+      this.scrolling = false;
+      return; 
+    }
+
+    var top = this.element.getBoundingClientRect().top;
+
+    if( this.cardTop - top + this.element.windowHeight - this.elementHeight - this.cardHeight + this.marginY + this.marginY*this.items.length > 0) { 
+      this.scrolling = false;
+      return;
+    }
+
+    for(var i = 0; i < this.items.length; i++) { // use only scale
+      var scrolling = this.cardTop - top - i*(this.cardHeight+this.marginY);
+      if(scrolling > 0) {  
+        var scaling = i == this.items.length - 1 ? 1 : (this.cardHeight - scrolling*0.05)/this.cardHeight;
+        this.items[i].style.transform = 'translateY('+this.marginY*i+'px) scale('+scaling+')';
+      } else {
+        this.items[i].style.transform = 'translateY('+this.marginY*i+'px)';
+      }
+    }
+
+    this.scrolling = false;
+  };
+
+  // initialize StackCards object
+  var stackCards = document.getElementsByClassName('js-stack-cards'),
+    intersectionObserverSupported = ('IntersectionObserver' in window && 'IntersectionObserverEntry' in window && 'intersectionRatio' in window.IntersectionObserverEntry.prototype),
+    reducedMotion = Util.osHasReducedMotion();
+    
+	if(stackCards.length > 0 && intersectionObserverSupported && !reducedMotion) { 
+    var stackCardsArray = [];
+		for(var i = 0; i < stackCards.length; i++) {
+			(function(i){
+        stackCardsArray.push(new StackCards(stackCards[i]));
+      })(i);
+    }
+    
+    var resizingId = false,
+      customEvent = new CustomEvent('resize-stack-cards');
+    
+    window.addEventListener('resize', function() {
+      clearTimeout(resizingId);
+      resizingId = setTimeout(doneResizing, 500);
+    });
+
+    function doneResizing() {
+      for( var i = 0; i < stackCardsArray.length; i++) {
+        (function(i){stackCardsArray[i].element.dispatchEvent(customEvent)})(i);
+      };
+    };
+	}
 }());
 // File#: _1_sticky-banner
 // Usage: codyhouse.co/license
@@ -8615,6 +11005,144 @@ function initContactMap(wrapper) {
 		});
   }
 }());
+// File#: _1_swipe-content
+(function() {
+	var SwipeContent = function(element) {
+		this.element = element;
+		this.delta = [false, false];
+		this.dragging = false;
+		this.intervalId = false;
+		initSwipeContent(this);
+	};
+
+	function initSwipeContent(content) {
+		content.element.addEventListener('mousedown', handleEvent.bind(content));
+		content.element.addEventListener('touchstart', handleEvent.bind(content));
+	};
+
+	function initDragging(content) {
+		//add event listeners
+		content.element.addEventListener('mousemove', handleEvent.bind(content));
+		content.element.addEventListener('touchmove', handleEvent.bind(content));
+		content.element.addEventListener('mouseup', handleEvent.bind(content));
+		content.element.addEventListener('mouseleave', handleEvent.bind(content));
+		content.element.addEventListener('touchend', handleEvent.bind(content));
+	};
+
+	function cancelDragging(content) {
+		//remove event listeners
+		if(content.intervalId) {
+			(!window.requestAnimationFrame) ? clearInterval(content.intervalId) : window.cancelAnimationFrame(content.intervalId);
+			content.intervalId = false;
+		}
+		content.element.removeEventListener('mousemove', handleEvent.bind(content));
+		content.element.removeEventListener('touchmove', handleEvent.bind(content));
+		content.element.removeEventListener('mouseup', handleEvent.bind(content));
+		content.element.removeEventListener('mouseleave', handleEvent.bind(content));
+		content.element.removeEventListener('touchend', handleEvent.bind(content));
+	};
+
+	function handleEvent(event) {
+		switch(event.type) {
+			case 'mousedown':
+			case 'touchstart':
+				startDrag(this, event);
+				break;
+			case 'mousemove':
+			case 'touchmove':
+				drag(this, event);
+				break;
+			case 'mouseup':
+			case 'mouseleave':
+			case 'touchend':
+				endDrag(this, event);
+				break;
+		}
+	};
+
+	function startDrag(content, event) {
+		content.dragging = true;
+		// listen to drag movements
+		initDragging(content);
+		content.delta = [parseInt(unify(event).clientX), parseInt(unify(event).clientY)];
+		// emit drag start event
+		emitSwipeEvents(content, 'dragStart', content.delta, event.target);
+	};
+
+	function endDrag(content, event) {
+		cancelDragging(content);
+		// credits: https://css-tricks.com/simple-swipe-with-vanilla-javascript/
+		var dx = parseInt(unify(event).clientX), 
+	    dy = parseInt(unify(event).clientY);
+	  
+	  // check if there was a left/right swipe
+		if(content.delta && (content.delta[0] || content.delta[0] === 0)) {
+	    var s = getSign(dx - content.delta[0]);
+			
+			if(Math.abs(dx - content.delta[0]) > 30) {
+				(s < 0) ? emitSwipeEvents(content, 'swipeLeft', [dx, dy]) : emitSwipeEvents(content, 'swipeRight', [dx, dy]);	
+			}
+	    
+	    content.delta[0] = false;
+	  }
+		// check if there was a top/bottom swipe
+	  if(content.delta && (content.delta[1] || content.delta[1] === 0)) {
+	  	var y = getSign(dy - content.delta[1]);
+
+	  	if(Math.abs(dy - content.delta[1]) > 30) {
+	    	(y < 0) ? emitSwipeEvents(content, 'swipeUp', [dx, dy]) : emitSwipeEvents(content, 'swipeDown', [dx, dy]);
+	    }
+
+	    content.delta[1] = false;
+	  }
+		// emit drag end event
+	  emitSwipeEvents(content, 'dragEnd', [dx, dy]);
+	  content.dragging = false;
+	};
+
+	function drag(content, event) {
+		if(!content.dragging) return;
+		// emit dragging event with coordinates
+		(!window.requestAnimationFrame) 
+			? content.intervalId = setTimeout(function(){emitDrag.bind(content, event);}, 250) 
+			: content.intervalId = window.requestAnimationFrame(emitDrag.bind(content, event));
+	};
+
+	function emitDrag(event) {
+		emitSwipeEvents(this, 'dragging', [parseInt(unify(event).clientX), parseInt(unify(event).clientY)]);
+	};
+
+	function unify(event) { 
+		// unify mouse and touch events
+		return event.changedTouches ? event.changedTouches[0] : event; 
+	};
+
+	function emitSwipeEvents(content, eventName, detail, el) {
+		var trigger = false;
+		if(el) trigger = el;
+		// emit event with coordinates
+		var event = new CustomEvent(eventName, {detail: {x: detail[0], y: detail[1], origin: trigger}});
+		content.element.dispatchEvent(event);
+	};
+
+	function getSign(x) {
+		if(!Math.sign) {
+			return ((x > 0) - (x < 0)) || +x;
+		} else {
+			return Math.sign(x);
+		}
+	};
+
+	window.SwipeContent = SwipeContent;
+	
+	//initialize the SwipeContent objects
+	var swipe = document.getElementsByClassName('js-swipe-content');
+	if( swipe.length > 0 ) {
+		for( var i = 0; i < swipe.length; i++) {
+			(function(i){new SwipeContent(swipe[i]);})(i);
+		}
+	}
+}());
 // File#: _1_switch-icon
 // Usage: codyhouse.co/license
 (function() {
@@ -8635,6 +11163,58 @@ function initContactMap(wrapper) {
 			});
 		};
 	}
+}());
+// File#: _1_table
+// Usage: codyhouse.co/license
+(function() {
+  function initTable(table) {
+    checkTableLayour(table); // switch from a collapsed to an expanded layout
+    Util.addClass(table, 'table--loaded'); // show table
+
+    // custom event emitted when window is resized
+    table.addEventListener('update-table', function(event){
+      checkTableLayour(table);
+    });
+  };
+
+  function checkTableLayour(table) {
+    var layout = getComputedStyle(table, ':before').getPropertyValue('content').replace(/\'|"/g, '');
+    Util.toggleClass(table, tableExpandedLayoutClass, layout != 'collapsed');
+  };
+
+  var tables = document.getElementsByClassName('js-table'),
+    tableExpandedLayoutClass = 'table--expanded';
+  if( tables.length > 0 ) {
+    var j = 0;
+    for( var i = 0; i < tables.length; i++) {
+      var beforeContent = getComputedStyle(tables[i], ':before').getPropertyValue('content');
+      if(beforeContent && beforeContent !='' && beforeContent !='none') {
+        (function(i){initTable(tables[i]);})(i);
+        j = j + 1;
+      } else {
+        Util.addClass(tables[i], 'table--loaded');
+      }
+    }
+    
+    if(j > 0) {
+      var resizingId = false,
+        customEvent = new CustomEvent('update-table');
+      window.addEventListener('resize', function(event){
+        clearTimeout(resizingId);
+        resizingId = setTimeout(doneResizing, 300);
+      });
+
+      function doneResizing() {
+        for( var i = 0; i < tables.length; i++) {
+          (function(i){tables[i].dispatchEvent(customEvent)})(i);
+        };
+      };
+
+      (window.requestAnimationFrame) // init table layout
+        ? window.requestAnimationFrame(doneResizing)
+        : doneResizing();
+    }
+  }
 }());
 // File#: _1_tabs
 // Usage: codyhouse.co/license
@@ -8761,6 +11341,549 @@ function initContactMap(wrapper) {
 	if( tabs.length > 0 ) {
 		for( var i = 0; i < tabs.length; i++) {
 			(function(i){new Tab(tabs[i]);})(i);
+		}
+	}
+}());
+// File#: _1_tilted-img-slideshow
+// Usage: codyhouse.co/license
+(function() {
+  var TiltedSlideshow = function(element) {
+    this.element = element;
+    this.list = this.element.getElementsByClassName('js-tilted-slideshow__list')[0];
+    this.images = this.list.getElementsByClassName('js-tilted-slideshow__item');
+    this.selectedIndex = 0;
+    this.animating = false;
+    // classes
+    this.orderClasses = ['tilted-slideshow__item--top', 'tilted-slideshow__item--middle', 'tilted-slideshow__item--bottom'];
+    this.moveClasses = ['tilted-slideshow__item--move-out', 'tilted-slideshow__item--move-in'];
+    this.interactedClass = 'tilted-slideshow--interacted';
+    initTiltedSlideshow(this);
+  };
+
+  function initTiltedSlideshow(slideshow) {
+    if(!animateImgs) removeTransitions(slideshow);
+    
+    slideshow.list.addEventListener('click', function(event) {
+      Util.addClass(slideshow.element, slideshow.interactedClass);
+      animateImgs ? animateImages(slideshow) : switchImages(slideshow);
+    });
+  };
+
+  function removeTransitions(slideshow) {
+    // if reduced motion is on or css variables are not supported -> do not animate images
+    for(var i = 0; i < slideshow.images.length; i++) {
+      slideshow.images[i].style.transition = 'none';
+    }
+  };
+
+  function switchImages(slideshow) {
+    // if reduced motion is on or css variables are not supported -> switch images without animation
+    resetOrderClasses(slideshow);
+    resetSelectedIndex(slideshow);
+  };
+
+  function resetSelectedIndex(slideshow) {
+    // update the index of the top image
+    slideshow.selectedIndex = resetIndex(slideshow, slideshow.selectedIndex + 1);
+  };
+
+  function resetIndex(slideshow, index) {
+    // make sure index is < 3
+    if(index >= slideshow.images.length) index = index - slideshow.images.length;
+    return index;
+  };
+
+  function resetOrderClasses(slideshow) {
+    // update the orderClasses for each images
+    if(!animateImgs) {
+      // top image -> remove top class and add bottom class
+      Util.addClass(slideshow.images[slideshow.selectedIndex], slideshow.orderClasses[2]);
+      Util.removeClass(slideshow.images[slideshow.selectedIndex], slideshow.orderClasses[0]);
+    }
+
+    // middle image -> remove middle class and add top class
+    var middleImage = slideshow.images[resetIndex(slideshow, slideshow.selectedIndex + 1)];
+    Util.addClass(middleImage, slideshow.orderClasses[0]);
+    Util.removeClass(middleImage, slideshow.orderClasses[1]);
+
+    // bottom image -> remove bottom class and add middle class
+    var bottomImage = slideshow.images[resetIndex(slideshow, slideshow.selectedIndex + 2)];
+    Util.addClass(bottomImage, slideshow.orderClasses[1]);
+    Util.removeClass(bottomImage, slideshow.orderClasses[2]);
+  };
+
+  function animateImages(slideshow) {
+    if(slideshow.animating) return;
+    slideshow.animating = true;
+
+    // reset order classes for middle/bottom images
+    resetOrderClasses(slideshow);
+    
+    // animate top image
+    var topImage = slideshow.images[slideshow.selectedIndex];
+    // remove top class and add move out class
+    Util.removeClass(topImage, slideshow.orderClasses[0]);
+    Util.addClass(topImage, slideshow.moveClasses[0]);
+    
+    topImage.addEventListener('transitionend', function cb(event) {
+      // remove transition
+			topImage.style.transition = 'none';
+			topImage.removeEventListener("transitionend", cb);
+      
+      setTimeout(function(){
+        // add bottom + move-in class, remove move-out class
+        Util.removeClass(topImage, slideshow.moveClasses[0]);
+        Util.addClass(topImage, slideshow.moveClasses[1]+' '+ slideshow.orderClasses[2]);
+        setTimeout(function(){
+          topImage.style.transition = '';
+          // remove move-in class
+          Util.removeClass(topImage, slideshow.moveClasses[1]);
+          topImage.addEventListener('transitionend', function cbn(event) {
+            // reset animating property and selectedIndex index
+            resetSelectedIndex(slideshow);
+            slideshow.animating = false;
+            topImage.removeEventListener("transitionend", cbn);
+          });
+        }, 10);
+      }, 10);
+		});
+  };
+
+  var tiltedSlideshow = document.getElementsByClassName('js-tilted-slideshow'),
+    animateImgs = !Util.osHasReducedMotion() && ('CSS' in window) && CSS.supports('color', 'var(--color-var)');
+  if(tiltedSlideshow.length > 0) {
+    for(var i = 0; i < tiltedSlideshow.length; i++) {
+      new TiltedSlideshow(tiltedSlideshow[i]);
+    }
+  }
+}());
+// File#: _1_tooltip
+// Usage: codyhouse.co/license
+(function() {
+	var Tooltip = function(element) {
+		this.element = element;
+		this.tooltip = false;
+		this.tooltipIntervalId = false;
+		this.tooltipContent = this.element.getAttribute('title');
+		this.tooltipPosition = (this.element.getAttribute('data-tooltip-position')) ? this.element.getAttribute('data-tooltip-position') : 'top';
+		this.tooltipClasses = (this.element.getAttribute('data-tooltip-class')) ? this.element.getAttribute('data-tooltip-class') : false;
+		this.tooltipId = 'js-tooltip-element'; // id of the tooltip element -> trigger will have the same aria-describedby attr
+		// there are cases where you only need the aria-label -> SR do not need to read the tooltip content (e.g., footnotes)
+		this.tooltipDescription = (this.element.getAttribute('data-tooltip-describedby') && this.element.getAttribute('data-tooltip-describedby') == 'false') ? false : true; 
+
+		this.tooltipDelay = 300; // show tooltip after a delay (in ms)
+		this.tooltipDelta = 10; // distance beetwen tooltip and trigger element (in px)
+		this.tooltipTriggerHover = false;
+		// tooltp sticky option
+		this.tooltipSticky = (this.tooltipClasses && this.tooltipClasses.indexOf('tooltip--sticky') > -1);
+		this.tooltipHover = false;
+		if(this.tooltipSticky) {
+			this.tooltipHoverInterval = false;
+		}
+		resetTooltipContent(this);
+		initTooltip(this);
+	};
+
+	function resetTooltipContent(tooltip) {
+		var htmlContent = tooltip.element.getAttribute('data-tooltip-title');
+		if(htmlContent) {
+			tooltip.tooltipContent = htmlContent;
+		}
+	};
+
+	function initTooltip(tooltipObj) {
+		// reset trigger element
+		tooltipObj.element.removeAttribute('title');
+		tooltipObj.element.setAttribute('tabindex', '0');
+		// add event listeners
+		tooltipObj.element.addEventListener('mouseenter', handleEvent.bind(tooltipObj));
+		tooltipObj.element.addEventListener('focus', handleEvent.bind(tooltipObj));
+	};
+
+	function removeTooltipEvents(tooltipObj) {
+		// remove event listeners
+		tooltipObj.element.removeEventListener('mouseleave',  handleEvent.bind(tooltipObj));
+		tooltipObj.element.removeEventListener('blur',  handleEvent.bind(tooltipObj));
+	};
+
+	function handleEvent(event) {
+		// handle events
+		switch(event.type) {
+			case 'mouseenter':
+			case 'focus':
+				showTooltip(this, event);
+				break;
+			case 'mouseleave':
+			case 'blur':
+				checkTooltip(this);
+				break;
+		}
+	};
+
+	function showTooltip(tooltipObj, event) {
+		// tooltip has already been triggered
+		if(tooltipObj.tooltipIntervalId) return;
+		tooltipObj.tooltipTriggerHover = true;
+		// listen to close events
+		tooltipObj.element.addEventListener('mouseleave', handleEvent.bind(tooltipObj));
+		tooltipObj.element.addEventListener('blur', handleEvent.bind(tooltipObj));
+		// show tooltip with a delay
+		tooltipObj.tooltipIntervalId = setTimeout(function(){
+			createTooltip(tooltipObj);
+		}, tooltipObj.tooltipDelay);
+	};
+
+	function createTooltip(tooltipObj) {
+		tooltipObj.tooltip = document.getElementById(tooltipObj.tooltipId);
+		
+		if( !tooltipObj.tooltip ) { // tooltip element does not yet exist
+			tooltipObj.tooltip = document.createElement('div');
+			document.body.appendChild(tooltipObj.tooltip);
+		} 
+		
+		// reset tooltip content/position
+		Util.setAttributes(tooltipObj.tooltip, {'id': tooltipObj.tooltipId, 'class': 'tooltip tooltip--is-hidden js-tooltip', 'role': 'tooltip'});
+		tooltipObj.tooltip.innerHTML = tooltipObj.tooltipContent;
+		if(tooltipObj.tooltipDescription) tooltipObj.element.setAttribute('aria-describedby', tooltipObj.tooltipId);
+		if(tooltipObj.tooltipClasses) Util.addClass(tooltipObj.tooltip, tooltipObj.tooltipClasses);
+		if(tooltipObj.tooltipSticky) Util.addClass(tooltipObj.tooltip, 'tooltip--sticky');
+		placeTooltip(tooltipObj);
+		Util.removeClass(tooltipObj.tooltip, 'tooltip--is-hidden');
+
+		// if tooltip is sticky, listen to mouse events
+		if(!tooltipObj.tooltipSticky) return;
+		tooltipObj.tooltip.addEventListener('mouseenter', function cb(){
+			tooltipObj.tooltipHover = true;
+			if(tooltipObj.tooltipHoverInterval) {
+				clearInterval(tooltipObj.tooltipHoverInterval);
+				tooltipObj.tooltipHoverInterval = false;
+			}
+			tooltipObj.tooltip.removeEventListener('mouseenter', cb);
+			tooltipLeaveEvent(tooltipObj);
+		});
+	};
+
+	function tooltipLeaveEvent(tooltipObj) {
+		tooltipObj.tooltip.addEventListener('mouseleave', function cb(){
+			tooltipObj.tooltipHover = false;
+			tooltipObj.tooltip.removeEventListener('mouseleave', cb);
+			hideTooltip(tooltipObj);
+		});
+	};
+
+	function placeTooltip(tooltipObj) {
+		// set top and left position of the tooltip according to the data-tooltip-position attr of the trigger
+		var dimention = [tooltipObj.tooltip.offsetHeight, tooltipObj.tooltip.offsetWidth],
+			positionTrigger = tooltipObj.element.getBoundingClientRect(),
+			position = [],
+			scrollY = window.scrollY || window.pageYOffset;
+		
+		position['top'] = [ (positionTrigger.top - dimention[0] - tooltipObj.tooltipDelta + scrollY), (positionTrigger.right/2 + positionTrigger.left/2 - dimention[1]/2)];
+		position['bottom'] = [ (positionTrigger.bottom + tooltipObj.tooltipDelta + scrollY), (positionTrigger.right/2 + positionTrigger.left/2 - dimention[1]/2)];
+		position['left'] = [(positionTrigger.top/2 + positionTrigger.bottom/2 - dimention[0]/2 + scrollY), positionTrigger.left - dimention[1] - tooltipObj.tooltipDelta];
+		position['right'] = [(positionTrigger.top/2 + positionTrigger.bottom/2 - dimention[0]/2 + scrollY), positionTrigger.right + tooltipObj.tooltipDelta];
+		
+		var direction = tooltipObj.tooltipPosition;
+		if( direction == 'top' && position['top'][0] < scrollY) direction = 'bottom';
+		else if( direction == 'bottom' && position['bottom'][0] + tooltipObj.tooltipDelta + dimention[0] > scrollY + window.innerHeight) direction = 'top';
+		else if( direction == 'left' && position['left'][1] < 0 )  direction = 'right';
+		else if( direction == 'right' && position['right'][1] + dimention[1] > window.innerWidth ) direction = 'left';
+		
+		if(direction == 'top' || direction == 'bottom') {
+			if(position[direction][1] < 0 ) position[direction][1] = 0;
+			if(position[direction][1] + dimention[1] > window.innerWidth ) position[direction][1] = window.innerWidth - dimention[1];
+		}
+		tooltipObj.tooltip.style.top = position[direction][0]+'px';
+		tooltipObj.tooltip.style.left = position[direction][1]+'px';
+		Util.addClass(tooltipObj.tooltip, 'tooltip--'+direction);
+	};
+
+	function checkTooltip(tooltipObj) {
+		tooltipObj.tooltipTriggerHover = false;
+		if(!tooltipObj.tooltipSticky) hideTooltip(tooltipObj);
+		else {
+			if(tooltipObj.tooltipHover) return;
+			if(tooltipObj.tooltipHoverInterval) return;
+			tooltipObj.tooltipHoverInterval = setTimeout(function(){
+				hideTooltip(tooltipObj); 
+				tooltipObj.tooltipHoverInterval = false;
+			}, 300);
+		}
+	};
+
+	function hideTooltip(tooltipObj) {
+		if(tooltipObj.tooltipHover || tooltipObj.tooltipTriggerHover) return;
+		clearInterval(tooltipObj.tooltipIntervalId);
+		if(tooltipObj.tooltipHoverInterval) {
+			clearInterval(tooltipObj.tooltipHoverInterval);
+			tooltipObj.tooltipHoverInterval = false;
+		}
+		tooltipObj.tooltipIntervalId = false;
+		if(!tooltipObj.tooltip) return;
+		// hide tooltip
+		removeTooltip(tooltipObj);
+		// remove events
+		removeTooltipEvents(tooltipObj);
+	};
+
+	function removeTooltip(tooltipObj) {
+		Util.addClass(tooltipObj.tooltip, 'tooltip--is-hidden');
+		if(tooltipObj.tooltipDescription) tooltipObj.element.removeAttribute('aria-describedby');
+	};
+
+	window.Tooltip = Tooltip;
+
+	//initialize the Tooltip objects
+	var tooltips = document.getElementsByClassName('js-tooltip-trigger');
+	if( tooltips.length > 0 ) {
+		for( var i = 0; i < tooltips.length; i++) {
+			(function(i){new Tooltip(tooltips[i]);})(i);
+		}
+	}
+}());
+// File#: _1_tree
+// Usage: codyhouse.co/license
+(function() {
+  var Tree = function(element) {
+    this.element = element;
+    this.contentEditable = treeIsEditable(this);
+    initTree(this);
+  };
+
+  function treeIsEditable(element) {
+    var editableAttr = element.element.getAttribute('data-tree-content-editable');
+    return editableAttr && editableAttr == 'true';
+  };
+
+  function initTree(element) {
+    element.element.addEventListener('click', function(event){
+      var control = event.target.closest('.js-tree__node-control');
+      if(control) {
+        var node = control.closest('.tree__node');
+        if(node) Util.toggleClass(node, 'tree__node--expanded', !Util.hasClass(node, 'tree__node--expanded'));
+      } else if(element.contentEditable) {
+        selectItem(element, event.target);
+      }
+    });
+
+    if(element.contentEditable) initContentEditable(element);
+
+    // keyboard navigation
+    initKeyboardNav(element);
+  };
+
+  function selectItem(element, target) {
+    var item = target.closest('.tree__item');
+    if(item) {
+      var selectedItem = element.element.getElementsByClassName('tree__item--selected');
+      if(selectedItem.length > 0) Util.removeClass(selectedItem[0], 'tree__item--selected');
+      Util.addClass(item, 'tree__item--selected');
+    }
+  };
+
+  function initContentEditable(element) {
+    element.element.addEventListener('dblclick', function(event){
+      // make label editable on double-click
+      var label = event.target.closest('.tree__label');
+      if(label) resetEditing(element, label, true);
+    });
+
+    element.element.addEventListener('focusout', function(event){
+      // if label loses focus -> remove the contenteditable attribute
+      var editingLabel = event.target.closest('.tree__label[contenteditable="true"]');
+      if(editingLabel) resetEditing(element, editingLabel, false);
+    });
+  };
+
+  function initKeyboardNav(element) {
+    element.element.addEventListener('keydown', function(event) {
+      var focusedNode = document.activeElement.closest('.tree__node');
+      if(!focusedNode) return;
+      var isGroupNode = focusedNode.querySelector('.tree__nodes'),
+        nodeIsEditing = event.target.closest('.tree__label[contenteditable="true"]');
+      
+      if((event.key && event.key.toLowerCase() === "arrowright") || (event.keyCode && event.keyCode === "39")) {
+        if(!isGroupNode || nodeIsEditing) return;
+        event.preventDefault();
+        // if this is a group -> open it
+        Util.addClass(focusedNode, 'tree__node--expanded');
+      } else if ((event.key && event.key.toLowerCase() === "arrowleft") || (event.keyCode && event.keyCode === "37")) {
+        if(!isGroupNode || nodeIsEditing) return;
+        event.preventDefault();
+        // if this is a group -> close it
+        Util.removeClass(focusedNode, 'tree__node--expanded');
+      } else if ((event.key && event.key.toLowerCase() === "arrowdown") || (event.keyCode && event.keyCode === "40")) {
+        event.preventDefault();
+        var nextNode = getNextNode(focusedNode, isGroupNode);
+        moveTreeFocused(element, nextNode);
+      } else if ((event.key && event.key.toLowerCase() === "arrowup") || (event.keyCode && event.keyCode === "38")) {
+        event.preventDefault();
+        var prevNode = getPrevNode(focusedNode);
+        moveTreeFocused(element, prevNode);
+			} else if ( element.contentEditable && (event.key && event.key.toLowerCase() === "enter") || (event.keyCode && event.keyCode === "13")) {
+        // user pressed the Enter key - only for content editable 
+        var editingLabel = event.target.closest('.tree__label[contenteditable="true"]'),
+          labelToEdit = event.target.closest('.tree__label');
+        if(editingLabel) { // label was being edited
+          event.preventDefault();
+          resetEditing(element, editingLabel, false);
+        } else if(labelToEdit) { // lable was in focus -> allow editing
+          event.preventDefault();
+          resetEditing(element, labelToEdit, true);
+        } 
+      } else if ( element.contentEditable && (event.key && event.key.toLowerCase() === "escape") || (event.keyCode && event.keyCode === "27")) {
+        // if user was editing an element -> resetEditing
+        var editingLabel = event.target.closest('.tree__label[contenteditable="true"]');
+        if(editingLabel) { // label was being edited
+          event.preventDefault();
+          resetEditing(element, editingLabel, false);
+        }
+      }
+    });
+  };
+
+  function getPrevNode(node) {
+    var prevSibling = node.previousElementSibling;
+    if(!prevSibling) {
+      // get parent
+      var parent = node.parentElement;
+      if(!parent) return false;
+      return parent.closest('.tree__node');
+    } else if(prevSibling.classList.contains('tree__node--expanded')) {
+      return getLastChild(prevSibling);
+    } else {
+      return prevSibling;
+    }
+  };
+
+  function getLastChild(node) { // recursive function used to grab the prev element to select
+    var children = Util.getChildrenByClassName(node.querySelector('.tree__nodes'), 'tree__node');
+    if(children.length > 0) {
+      var lastChild = children[children.length - 1];
+      console.log(lastChild);
+      if(lastChild.classList.contains('tree__node--expanded')) {
+        return getLastChild(lastChild);
+      } else {
+        return lastChild;
+      }
+    } else {
+      return node;
+    }
+  };
+
+  function getNextNode(node, isGroupNode) {
+    var nextSibling = false;
+    if(isGroupNode && Util.hasClass(node, 'tree__node--expanded')) {
+      // expanded group -> take children if any
+      var children = node.getElementsByClassName('tree__node');
+      if(children.length > 0) {
+        nextSibling = children[0];
+      } else {
+        nextSibling = node.nextElementSibling;
+      }
+    } else {
+      nextSibling = node.nextElementSibling;
+    }
+    return getNotFalseNextElement(node, nextSibling);
+  };
+
+  function getNotFalseNextElement(node, nextSibling) { // recursive function used to grab the next element to select
+    if(nextSibling) return nextSibling;
+    // element does not have siblings to return -> get parent and check for next not false sibling
+    var parent = node.parentElement;
+    if(!parent) return false;
+    var parentItem = parent.closest('.tree__node');
+    if(parentItem) return getNotFalseNextElement(parentItem, parentItem.nextElementSibling);
+    else return false;
+  };
+
+  function moveTreeFocused(element, node) { // new node has been selected using the keyboard (up/down arrows)
+    if(!node) return;
+    var isGroupNode = node.querySelector('.tree__nodes');
+    // move focus to anchor/button or to span (content-editable variation)
+    var focusEl;
+    if(element.contentEditable) {
+      focusEl = node.querySelector('.tree__label');
+    } else {
+      focusEl = isGroupNode ? node.querySelector('.js-tree__node-control') : node.querySelector('a');
+    }
+    if(focusEl) focusEl.focus();
+    // content-editable -> move also the selected class
+    if(element.contentEditable) selectItem(element, focusEl);
+  };
+
+  function resetEditing(element, label, bool) {
+    if(!label) return;
+    Util.toggleClass(label.closest('.tree__item'), 'tree__item--editing', bool);
+    if(bool) { // make label editable
+      label.setAttribute('contenteditable', 'true');
+      selectText(label);
+    } else { // label not editable
+      label.removeAttribute('contenteditable');
+      // emit custom event to keep track of the updated labels
+		  element.element.dispatchEvent(new CustomEvent('labelEdited', {detail: label}));
+    }
+  };
+
+  function selectText(element) {
+    // when label is being editied -> select all its text
+    if (document.body.createTextRange) {
+      var range = document.body.createTextRange();
+      range.moveToElementText(element);
+      range.select();
+    } else if (window.getSelection) {
+      var selection = window.getSelection();        
+      var range = document.createRange();
+      range.selectNodeContents(element);
+      selection.removeAllRanges();
+      selection.addRange(range);
+    }
+  };
+
+  //initialize the Tree objects
+  var trees = document.getElementsByClassName('js-tree');
+	if( trees.length > 0) {
+		for( var i = 0; i < trees.length; i++) {
+      new Tree(trees[i]);
+    }
+	}
+}());
+// File#: _1_vertical-timeline
+// Usage: codyhouse.co/license
+(function() {
+	var VTimeline = function(element) {
+    this.element = element;
+    this.sections = this.element.getElementsByClassName('js-v-timeline__section');
+    this.animate = this.element.getAttribute('data-animation') && this.element.getAttribute('data-animation') == 'on' ? true : false;
+    this.animationClass = 'v-timeline__section--animate';
+    this.animationDelta = '-150px';
+    initVTimeline(this);
+  };
+
+  function initVTimeline(element) {
+    if(!element.animate) return;
+    for(var i = 0; i < element.sections.length; i++) {
+      var observer = new IntersectionObserver(vTimelineCallback.bind(element, i),
+      {rootMargin: "0px 0px "+element.animationDelta+" 0px"});
+		  observer.observe(element.sections[i]);
+    }
+  };
+
+  function vTimelineCallback(index, entries, observer) {
+    if(entries[0].isIntersecting) {
+      Util.addClass(this.sections[index], this.animationClass);
+      observer.unobserve(this.sections[index]);
+    } 
+  };
+
+  //initialize the VTimeline objects
+  var timelines = document.querySelectorAll('.js-v-timeline'),
+    intersectionObserverSupported = ('IntersectionObserver' in window && 'IntersectionObserverEntry' in window && 'intersectionRatio' in window.IntersectionObserverEntry.prototype),
+    reducedMotion = Util.osHasReducedMotion();
+	if( timelines.length > 0) {
+		for( var i = 0; i < timelines.length; i++) {
+      if(intersectionObserverSupported && !reducedMotion) (function(i){new VTimeline(timelines[i]);})(i);
+      else timelines[i].removeAttribute('data-animation');
 		}
 	}
 }());
@@ -10025,6 +13148,1410 @@ function initContactMap(wrapper) {
     }
   };
 }());
+// File#: _2_chart
+// Usage: codyhouse.co/license
+(function() {
+  var Chart = function(opts) {
+    this.options = Util.extend(Chart.defaults , opts);
+    this.element = this.options.element.getElementsByClassName('js-chart__area')[0];
+    this.svgPadding = this.options.padding;
+    this.topDelta = this.svgPadding;
+    this.bottomDelta = 0;
+    this.leftDelta = 0;
+    this.rightDelta = 0;
+    this.legendHeight = 0;
+    this.yChartMaxWidth = 0;
+    this.yAxisHeight = 0;
+    this.xAxisWidth = 0;
+    this.yAxisInterval = []; // used to store min and max value on y axis
+    this.xAxisInterval = []; // used to store min and max value on x axis
+    this.datasetScaled = []; // used to store set data converted to chart coordinates
+    this.datasetScaledFlat = []; // used to store set data converted to chart coordinates for animation
+    this.datasetAreaScaled = []; // used to store set data (area part) converted to chart coordinates
+    this.datasetAreaScaledFlat = []; // used to store set data (area part)  converted to chart coordinates for animation
+    // columns chart - store if x axis label where rotated
+    this.xAxisLabelRotation = false;
+    // tooltip
+    this.interLine = false;
+    this.markers = false;
+    this.tooltipOn = this.options.tooltip && this.options.tooltip.enabled;
+    this.tooltipClasses = (this.tooltipOn && this.options.tooltip.classes) ? this.options.tooltip.classes : '';
+    this.tooltipPosition = (this.tooltipOn && this.options.tooltip.position) ? this.options.tooltip.position : false;
+    this.tooltipDelta = 10;
+    this.selectedMarker = false;
+    this.selectedMarkerClass = 'chart__marker--selected';
+    this.selectedBarClass = 'chart__data-bar--selected';
+    this.hoverId = false;
+    this.hovering = false;
+    // events id
+    this.eventIds = []; // will use to store event ids
+    // accessibility
+    this.categories = this.options.element.getElementsByClassName('js-chart__category');
+    this.loaded = false;
+    // init chart
+    initChartInfo(this);
+    initChart(this);
+    // if externalDate == true
+    initExternalData(this);
+  };
+
+  function initChartInfo(chart) {
+    // we may need to store store some initial config details before setting up the chart
+    if(chart.options.type == 'column') {
+      setChartColumnSize(chart);
+    }
+  };
+
+  function initChart(chart) {
+    if(chart.options.datasets.length == 0) return; // no data where provided
+    if(!intObservSupported) chart.options.animate = false; // do not animate if intersectionObserver is not supported
+    // init event ids variables
+    intEventIds(chart);
+    setChartSize(chart);
+    createChartSvg(chart);
+    createSrTables(chart); // chart accessibility
+    animateChart(chart); // if animate option is true
+    resizeChart(chart);
+    chart.loaded = true;
+  };
+
+  function intEventIds(chart) {
+    chart.eventIds['resize'] = false;
+  };
+
+  function setChartSize(chart) {
+    chart.height = chart.element.clientHeight;
+    chart.width = chart.element.clientWidth;
+  };
+
+  function createChartSvg(chart) {
+    var svg = '<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" width="'+chart.width+'" height="'+chart.height+'" class="chart__svg js-chart__svg"></svg>';
+    chart.element.innerHTML = svg;
+    chart.svg = chart.element.getElementsByClassName('js-chart__svg')[0];
+
+    // create chart content
+    switch (chart.options.type) {
+      case 'pie':
+        getPieSvgCode(chart);
+        break;
+      case 'doughnut':
+        getDoughnutSvgCode(chart);
+        break;
+      case 'column':
+        getColumnSvgCode(chart);
+        break;
+      default:
+        getLinearSvgCode(chart);
+    }
+  };
+
+  function getLinearSvgCode(chart) { // svg for linear + area charts
+    setYAxis(chart);
+    setXAxis(chart);
+    updateChartWidth(chart);
+    placexAxisLabels(chart);
+    placeyAxisLabels(chart);
+    setChartDatasets(chart);
+    initTooltips(chart);
+  };
+
+  function getColumnSvgCode(chart) { // svg for column charts
+    setYAxis(chart);
+    setXAxis(chart);
+    updateChartWidth(chart);
+    placexAxisLabels(chart);
+    placeyAxisLabels(chart);
+    resetColumnChart(chart);
+    setColumnChartDatasets(chart);
+    initTooltips(chart);
+  };
+
+  function setXAxis(chart) {
+    // set legend of axis if available
+    if( chart.options.xAxis && chart.options.xAxis.legend) {
+      var textLegend = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      textLegend.textContent = chart.options.xAxis.legend;
+      Util.setAttributes(textLegend, {class: 'chart__axis-legend chart__axis-legend--x js-chart__axis-legend--x'});
+      chart.svg.appendChild(textLegend);
+
+      var xLegend = chart.element.getElementsByClassName('js-chart__axis-legend--x')[0];
+
+      if(isVisible(xLegend)) {
+        var size = xLegend.getBBox(),
+          xPosition = chart.width/2 - size.width/2,
+          yPosition = chart.height - chart.bottomDelta;
+
+        Util.setAttributes(xLegend, {x: xPosition, y: yPosition});
+        chart.bottomDelta = chart.bottomDelta + size.height +chart.svgPadding;
+      }
+    }
+
+    // get interval and create scale
+    var xLabels;
+    if(chart.options.xAxis && chart.options.xAxis.labels && chart.options.xAxis.labels.length > 1) {
+      xLabels = chart.options.xAxis.labels;
+      chart.xAxisInterval = [0, chart.options.xAxis.labels.length - 1];
+    } else {
+      xLabels = getChartXLabels(chart); // this function is used to set chart.xAxisInterval as well
+    }
+    // modify axis labels
+    if(chart.options.xAxis && chart.options.xAxis.labelModifier) {
+      xLabels = modifyAxisLabel(xLabels, chart.options.xAxis.labelModifier);
+    } 
+
+    var gEl = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    Util.setAttributes(gEl, {class: 'chart__axis-labels chart__axis-labels--x js-chart__axis-labels--x'});
+
+    for(var i = 0; i < xLabels.length; i++) {
+      var textEl = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      var labelClasses = (chart.options.xAxis && chart.options.xAxis.labels) ? 'chart__axis-label chart__axis-label--x js-chart__axis-label' : 'is-hidden js-chart__axis-label';
+      Util.setAttributes(textEl, {class: labelClasses, 'alignment-baseline': 'middle'});
+      textEl.textContent = xLabels[i];
+      gEl.appendChild(textEl);
+    }
+    
+    if(chart.options.xAxis && chart.options.xAxis.line) {
+      var lineEl = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+      Util.setAttributes(lineEl, {class: 'chart__axis chart__axis--x js-chart__axis--x', 'stroke-linecap': 'square'});
+      gEl.appendChild(lineEl);
+    }
+
+    var ticksLength = xLabels.length;
+    if(chart.options.type == 'column') ticksLength = ticksLength + 1;
+    
+    for(var i = 0; i < ticksLength; i++) {
+      var tickEl = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+      var classTicks = (chart.options.xAxis && chart.options.xAxis.ticks) ? 'chart__tick chart__tick-x js-chart__tick-x' : 'js-chart__tick-x';
+      Util.setAttributes(tickEl, {class: classTicks, 'stroke-linecap': 'square'});
+      gEl.appendChild(tickEl);
+    }
+
+    chart.svg.appendChild(gEl);
+  };
+
+  function setYAxis(chart) {
+    // set legend of axis if available
+    if( chart.options.yAxis && chart.options.yAxis.legend) {
+      var textLegend = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      textLegend.textContent = chart.options.yAxis.legend;
+      textLegend.setAttribute('class', 'chart__axis-legend chart__axis-legend--y js-chart__axis-legend--y');
+      chart.svg.appendChild(textLegend);
+
+      var yLegend = chart.element.getElementsByClassName('js-chart__axis-legend--y')[0];
+      if(isVisible(yLegend)) {
+        var height = yLegend.getBBox().height,
+          xPosition = chart.leftDelta + height/2,
+          yPosition = chart.topDelta;
+    
+        Util.setAttributes(yLegend, {x: xPosition, y: yPosition});
+        chart.leftDelta = chart.leftDelta + height + chart.svgPadding;
+      }
+    }
+    // get interval and create scale
+    var yLabels;
+    if(chart.options.yAxis && chart.options.yAxis.labels && chart.options.yAxis.labels.length > 1) {
+      yLabels = chart.options.yAxis.labels;
+      chart.yAxisInterval = [0, chart.options.yAxis.labels.length - 1];
+    } else {
+      yLabels = getChartYLabels(chart); // this function is used to set chart.yAxisInterval as well
+    }
+
+    // modify axis labels
+    if(chart.options.yAxis && chart.options.yAxis.labelModifier) {
+      yLabels = modifyAxisLabel(yLabels, chart.options.yAxis.labelModifier);
+    } 
+
+    var gEl = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    Util.setAttributes(gEl, {class: 'chart__axis-labels chart__axis-labels--y js-chart__axis-labels--y'});
+
+    for(var i = yLabels.length - 1; i >= 0; i--) {
+      var textEl = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      var labelClasses = (chart.options.yAxis && chart.options.yAxis.labels) ? 'chart__axis-label chart__axis-label--y js-chart__axis-label' : 'is-hidden js-chart__axis-label';
+      Util.setAttributes(textEl, {class: labelClasses, 'alignment-baseline': 'middle'});
+      textEl.textContent = yLabels[i];
+      gEl.appendChild(textEl);
+    }
+
+    if(chart.options.yAxis && chart.options.yAxis.line) {
+      var lineEl = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+      Util.setAttributes(lineEl, {class: 'chart__axis chart__axis--y js-chart__axis--y', 'stroke-linecap': 'square'});
+      gEl.appendChild(lineEl);
+    }
+
+    var hideGuides = chart.options.xAxis && chart.options.xAxis.hasOwnProperty('guides') && !chart.options.xAxis.guides;
+    for(var i = 1; i < yLabels.length; i++ ) {
+      var rectEl = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+      Util.setAttributes(rectEl, {class: 'chart__guides js-chart__guides'});
+      if(hideGuides) {
+        Util.setAttributes(rectEl, {class: 'chart__guides js-chart__guides opacity-0'});
+      }
+      gEl.appendChild(rectEl);
+    }
+    chart.svg.appendChild(gEl);
+  };
+
+  function updateChartWidth(chart) {
+    var labels = chart.element.getElementsByClassName('js-chart__axis-labels--y')[0].querySelectorAll('.js-chart__axis-label');
+
+    if(isVisible(labels[0])) {
+      chart.yChartMaxWidth = getLabelMaxSize(labels, 'width');
+      chart.leftDelta = chart.leftDelta + chart.svgPadding + chart.yChartMaxWidth + chart.svgPadding;
+    } else {
+      chart.leftDelta = chart.leftDelta + chart.svgPadding;
+    }
+
+    var xLabels = chart.element.getElementsByClassName('js-chart__axis-labels--x')[0].querySelectorAll('.js-chart__axis-label');
+    if(isVisible(xLabels[0]) && !isVisible(labels[0])) {
+      chart.leftDelta = chart.leftDelta + xLabels[0].getBBox().width*0.5;
+    }
+  };
+
+  function placeyAxisLabels(chart) {
+    var labels = chart.element.getElementsByClassName('js-chart__axis-labels--y')[0].querySelectorAll('.js-chart__axis-label');
+
+    var labelsVisible = isVisible(labels[0]);
+    var height = 0;
+    if(labelsVisible) height = labels[0].getBBox().height*0.5;
+    
+    // update topDelta and set chart height
+    chart.topDelta = chart.topDelta + height + chart.svgPadding;
+    chart.yAxisHeight = chart.height - chart.topDelta - chart.bottomDelta;
+
+    var yDelta = chart.yAxisHeight/(labels.length - 1);
+
+    var gridRect = chart.element.getElementsByClassName('js-chart__guides'),
+      dasharray = ""+chart.xAxisWidth+" "+(2*(chart.xAxisWidth + yDelta))+"";
+
+    for(var i = 0; i < labels.length; i++) {
+      var labelWidth = 0;
+      if(labelsVisible) labelWidth = labels[i].getBBox().width;
+      // chart.leftDelta has already been updated in updateChartWidth() function
+      Util.setAttributes(labels[i], {x: chart.leftDelta - labelWidth - 2*chart.svgPadding, y: chart.topDelta + yDelta*i });
+      // place grid rectangles
+      if(gridRect[i]) Util.setAttributes(gridRect[i], {x: chart.leftDelta, y: chart.topDelta + yDelta*i, height: yDelta, width: chart.xAxisWidth, 'stroke-dasharray': dasharray});
+    }
+
+    // place the y axis
+    var yAxis = chart.element.getElementsByClassName('js-chart__axis--y');
+    if(yAxis.length > 0) {
+      Util.setAttributes(yAxis[0], {x1: chart.leftDelta, x2: chart.leftDelta, y1: chart.topDelta, y2: chart.topDelta + chart.yAxisHeight})
+    }
+    // center y axis label
+    var yLegend = chart.element.getElementsByClassName('js-chart__axis-legend--y');
+    if(yLegend.length > 0 && isVisible(yLegend[0]) ) {
+      var position = yLegend[0].getBBox(),
+        height = position.height,
+        yPosition = position.y + 0.5*(chart.yAxisHeight + position.width),
+        xPosition = position.x + height/4;
+      
+      Util.setAttributes(yLegend[0], {y: yPosition, x: xPosition, transform: 'rotate(-90 '+(position.x + height)+' '+(yPosition + height/2)+')'});
+    }
+  };
+
+  function placexAxisLabels(chart) {
+    var labels = chart.element.getElementsByClassName('js-chart__axis-labels--x')[0].querySelectorAll('.js-chart__axis-label');
+    var ticks = chart.element.getElementsByClassName('js-chart__tick-x');
+
+    // increase rightDelta value
+    var labelWidth = 0,
+      labelsVisible = isVisible(labels[labels.length - 1]);
+    if(labelsVisible) labelWidth = labels[labels.length - 1].getBBox().width;
+    if(chart.options.type != 'column') {
+      chart.rightDelta = chart.rightDelta + labelWidth*0.5 + chart.svgPadding;
+    } else {
+      chart.rightDelta = chart.rightDelta + 4;
+    }
+    chart.xAxisWidth = chart.width - chart.leftDelta - chart.rightDelta;
+    
+
+    var maxHeight = getLabelMaxSize(labels, 'height'),
+      maxWidth = getLabelMaxSize(labels, 'width'),
+      xDelta = chart.xAxisWidth/(labels.length - 1);
+
+    if(chart.options.type == 'column') xDelta = chart.xAxisWidth/labels.length;
+
+    var totWidth = 0,
+      height = 0;
+    if(labelsVisible)  height = labels[0].getBBox().height;
+
+    for(var i = 0; i < labels.length; i++) {
+      var width = 0;
+      if(labelsVisible) width = labels[i].getBBox().width;
+      // label
+      Util.setAttributes(labels[i], {y: chart.height - chart.bottomDelta - height/2, x: chart.leftDelta + xDelta*i - width/2});
+      // tick
+      Util.setAttributes(ticks[i], {y1: chart.height - chart.bottomDelta - maxHeight - chart.svgPadding, y2: chart.height - chart.bottomDelta - maxHeight - chart.svgPadding + 5, x1: chart.leftDelta + xDelta*i, x2: chart.leftDelta + xDelta*i});
+      totWidth = totWidth + width + 4;
+    }
+    // for columns chart -> there's an additional tick element
+    if(chart.options.type == 'column' && ticks[labels.length]) {
+      Util.setAttributes(ticks[labels.length], {y1: chart.height - chart.bottomDelta - maxHeight - chart.svgPadding, y2: chart.height - chart.bottomDelta - maxHeight - chart.svgPadding + 5, x1: chart.leftDelta + xDelta*labels.length, x2: chart.leftDelta + xDelta*labels.length});
+    }
+    //check if we need to rotate chart label -> not enough space
+    if(totWidth >= chart.xAxisWidth) {
+      chart.xAxisLabelRotation = true;
+      rotatexAxisLabels(chart, labels, ticks, maxWidth - maxHeight);
+      maxHeight = maxWidth;
+    } else {
+      chart.xAxisLabelRotation = false;
+    }
+
+    chart.bottomDelta = chart.bottomDelta + chart.svgPadding + maxHeight;
+
+    // place the x axis
+    var xAxis = chart.element.getElementsByClassName('js-chart__axis--x');
+    if(xAxis.length > 0) {
+      Util.setAttributes(xAxis[0], {x1: chart.leftDelta, x2: chart.width - chart.rightDelta, y1: chart.height - chart.bottomDelta, y2: chart.height - chart.bottomDelta})
+    }
+
+    // center x-axis label
+    var xLegend = chart.element.getElementsByClassName('js-chart__axis-legend--x');
+    if(xLegend.length > 0 && isVisible(xLegend[0])) {
+      xLegend[0].setAttribute('x', chart.leftDelta + 0.5*(chart.xAxisWidth - xLegend[0].getBBox().width));
+    }
+  };
+
+  function rotatexAxisLabels(chart, labels, ticks, delta) {
+    // there's not enough horiziontal space -> we need to rotate the x axis labels
+    for(var i = 0; i < labels.length; i++) {
+      var dimensions = labels[i].getBBox(),
+        xCenter = parseFloat(labels[i].getAttribute('x')) + dimensions.width/2,
+        yCenter = parseFloat(labels[i].getAttribute('y'))  - delta;
+
+      Util.setAttributes(labels[i], {y: parseFloat(labels[i].getAttribute('y')) - delta, transform: 'rotate(-45 '+xCenter+' '+yCenter+')'});
+
+      ticks[i].setAttribute('transform', 'translate(0 -'+delta+')');
+    }
+    if(ticks[labels.length]) ticks[labels.length].setAttribute('transform', 'translate(0 -'+delta+')');
+  };
+
+  function setChartDatasets(chart) {
+    var gEl = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    gEl.setAttribute('class', 'chart__dataset js-chart__dataset');
+    chart.datasetScaled = [];
+    for(var i = 0; i < chart.options.datasets.length; i++) {
+      var gSet = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+      gSet.setAttribute('class', 'chart__set chart__set--'+(i+1)+' js-chart__set');
+      chart.datasetScaled[i] = JSON.parse(JSON.stringify(chart.options.datasets[i].data));
+      chart.datasetScaled[i] = getChartData(chart, chart.datasetScaled[i]);
+      chart.datasetScaledFlat[i] = JSON.parse(JSON.stringify(chart.datasetScaled[i]));
+      if(chart.options.type == 'area') {
+        chart.datasetAreaScaled[i] = getAreaPointsFromLine(chart, chart.datasetScaled[i]);
+        chart.datasetAreaScaledFlat[i] = JSON.parse(JSON.stringify(chart.datasetAreaScaled[i]));
+      }
+      if(!chart.loaded && chart.options.animate) {
+        flatDatasets(chart, i);
+      }
+      gSet.appendChild(getPath(chart, chart.datasetScaledFlat[i], chart.datasetAreaScaledFlat[i], i));
+      gSet.appendChild(getMarkers(chart, chart.datasetScaled[i], i));
+      gEl.appendChild(gSet);
+    }
+    
+    chart.svg.appendChild(gEl);
+  };
+
+  function getChartData(chart, data) {
+    var multiSet = data[0].length > 1;
+    var points = multiSet ? data : addXData(data); // addXData is used for one-dimension dataset; e.g. [2, 4, 6] rather than [[2, 4], [4, 7]]
+    
+    // xOffsetChart used for column chart type onlymodified
+    var xOffsetChart = chart.xAxisWidth/(points.length-1) - chart.xAxisWidth/points.length;
+    // now modify the points to coordinate relative to the svg 
+    for(var i = 0; i < points.length; i++) {
+      var xNewCoordinate = chart.leftDelta + chart.xAxisWidth*(points[i][0] - chart.xAxisInterval[0])/(chart.xAxisInterval[1] - chart.xAxisInterval[0]),
+        yNewCoordinate = chart.height - chart.bottomDelta - chart.yAxisHeight*(points[i][1] - chart.yAxisInterval[0])/(chart.yAxisInterval[1] - chart.yAxisInterval[0]);
+      if(chart.options.type == 'column') {
+        xNewCoordinate = xNewCoordinate - i*xOffsetChart;
+      }
+      points[i] = [xNewCoordinate, yNewCoordinate];
+    }
+    return points;
+  };
+
+  function getPath(chart, points, areaPoints, index) {
+    var pathCode = chart.options.smooth ? getSmoothLine(points, false) : getStraightLine(points);
+    
+    var gEl = document.createElementNS('http://www.w3.org/2000/svg', 'g'),
+      pathL = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      
+    Util.setAttributes(pathL, {d: pathCode, class: 'chart__data-line chart__data-line--'+(index+1)+' js-chart__data-line--'+(index+1)});
+
+    if(chart.options.type == 'area') {
+      var areaCode = chart.options.smooth ? getSmoothLine(areaPoints, true) : getStraightLine(areaPoints);
+      var pathA = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      Util.setAttributes(pathA, {d: areaCode, class: 'chart__data-fill chart__data-fill--'+(index+1)+' js-chart__data-fill--'+(index+1)});
+      gEl.appendChild(pathA);
+    }
+   
+    gEl.appendChild(pathL);
+    return gEl;
+  };
+
+  function getStraightLine(points) {
+    var dCode = '';
+    for(var i = 0; i < points.length; i++) {
+      dCode = (i == 0) ? 'M '+points[0][0]+','+points[0][1] : dCode+ ' L '+points[i][0]+','+points[i][1];
+    }
+    return dCode;
+  };
+
+  function flatDatasets(chart, index) {
+    var bottomY = getBottomFlatDatasets(chart);
+    for(var i = 0; i < chart.datasetScaledFlat[index].length; i++) {
+      chart.datasetScaledFlat[index][i] = [chart.datasetScaled[index][i][0], bottomY];
+    }
+    if(chart.options.type == 'area') {
+      chart.datasetAreaScaledFlat[index] = getAreaPointsFromLine(chart, chart.datasetScaledFlat[index]);
+    }
+  };
+
+  // https://medium.com/@francoisromain/smooth-a-svg-path-with-cubic-bezier-curves-e37b49d46c74
+  function getSmoothLine(points, bool) {
+    var dCode = '';
+    var maxVal = points.length;
+    var pointsLoop = JSON.parse(JSON.stringify(points));
+    if(bool) {
+      maxVal = maxVal - 3;
+      pointsLoop.splice(-3, 3);
+    }
+    for(var i = 0; i < maxVal; i++) {
+      if(i == 0) dCode = 'M '+points[0][0]+','+points[0][1];
+      else dCode = dCode + ' '+bezierCommand(points[i], i, pointsLoop);
+    }
+    if(bool) {
+      for(var j = maxVal; j < points.length; j++) {
+        dCode = dCode + ' L '+points[j][0]+','+points[j][1];
+      }
+    }
+    return dCode;
+  };  
+  
+  function pathLine(pointA, pointB) {
+    var lengthX = pointB[0] - pointA[0];
+    var lengthY = pointB[1] - pointA[1];
+
+    return {
+      length: Math.sqrt(Math.pow(lengthX, 2) + Math.pow(lengthY, 2)),
+      angle: Math.atan2(lengthY, lengthX)
+    };
+  };
+
+  function pathControlPoint(current, previous, next, reverse) {
+    var p = previous || current;
+    var n = next || current;
+    var smoothing = 0.2;
+    var o = pathLine(p, n);
+
+    var angle = o.angle + (reverse ? Math.PI : 0);
+    var length = o.length * smoothing;
+
+    var x = current[0] + Math.cos(angle) * length;
+    var y = current[1] + Math.sin(angle) * length;
+    return [x, y];
+  };
+
+  function bezierCommand(point, i, a) {
+    var cps =  pathControlPoint(a[i - 1], a[i - 2], point);
+    var cpe = pathControlPoint(point, a[i - 1], a[i + 1], true);
+    return "C "+cps[0]+','+cps[1]+' '+cpe[0]+','+cpe[1]+' '+point[0]+','+point[1];
+  };
+
+  function getAreaPointsFromLine(chart, array) {
+    var points = JSON.parse(JSON.stringify(array)),
+      firstPoint = points[0],
+      lastPoint = points[points.length -1];
+
+    var boottomY = getBottomFlatDatasets(chart); 
+    points.push([lastPoint[0], boottomY]);
+    points.push([chart.leftDelta, boottomY]);
+    points.push([chart.leftDelta, firstPoint[1]]);
+    return points;
+  };
+
+  function getBottomFlatDatasets(chart) {
+    var bottom = chart.height - chart.bottomDelta;
+    if(chart.options.fillOrigin ) {
+      bottom = chart.height - chart.bottomDelta - chart.yAxisHeight*(0 - chart.yAxisInterval[0])/(chart.yAxisInterval[1] - chart.yAxisInterval[0]);
+    }
+    if(chart.options.type && chart.options.type == 'column') {
+      bottom = chart.yZero; 
+    }
+    return bottom;
+  };
+
+  function getMarkers(chart, points, index) {
+    // see if we need to show tooltips 
+    var gEl = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    var xOffset = 0;
+    if(chart.options.type == 'column') {
+      xOffset = 0.5*chart.xAxisWidth/points.length;
+    }
+    for(var i = 0; i < points.length; i++) {
+      var marker = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+      Util.setAttributes(marker, {class: 'chart__marker js-chart__marker chart__marker--'+(index+1), cx: points[i][0] + xOffset, cy: points[i][1], r: 2, 'data-set': index, 'data-index': i});
+      gEl.appendChild(marker);
+    }
+    return gEl;
+  };
+
+  function addXData(data) {
+    var multiData = [];
+    for(var i = 0; i < data.length; i++) {
+      multiData.push([i, data[i]]);
+    }
+    return multiData;
+  };
+
+  function createSrTables(chart) {
+    // create a table element for accessibility reasons
+    var table = '<div class="chart__sr-table sr-only">';
+    for(var i = 0; i < chart.options.datasets.length; i++) {
+      table = table + createDataTable(chart, i);
+    }
+    table = table + '</div>';
+    chart.element.insertAdjacentHTML('afterend', table);
+  };
+
+  function createDataTable(chart, index) {
+    var tableTitle = (chart.categories.length > index ) ? 'aria-label="'+chart.categories.length[index].textContent+'"': '';
+    var table = '<table '+tableTitle+'><thead><tr>';
+    table = (chart.options.xAxis && chart.options.xAxis.legend) 
+      ? table + '<th scope="col">'+chart.options.xAxis.legend+'</th>'
+      : table + '<th scope="col"></th>';
+      
+    table = (chart.options.yAxis && chart.options.yAxis.legend) 
+      ? table + '<th scope="col">'+chart.options.yAxis.legend+'</th>'
+      : table + '<th scope="col"></th>';
+
+    table = table + '</thead><tbody>';
+    var multiset = chart.options.datasets[index].data[0].length > 1,
+      xAxisLabels = chart.options.xAxis && chart.options.xAxis.labels && chart.options.xAxis.labels.length > 1;
+    for(var i = 0; i < chart.options.datasets[index].data.length; i++) {
+      table = table + '<tr>';
+      if(multiset) {
+        table = table + '<td role="cell">'+chart.options.datasets[index].data[i][0]+'</td><td role="cell">'+chart.options.datasets[index].data[i][1]+'</td>';
+      } else {
+        var xValue = xAxisLabels ? chart.options.xAxis.labels[i]: (i + 1);
+        table = table + '<td role="cell">'+xValue+'</td><td role="cell">'+chart.options.datasets[index].data[i]+'</td>';
+      }
+      table = table + '</tr>';
+    }
+    table = table + '</tbody></table>';
+    return table;
+  }
+
+  function getChartYLabels(chart) {
+    var labels = [],
+      intervals = 0;
+    if(chart.options.yAxis && chart.options.yAxis.range && chart.options.yAxis.step) {
+      intervals = Math.ceil((chart.options.yAxis.range[1] - chart.options.yAxis.range[0])/chart.options.yAxis.step);
+      for(var i = 0; i <= intervals; i++) {
+        labels.push(chart.options.yAxis.range[0] + chart.options.yAxis.step*i);
+      }
+      chart.yAxisInterval = [chart.options.yAxis.range[0], chart.options.yAxis.range[1]];
+    } else {
+      var columnChartStacked = (chart.options.type && chart.options.type == 'column' && chart.options.stacked);
+      if(columnChartStacked) setDatasetsSum(chart);
+      var min = columnChartStacked ? getColStackedMinDataValue(chart) : getMinDataValue(chart, true);
+      var max = columnChartStacked ? getColStackedMaxDataValue(chart) : getMaxDataValue(chart, true);
+      var niceScale = new NiceScale(min, max, 5);
+      var intervals = Math.ceil((niceScale.getNiceUpperBound() - niceScale.getNiceLowerBound()) /niceScale.getTickSpacing());
+
+      for(var i = 0; i <= intervals; i++) {
+        labels.push(niceScale.getNiceLowerBound() + niceScale.getTickSpacing()*i);
+      }
+      chart.yAxisInterval = [niceScale.getNiceLowerBound(), niceScale.getNiceUpperBound()];
+    }
+    return labels;
+  };
+
+  function getChartXLabels(chart) {
+    var labels = [],
+      intervals = 0;
+    if(chart.options.xAxis && chart.options.xAxis.range && chart.options.xAxis.step) {
+      intervals = Math.ceil((chart.options.xAxis.range[1] - chart.options.xAxis.range[0])/chart.options.xAxis.step);
+      for(var i = 0; i <= intervals; i++) {
+        labels.push(chart.options.xAxis.range[0] + chart.options.xAxis.step*i);
+      }
+      chart.xAxisInterval = [chart.options.xAxis.range[0], chart.options.xAxis.range[1]];
+    } else if(!chart.options.datasets[0].data[0].length || chart.options.datasets[0].data[0].length < 2) {
+      // data sets are passed with a single value (y axis only)
+      chart.xAxisInterval = [0, chart.options.datasets[0].data.length - 1];
+      for(var i = 0; i < chart.options.datasets[0].data.length; i++) {
+        labels.push(i);
+      }
+    } else {
+      var min = getMinDataValue(chart, false);
+      var max = getMaxDataValue(chart, false);
+      var niceScale = new NiceScale(min, max, 5);
+      var intervals = Math.ceil((niceScale.getNiceUpperBound() - niceScale.getNiceLowerBound()) /niceScale.getTickSpacing());
+
+      for(var i = 0; i <= intervals; i++) {
+        labels.push(niceScale.getNiceLowerBound() + niceScale.getTickSpacing()*i);
+      }
+      chart.xAxisInterval = [niceScale.getNiceLowerBound(), niceScale.getNiceUpperBound()];
+    }
+    return labels;
+  };
+
+  function modifyAxisLabel(labels, fnModifier) {
+    for(var i = 0; i < labels.length; i++) {
+      labels[i] = fnModifier(labels[i]);
+    }
+
+    return labels;
+  };
+
+  function getLabelMaxSize(labels, dimesion) {
+    if(!isVisible(labels[0])) return 0;
+    var size = 0;
+    for(var i = 0; i < labels.length; i++) {
+      var labelSize = labels[i].getBBox()[dimesion];
+      if(labelSize > size) size = labelSize;
+    };  
+    return size;
+  };
+
+  function getMinDataValue(chart, bool) { // bool = true for y axis
+    var minArray = [];
+    for(var i = 0; i < chart.options.datasets.length; i++) {
+      minArray.push(getMin(chart.options.datasets[i].data, bool));
+    }
+    return Math.min.apply(null, minArray);
+  };
+
+  function getMaxDataValue(chart, bool) { // bool = true for y axis
+    var maxArray = [];
+    for(var i = 0; i < chart.options.datasets.length; i++) {
+      maxArray.push(getMax(chart.options.datasets[i].data, bool));
+    }
+    return Math.max.apply(null, maxArray);
+  };
+
+  function setDatasetsSum(chart) {
+    // sum all datasets -> this is used for column and bar charts
+    chart.datasetsSum = [];
+    for(var i = 0; i < chart.options.datasets.length; i++) {
+      for(var j = 0; j < chart.options.datasets[i].data.length; j++) {
+        chart.datasetsSum[j] = (i == 0) ? chart.options.datasets[i].data[j] : chart.datasetsSum[j] + chart.options.datasets[i].data[j];
+      }
+    } 
+  };
+
+  function getColStackedMinDataValue(chart) {
+    var min = Math.min.apply(null, chart.datasetsSum);
+    if(min > 0) min = 0;
+    return min;
+  };
+
+  function getColStackedMaxDataValue(chart) {
+    var max = Math.max.apply(null, chart.datasetsSum);
+    if(max < 0) max = 0;
+    return max;
+  };
+
+  function getMin(array, bool) {
+    var min;
+    var multiSet = array[0].length > 1;
+    for(var i = 0; i < array.length; i++) {
+      var value;
+      if(multiSet) {
+        value = bool ? array[i][1] : array[i][0];
+      } else {
+        value = array[i];
+      }
+      if(i == 0) {min = value;}
+      else if(value < min) {min = value;}
+    }
+    return min;
+  };
+
+  function getMax(array, bool) {
+    var max;
+    var multiSet = array[0].length > 1;
+    for(var i = 0; i < array.length; i++) {
+      var value;
+      if(multiSet) {
+        value = bool ? array[i][1] : array[i][0];
+      } else {
+        value = array[i];
+      }
+      if(i == 0) {max = value;}
+      else if(value > max) {max = value;}
+    }
+    return max;
+  };
+
+  // https://gist.github.com/igodorogea/4f42a95ea31414c3a755a8b202676dfd
+  function NiceScale (lowerBound, upperBound, _maxTicks) {
+    var maxTicks = _maxTicks || 10;
+    var tickSpacing;
+    var range;
+    var niceLowerBound;
+    var niceUpperBound;
+  
+    calculate();
+  
+    this.setMaxTicks = function (_maxTicks) {
+      maxTicks = _maxTicks;
+      calculate();
+    };
+  
+    this.getNiceUpperBound = function() {
+      return niceUpperBound;
+    };
+  
+    this.getNiceLowerBound = function() {
+      return niceLowerBound;
+    };
+  
+    this.getTickSpacing = function() {
+      return tickSpacing;
+    };
+  
+    function setMinMaxPoints (min, max) {
+      lowerBound = min;
+      upperBound = max;
+      calculate();
+    }
+  
+    function calculate () {
+      range = niceNum(upperBound - lowerBound, false);
+      tickSpacing = niceNum(range / (maxTicks - 1), true);
+      niceLowerBound = Math.floor(lowerBound / tickSpacing) * tickSpacing;
+      niceUpperBound = Math.ceil(upperBound / tickSpacing) * tickSpacing;
+    }
+  
+    function niceNum (range, round) {
+      // var exponent = Math.floor(Math.log10(range));
+      var exponent = Math.floor(Math.log(range) * Math.LOG10E);
+      var fraction = range / Math.pow(10, exponent);
+      var niceFraction;
+  
+      if (round) {
+        if (fraction < 1.5) niceFraction = 1;
+        else if (fraction < 3) niceFraction = 2;
+        else if (fraction < 7) niceFraction = 5;
+        else niceFraction = 10;
+      } else {
+        if (fraction <= 1) niceFraction = 1;
+        else if (fraction <= 2) niceFraction = 2;
+        else if (fraction <= 5) niceFraction = 5;
+        else niceFraction = 10;
+      }
+  
+      return niceFraction * Math.pow(10, exponent);
+    }
+  };
+
+  function initTooltips(chart) {
+    if(!intObservSupported) return;
+
+    chart.markers = [];
+    chart.bars = []; // this is for column/bar charts only
+    var chartSets = chart.element.getElementsByClassName('js-chart__set');
+    for(var i = 0; i < chartSets.length; i++) {
+      chart.markers[i] = chartSets[i].querySelectorAll('.js-chart__marker');
+      if(chart.options.type && chart.options.type == 'column') {
+        chart.bars[i] = chartSets[i].querySelectorAll('.js-chart__data-bar');
+      }
+    }
+    
+    // create tooltip line
+    if(chart.options.yIndicator) {
+      var tooltipLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+      Util.setAttributes(tooltipLine, {x1: 0, y1: chart.topDelta, x2: 0, y2: chart.topDelta + chart.yAxisHeight, transform: 'translate('+chart.leftDelta+' '+chart.topDelta+')', class: 'chart__y-indicator js-chart__y-indicator is-hidden'});
+      chart.svg.insertBefore(tooltipLine, chart.element.getElementsByClassName('js-chart__dataset')[0]);
+      chart.interLine = chart.element.getElementsByClassName('js-chart__y-indicator')[0];
+    }
+    
+    // create tooltip
+    if(chart.tooltipOn) {
+      var tooltip = document.createElement('div');
+      tooltip.setAttribute('class', 'chart__tooltip js-chart__tooltip is-hidden '+chart.tooltipClasses);
+      chart.element.appendChild(tooltip);
+      chart.tooltip = chart.element.getElementsByClassName('js-chart__tooltip')[0];
+    }
+    initChartHover(chart);
+  };
+
+  function initChartHover(chart) {
+    if(!chart.options.yIndicator && !chart.tooltipOn) return;
+    // init hover effect
+    chart.chartArea = chart.element.getElementsByClassName('js-chart__axis-labels--y')[0];
+    chart.eventIds['hover'] = handleEvent.bind(chart);
+    chart.chartArea.addEventListener('mouseenter', chart.eventIds['hover']);
+    chart.chartArea.addEventListener('mousemove', chart.eventIds['hover']);
+    chart.chartArea.addEventListener('mouseleave', chart.eventIds['hover']);
+    if(!SwipeContent) return;
+    new SwipeContent(chart.element);
+    chart.element.addEventListener('dragStart', chart.eventIds['hover']);
+    chart.element.addEventListener('dragging', chart.eventIds['hover']);
+    chart.element.addEventListener('dragEnd', chart.eventIds['hover']);
+  };
+
+  function hoverChart(chart, event) {
+    if(chart.hovering) return;
+    if(!chart.options.yIndicator && !chart.tooltipOn) return;
+    chart.hovering = true;
+    var selectedMarker = getSelectedMarker(chart, event);
+    if(selectedMarker === false) return;
+    if(selectedMarker !== chart.selectedMarker) {
+      resetMarkers(chart, false);
+      resetBars(chart, false);
+
+      chart.selectedMarker = selectedMarker;
+      resetMarkers(chart, true);
+      resetBars(chart, true);
+      var markerSize = chart.markers[0][chart.selectedMarker].getBBox();
+      
+      if(chart.options.yIndicator) {
+        Util.removeClass(chart.interLine, 'is-hidden');
+        chart.interLine.setAttribute('transform', 'translate('+(markerSize.x + markerSize.width/2)+' 0)');
+      }
+      
+      if(chart.tooltipOn) {
+        Util.removeClass(chart.tooltip, 'is-hidden');
+        setTooltipHTML(chart);
+        placeTooltip(chart);
+      }
+    }
+    updateExternalData(chart);
+    chart.hovering = false;
+  };
+
+  function getSelectedMarker(chart, event) {
+    if(chart.markers[0].length < 1) return false;
+    var clientX = event.detail.x ? event.detail.x : event.clientX;
+    var xposition =  clientX - chart.svg.getBoundingClientRect().left;
+    var marker = 0,
+      deltaX = Math.abs(chart.markers[0][0].getBBox().x - xposition);
+    for(var i = 1; i < chart.markers[0].length; i++) {
+      var newDeltaX = Math.abs(chart.markers[0][i].getBBox().x - xposition);
+      if(newDeltaX < deltaX) {
+        deltaX = newDeltaX;
+        marker = i;
+      }
+    }
+    return marker;
+  };
+
+  function resetTooltip(chart) {
+    if(chart.hoverId) {
+      (window.requestAnimationFrame) ? window.cancelAnimationFrame(chart.hoverId) : clearTimeout(chart.hoverId);
+      chart.hoverId = false;
+    }
+    if(chart.tooltipOn) Util.addClass(chart.tooltip, 'is-hidden');
+    if(chart.options.yIndicator)Util.addClass(chart.interLine, 'is-hidden');
+    resetMarkers(chart, false);
+    resetBars(chart, false);
+    chart.selectedMarker = false;
+    resetExternalData(chart);
+    chart.hovering = false;
+  };
+
+  function resetMarkers(chart, bool) {
+    for(var i = 0; i < chart.markers.length; i++) {
+      if(chart.markers[i] && chart.markers[i][chart.selectedMarker]) Util.toggleClass(chart.markers[i][chart.selectedMarker], chart.selectedMarkerClass, bool);
+    }
+  };
+
+  function resetBars(chart, bool) {
+    // for column/bar chart -> change opacity on hover
+    if(!chart.options.type || chart.options.type != 'column') return;
+    for(var i = 0; i < chart.bars.length; i++) {
+      if(chart.bars[i] && chart.bars[i][chart.selectedMarker]) Util.toggleClass(chart.bars[i][chart.selectedMarker], chart.selectedBarClass, bool);
+    }
+  };
+
+  function setTooltipHTML(chart) {
+    var selectedMarker = chart.markers[0][chart.selectedMarker];
+    chart.tooltip.innerHTML = getTooltipHTML(chart, selectedMarker.getAttribute('data-index'), selectedMarker.getAttribute('data-set'));
+  };
+
+  function getTooltipHTML(chart, index, setIndex) {
+    var htmlContent = '';
+    if(chart.options.tooltip.customHTML) {
+      htmlContent = chart.options.tooltip.customHTML(index, chart.options, setIndex);
+    } else {
+      var multiVal = chart.options.datasets[setIndex].data[index].length > 1;
+      if(chart.options.xAxis && chart.options.xAxis.labels && chart.options.xAxis.labels.length > 1) {
+        htmlContent = chart.options.xAxis.labels[index] +' - ';
+      } else if(multiVal) {
+        htmlContent = chart.options.datasets[setIndex].data[index][0] +' - ';
+      }
+      htmlContent = (multiVal) 
+        ? htmlContent + chart.options.datasets[setIndex].data[index][1] 
+        : htmlContent + chart.options.datasets[setIndex].data[index];
+    }   
+    return htmlContent;
+  };
+
+  function placeTooltip(chart) {
+    var selectedMarker = chart.markers[0][chart.selectedMarker];
+    var markerPosition = selectedMarker.getBoundingClientRect();
+    var markerPositionSVG = selectedMarker.getBBox();
+    var svgPosition = chart.svg.getBoundingClientRect();
+
+    if(chart.options.type == 'column') {
+      tooltipPositionColumnChart(chart, selectedMarker, markerPosition, markerPositionSVG);
+    } else {
+      tooltipPositionChart(chart, markerPosition, markerPositionSVG, svgPosition.left, svgPosition.width);
+    }
+  };
+
+  function tooltipPositionChart(chart, markerPosition, markerPositionSVG, svgPositionLeft, svgPositionWidth) {
+    // set top/left/transform of the tooltip for line/area charts
+    // horizontal position
+    if(markerPosition.left - svgPositionLeft <= svgPositionWidth/2) {
+      chart.tooltip.style.left = (markerPositionSVG.x + markerPositionSVG.width + 2)+'px';
+      chart.tooltip.style.right = 'auto';
+      chart.tooltip.style.transform = 'translateY(-100%)';
+    } else {
+      chart.tooltip.style.left = 'auto';
+      chart.tooltip.style.right = (svgPositionWidth - markerPositionSVG.x + 2)+'px';
+      chart.tooltip.style.transform = 'translateY(-100%)'; 
+    }
+    // vertical position
+    if(!chart.tooltipPosition) {
+      chart.tooltip.style.top = markerPositionSVG.y +'px';
+    } else if(chart.tooltipPosition == 'top') {
+      chart.tooltip.style.top = (chart.topDelta + chart.tooltip.getBoundingClientRect().height + 5) +'px';
+      chart.tooltip.style.bottom = 'auto';
+    } else {
+      chart.tooltip.style.top = 'auto';
+      chart.tooltip.style.bottom = (chart.bottomDelta + 5)+'px';
+      chart.tooltip.style.transform = ''; 
+    }
+  };
+
+  function tooltipPositionColumnChart(chart, marker, markerPosition, markerPositionSVG) {
+    // set top/left/transform of the tooltip for column charts
+    chart.tooltip.style.left = (markerPositionSVG.x + markerPosition.width/2)+'px';
+    chart.tooltip.style.right = 'auto';
+    chart.tooltip.style.transform = 'translateX(-50%) translateY(-100%)';
+    if(!chart.tooltipPosition) {
+      if(parseInt(marker.getAttribute('cy')) > chart.yZero) {
+        // negative value -> move tooltip below the bar
+        chart.tooltip.style.top = (markerPositionSVG.y + markerPositionSVG.height + 6) +'px';
+        chart.tooltip.style.transform = 'translateX(-50%)';
+      } else {
+        chart.tooltip.style.top = (markerPositionSVG.y - 6) +'px';
+      }
+    } else if(chart.tooltipPosition == 'top') {
+      chart.tooltip.style.top = (chart.topDelta + chart.tooltip.getBoundingClientRect().height + 5) +'px';
+      chart.tooltip.style.bottom = 'auto';
+    } else {
+      chart.tooltip.style.bottom = (chart.bottomDelta + 5)+'px';
+      chart.tooltip.style.top = 'auto';
+      chart.tooltip.style.transform = 'translateX(-50%)';
+    }
+  };
+
+  function animateChart(chart) {
+    if(!chart.options.animate) return;
+    var observer = new IntersectionObserver(chartObserve.bind(chart), {rootMargin: "0px 0px -200px 0px"});
+    observer.observe(chart.element);
+  };
+
+  function chartObserve(entries, observer) { // observe chart position -> start animation when inside viewport
+    if(entries[0].isIntersecting) {
+      triggerChartAnimation(this);
+      observer.unobserve(this.element);
+    }
+  };
+
+  function triggerChartAnimation(chart) {
+    if(chart.options.type == 'line' || chart.options.type == 'area') {
+      animatePath(chart, 'line');
+      if(chart.options.type == 'area') animatePath(chart, 'fill');
+    } else if(chart.options.type == 'column') {
+      animateRectPath(chart, 'column');
+    }
+  };
+
+  function animatePath(chart, type) {
+    var currentTime = null,
+      duration = 600;
+
+    var startArray = chart.datasetScaledFlat,
+      finalArray = chart.datasetScaled;
+
+    if(type == 'fill') {
+      startArray = chart.datasetAreaScaledFlat;
+      finalArray = chart.datasetAreaScaled;
+    }
+        
+    var animateSinglePath = function(timestamp){
+      if (!currentTime) currentTime = timestamp;        
+      var progress = timestamp - currentTime;
+      if(progress > duration) progress = duration;
+      for(var i = 0; i < finalArray.length; i++) {
+        var points = [];
+        var path = chart.element.getElementsByClassName('js-chart__data-'+type+'--'+(i+1))[0];
+        for(var j = 0; j < finalArray[i].length; j++) {
+          var val = Math.easeOutQuart(progress, startArray[i][j][1], finalArray[i][j][1]-startArray[i][j][1], duration);
+          points[j] = [finalArray[i][j][0], val];
+        }
+        // get path and animate
+        var pathCode = chart.options.smooth ? getSmoothLine(points, type == 'fill') : getStraightLine(points);
+        path.setAttribute('d', pathCode);
+      }
+      if(progress < duration) {
+        window.requestAnimationFrame(animateSinglePath);
+      }
+    };
+
+    window.requestAnimationFrame(animateSinglePath);
+  };
+
+  function resizeChart(chart) {
+    window.addEventListener('resize', function() {
+      clearTimeout(chart.eventIds['resize']);
+      chart.eventIds['resize'] = setTimeout(doneResizing, 300);
+    });
+
+    function doneResizing() {
+      resetChartResize(chart);
+      initChart(chart);
+    };
+  };
+
+  function resetChartResize(chart) {
+    chart.topDelta = 0;
+    chart.bottomDelta = 0;
+    chart.leftDelta = 0;
+    chart.rightDelta = 0;
+    chart.dragging = false;
+    // reset event listeners
+    if( chart.eventIds && chart.eventIds['hover']) {
+      chart.chartArea.removeEventListener('mouseenter', chart.eventIds['hover']);
+      chart.chartArea.removeEventListener('mousemove', chart.eventIds['hover']);
+      chart.chartArea.removeEventListener('mouseleave', chart.eventIds['hover']);
+      chart.element.removeEventListener('dragStart', chart.eventIds['hover']);
+      chart.element.removeEventListener('dragging', chart.eventIds['hover']);
+      chart.element.removeEventListener('dragEnd', chart.eventIds['hover']);
+    }
+  };
+
+  function handleEvent(event) {
+		switch(event.type) {
+			case 'mouseenter':
+				hoverChart(this, event);
+        break;
+			case 'mousemove':
+      case 'dragging':   
+        var self = this;
+				self.hoverId  = window.requestAnimationFrame 
+          ? window.requestAnimationFrame(function(){hoverChart(self, event)})
+          : setTimeout(function(){hoverChart(self, event);});
+        break;
+			case 'mouseleave':
+      case 'dragEnd':
+				resetTooltip(this);
+        break;
+		}
+  };
+
+  function isVisible(item) {
+    return (item && item.getClientRects().length > 0);
+  };
+
+  function initExternalData(chart) {
+    if(!chart.options.externalData) return;
+    var chartId = chart.options.element.getAttribute('id');
+    if(!chartId) return;
+    chart.extDataX = [];
+    chart.extDataXInit = [];
+    chart.extDataY = [];
+    chart.extDataYInit = [];
+    if(chart.options.datasets.length > 1) {
+      for(var i = 0; i < chart.options.datasets.length; i++) {
+        chart.extDataX[i] = document.querySelectorAll('.js-ext-chart-data-x--'+(i+1)+'[data-chart="'+chartId+'"]');
+        chart.extDataY[i] = document.querySelectorAll('.js-ext-chart-data-y--'+(i+1)+'[data-chart="'+chartId+'"]');
+      }
+    } else {
+      chart.extDataX[0] = document.querySelectorAll('.js-ext-chart-data-x[data-chart="'+chartId+'"]');
+      chart.extDataY[0] = document.querySelectorAll('.js-ext-chart-data-y[data-chart="'+chartId+'"]');
+    }
+    // store initial HTML contentent
+    storeExternalDataContent(chart, chart.extDataX, chart.extDataXInit);
+    storeExternalDataContent(chart, chart.extDataY, chart.extDataYInit);
+  };
+
+  function storeExternalDataContent(chart, elements, array) {
+    for(var i = 0; i < elements.length; i++) {
+      array[i] = [];
+      if(elements[i][0]) array[i][0] = elements[i][0].innerHTML;
+    }
+  };
+
+  function updateExternalData(chart) {
+    if(!chart.extDataX || !chart.extDataY) return;
+    var marker = chart.markers[0][chart.selectedMarker];
+    if(!marker) return;
+    var dataIndex = marker.getAttribute('data-index');
+    var multiVal = chart.options.datasets[0].data[0].length > 1;
+    for(var i = 0; i < chart.options.datasets.length; i++) {
+      updateExternalDataX(chart, dataIndex, i, multiVal);
+      updateExternalDataY(chart, dataIndex, i, multiVal);
+    }
+  };
+
+  function updateExternalDataX(chart, dataIndex, setIndex, multiVal) {
+    if( !chart.extDataX[setIndex] || !chart.extDataX[setIndex][0]) return;
+    var value = '';
+    if(chart.options.externalData.customXHTML) {
+      value = chart.options.externalData.customXHTML(dataIndex, chart.options, setIndex);
+    } else {
+      if(chart.options.xAxis && chart.options.xAxis.labels && chart.options.xAxis.labels.length > 1) {
+        value = chart.options.xAxis.labels[dataIndex];
+      } else if(multiVal) {
+        htmlContent = chart.options.datasets[setIndex].data[dataIndex][0];
+      }
+    }
+    chart.extDataX[setIndex][0].innerHTML = value;
+  };
+
+  function updateExternalDataY(chart, dataIndex, setIndex, multiVal) {
+    if( !chart.extDataY[setIndex] || !chart.extDataY[setIndex][0]) return;
+    var value = '';
+    if(chart.options.externalData.customYHTML) {
+      value = chart.options.externalData.customYHTML(dataIndex, chart.options, setIndex);
+    } else {
+      if(multiVal) {
+        value = chart.options.datasets[setIndex].data[dataIndex][1];
+      } else {
+        value = chart.options.datasets[setIndex].data[dataIndex];
+      }
+    }
+    chart.extDataY[setIndex][0].innerHTML = value;
+  };
+
+  function resetExternalData(chart) {
+    if(!chart.options.externalData) return;
+    for(var i = 0; i < chart.options.datasets.length; i++) {
+      if(chart.extDataX[i][0]) chart.extDataX[i][0].innerHTML = chart.extDataXInit[i][0];
+      if(chart.extDataY[i][0]) chart.extDataY[i][0].innerHTML = chart.extDataYInit[i][0];
+    }
+  };
+
+  function setChartColumnSize(chart) {
+    chart.columnWidthPerc = 100;
+    chart.columnGap = 0;
+    if(chart.options.column && chart.options.column.width) {
+      chart.columnWidthPerc = parseInt(chart.options.column.width);
+    }
+    if(chart.options.column && chart.options.column.gap) {
+      chart.columnGap = parseInt(chart.options.column.gap);
+    } 
+  };
+
+  function resetColumnChart(chart) {
+    var labels = chart.element.getElementsByClassName('js-chart__axis-labels--x')[0].querySelectorAll('.js-chart__axis-label'),
+      labelsVisible = isVisible(labels[labels.length - 1]),
+      xDelta = chart.xAxisWidth/labels.length;
+    
+    // translate x axis labels
+    if(labelsVisible) {
+      moveXAxisLabels(chart, labels, 0.5*xDelta);
+    }
+    // set column width + separation gap between columns
+    var columnsSpace = xDelta*chart.columnWidthPerc/100;
+    if(chart.options.stacked) {
+      chart.columnWidth = columnsSpace;
+    } else {
+      chart.columnWidth = (columnsSpace - chart.columnGap*(chart.options.datasets.length - 1) )/chart.options.datasets.length;
+    }
+
+    chart.columnDelta = (xDelta - columnsSpace)/2;
+  };
+
+  function moveXAxisLabels(chart, labels, delta) { 
+    // this applies to column charts only
+    // translate the xlabels to center them 
+    if(chart.xAxisLabelRotation) return; // labels were rotated - no need to translate
+    for(var i = 0; i < labels.length; i++) {
+      Util.setAttributes(labels[i], {x: labels[i].getBBox().x + delta});
+    }
+  };
+
+  function setColumnChartDatasets(chart) {
+    var gEl = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    gEl.setAttribute('class', 'chart__dataset js-chart__dataset');
+    chart.datasetScaled = [];
+
+    setColumnChartYZero(chart);
+    
+    for(var i = 0; i < chart.options.datasets.length; i++) {
+      var gSet = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+      gSet.setAttribute('class', 'chart__set chart__set--'+(i+1)+' js-chart__set');
+      chart.datasetScaled[i] = JSON.parse(JSON.stringify(chart.options.datasets[i].data));
+      chart.datasetScaled[i] = getChartData(chart, chart.datasetScaled[i]);
+      chart.datasetScaledFlat[i] = JSON.parse(JSON.stringify(chart.datasetScaled[i]));
+      if(!chart.loaded && chart.options.animate) {
+        flatDatasets(chart, i);
+      }
+      gSet.appendChild(getSvgColumns(chart, chart.datasetScaledFlat[i], i));
+      gEl.appendChild(gSet);
+      gSet.appendChild(getMarkers(chart, chart.datasetScaled[i], i));
+    }
+    
+    chart.svg.appendChild(gEl);
+  };
+
+  function setColumnChartYZero(chart) {
+    // if there are negative values -> make sre columns start from zero
+    chart.yZero = chart.height - chart.bottomDelta;
+    if(chart.yAxisInterval[0] < 0) {
+      chart.yZero = chart.height - chart.bottomDelta + chart.yAxisHeight*(chart.yAxisInterval[0])/(chart.yAxisInterval[1] - chart.yAxisInterval[0]);
+    }
+  };
+
+  function getSvgColumns(chart, dataset, index) {
+    var gEl = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+
+    for(var i = 0; i < dataset.length; i++) {
+      var pathL = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      var points = getColumnPoints(chart, dataset[i], index, i, chart.datasetScaledFlat);
+      var lineType =  chart.options.column && chart.options.column.radius ? 'round' : 'square';
+      if(lineType == 'round' && chart.options.stacked && index < chart.options.datasets.length - 1) lineType = 'square';
+      var dPath = (lineType == 'round') ? getRoundedColumnRect(chart, points) : getStraightLine(points);
+      Util.setAttributes(pathL, {d: dPath, class: 'chart__data-bar chart__data-bar--'+(index+1)+' js-chart__data-bar js-chart__data-bar--'+(index+1)});
+      gEl.appendChild(pathL);
+    }
+    return gEl;
+  };
+
+  function getColumnPoints(chart, point, index, pointIndex, dataSetsAll) {
+    var xOffset = chart.columnDelta + index*(chart.columnWidth + chart.columnGap),
+      yOffset = 0;
+
+    if(chart.options.stacked) {
+      xOffset = chart.columnDelta;
+      yOffset = getyOffsetColChart(chart, dataSetsAll, index, pointIndex);
+    }
+
+    return [ 
+      [point[0] + xOffset, chart.yZero - yOffset],
+      [point[0] + xOffset, point[1] - yOffset], 
+      [point[0] + xOffset + chart.columnWidth, point[1] - yOffset],
+      [point[0] + xOffset + chart.columnWidth, chart.yZero - yOffset]
+    ];
+  };
+
+  function getyOffsetColChart(chart, dataSetsAll, index, pointIndex) {
+    var offset = 0;
+    for(var i = 0; i < index; i++) {
+      if(dataSetsAll[i] && dataSetsAll[i][pointIndex]) offset = offset + (chart.height - chart.bottomDelta - dataSetsAll[i][pointIndex][1]);
+    }
+    return offset;
+  };
+
+  function getRoundedColumnRect(chart, points) {
+    var radius = parseInt(chart.options.column.radius);
+    var arcType = '0,0,1',
+      deltaArc1 = '-',
+      deltaArc2 = ',',
+      rectHeight = points[1][1] + radius;
+    if(chart.yAxisInterval[0] < 0 && points[1][1] > chart.yZero) {
+      arcType = '0,0,0';
+      deltaArc1 = ',';
+      deltaArc2 = '-';
+      rectHeight = points[1][1] - radius;
+    }
+    var dpath = 'M '+points[0][0]+' '+points[0][1];
+    dpath = dpath + ' V '+rectHeight;
+    dpath = dpath + ' a '+radius+','+radius+','+arcType+','+radius+deltaArc1+radius;
+    dpath = dpath + ' H '+(points[2][0] - radius);
+    dpath = dpath + ' a '+radius+','+radius+','+arcType+','+radius+deltaArc2+radius;
+    dpath = dpath + ' V '+points[3][1];
+    return dpath;
+  };
+
+  function animateRectPath(chart, type) {
+    var currentTime = null,
+      duration = 600;
+
+    var startArray = chart.datasetScaledFlat,
+      finalArray = chart.datasetScaled;
+        
+    var animateSingleRectPath = function(timestamp){
+      if (!currentTime) currentTime = timestamp;        
+      var progress = timestamp - currentTime;
+      if(progress > duration) progress = duration;
+      var multiSetPoint = [];
+      for(var i = 0; i < finalArray.length; i++) {
+        // multi sets
+        var points = [];
+        var paths = chart.element.getElementsByClassName('js-chart__data-bar--'+(i+1));
+        var rectLine = chart.options.column && chart.options.column.radius ? 'round' : 'square';
+        if(chart.options.stacked && rectLine == 'round' && i < finalArray.length - 1) rectLine = 'square'; 
+        for(var j = 0; j < finalArray[i].length; j++) {
+          var val = Math.easeOutQuart(progress, startArray[i][j][1], finalArray[i][j][1]-startArray[i][j][1], duration);
+          points[j] = [finalArray[i][j][0], val];
+          // get path and animate
+          var rectPoints = getColumnPoints(chart, points[j], i, j, multiSetPoint);
+          var dPath = (rectLine == 'round') ? getRoundedColumnRect(chart, rectPoints) : getStraightLine(rectPoints);
+          paths[j].setAttribute('d', dPath);
+        }
+
+        multiSetPoint[i] = points;
+      }
+      if(progress < duration) {
+        window.requestAnimationFrame(animateSingleRectPath);
+      }
+    };
+
+    window.requestAnimationFrame(animateSingleRectPath);
+  };
+
+  function getPieSvgCode(chart) {
+
+  };
+
+  function getDoughnutSvgCode(chart) {
+
+  };
+
+  Chart.defaults = {
+    element : '',
+    type: 'line', // can be line, area, bar
+    xAxis: {},
+    yAxis: {},
+    datasets: [],
+    tooltip: {
+      enabled: false,
+      classes: false,
+      customHTM: false
+    },
+    yIndicator: true,
+    padding: 10
+  };
+
+  window.Chart = Chart;
+
+  var intObservSupported = ('IntersectionObserver' in window && 'IntersectionObserverEntry' in window && 'intersectionRatio' in window.IntersectionObserverEntry.prototype);
+}());
+// File#: _2_checkout-v2
+// Usage: codyhouse.co/license
+(function() {
+  // update billing info visibility
+  var billingCheckBox = document.getElementsByClassName('js-billing-checkbox');
+  if(billingCheckBox.length > 0) {
+    var billingInfo = document.getElementsByClassName('js-billing-info');
+    if(billingInfo.length == 0) return;
+    resetBillingInfo(billingCheckBox[0], billingInfo[0]);
+    
+    billingCheckBox[0].addEventListener('change', function(){
+      resetBillingInfo(billingCheckBox[0], billingInfo[0]);
+    });
+  }
+
+  function resetBillingInfo(input, content) {
+    Util.toggleClass(content, 'is-visible', !input.checked);
+  };
+}());
 // File#: _2_checkout
 // Usage: codyhouse.co/license
 (function() {
@@ -10801,6 +15328,525 @@ function initContactMap(wrapper) {
       new DateRange(opts);
     })(i);}
 	}
+}());
+// File#: _2_drag-drop-file
+// Usage: codyhouse.co/license
+(function() {
+  var Ddf = function(opts) {
+    this.options = Util.extend(Ddf.defaults , opts);
+    this.element = this.options.element;
+    this.area = this.element.getElementsByClassName('js-ddf__area');
+    this.input = this.element.getElementsByClassName('js-ddf__input');
+    this.label = this.element.getElementsByClassName('js-ddf__label');
+    this.labelEnd = this.element.getElementsByClassName('js-ddf__files-counter');
+    this.labelEndMessage = this.labelEnd.length > 0 ? this.labelEnd[0].innerHTML.split('%') : false;
+    this.droppedFiles = [];
+    this.lastDroppedFiles = [];
+    this.options.acceptFile = [];
+    this.progress = false;
+    this.progressObj = [];
+    this.progressCompleteClass = 'ddf__progress--complete';
+    initDndMessageResponse(this);
+    initProgress(this, 0, 1, false);
+    initDdf(this);
+  };
+
+  function initDndMessageResponse(element) { 
+    // use this function to initilise the response of the Ddf when files are dropped (e.g., show list of files, update label message, show loader)
+    if(element.options.showFiles) {
+      element.filesList = element.element.getElementsByClassName('js-ddf__list');
+      if(element.filesList.length == 0) return;
+      element.fileItems = element.filesList[0].getElementsByClassName('js-ddf__item');
+      if(element.fileItems.length > 0) Util.addClass(element.fileItems[0], 'is-hidden');+
+      // listen for click on remove file action
+      initRemoveFile(element);
+    } else { // do not show list of files
+      if(element.label.length == 0) return;
+      if(element.options.upload) element.progress = element.element.getElementsByClassName('js-ddf__progress');
+    }
+  };
+
+  function initDdf(element) {
+    if(element.input.length > 0 ) { // store accepted file format
+      var accept = element.input[0].getAttribute('accept');
+      if(accept) element.options.acceptFile = accept.split(',').map(function(element){ return element.trim();})
+    }
+
+    initDndInput(element);
+    initDndArea(element);
+  };
+
+  function initDndInput(element) { // listen to changes in the input file element
+    if(element.input.length == 0 ) return;
+    element.input[0].addEventListener('change', function(event){
+      if(element.input[0].value == '') return; 
+      storeDroppedFiles(element, element.input[0].files);
+      element.input[0].value = '';
+      updateDndArea(element);
+    });
+  };
+
+  function initDndArea(element) { //drag event listeners
+    element.element.addEventListener('dragenter', handleEvent.bind(element));
+    element.element.addEventListener('dragover', handleEvent.bind(element));
+    element.element.addEventListener('dragleave', handleEvent.bind(element));
+    element.element.addEventListener('drop', handleEvent.bind(element));
+  };
+
+  function handleEvent(event) {
+    switch(event.type) {
+      case 'dragenter': 
+      case 'dragover':
+        preventDefaults(event);
+        Util.addClass(this.area[0], 'ddf__area--file-hover');
+        break;
+      case 'dragleave':
+        preventDefaults(event);
+        Util.removeClass(this.area[0], 'ddf__area--file-hover');
+        break;
+      case 'drop':
+        preventDefaults(event);
+        storeDroppedFiles(this, event.dataTransfer.files);
+        updateDndArea(this);
+        break;
+    }
+  };
+
+  function storeDroppedFiles(element, fileData) { // check files size/format/number
+    element.lastDroppedFiles = [];
+    if(element.options.replaceFiles) element.droppedFiles = [];
+    Array.prototype.push.apply(element.lastDroppedFiles, fileData);
+    filterUploadedFiles(element); // remove files that do not respect format/size
+    element.droppedFiles = element.droppedFiles.concat(element.lastDroppedFiles);
+    if(element.options.maxFiles) filterMaxFiles(element); // check max number of files
+  };
+
+  function updateDndArea(element) { // update UI + emit events
+    if(element.options.showFiles) updateDndList(element);
+    else {
+      updateDndAreaMessage(element);
+      Util.addClass(element.area[0], 'ddf__area--file-dropped');
+    }
+    Util.removeClass(element.area[0], 'ddf__area--file-hover');
+    emitCustomEvents(element, 'filesUploaded', false);
+  };
+
+  function preventDefaults(event) {
+    event.preventDefault();
+    event.stopPropagation();
+  };
+
+  function filterUploadedFiles(element) {
+    // check max weight
+    if(element.options.maxSize) filterMaxWeight(element);
+    // check file format
+    if(element.options.acceptFile.length > 0) filterAcceptFile(element);
+  };
+
+  function filterMaxWeight(element) { // filter files by size
+    var rejected = [];
+    for(var i = element.lastDroppedFiles.length - 1; i >= 0; i--) {
+      if(element.lastDroppedFiles[i].size > element.options.maxSize*1000) {
+        var rejectedFile = element.lastDroppedFiles.splice(i, 1);
+        rejected.push(rejectedFile[0].name);
+      }
+    }
+    if(rejected.length > 0) {
+      emitCustomEvents(element, 'rejectedWeight', rejected);
+    }
+  };
+
+  function filterAcceptFile(element) { // filter files by format
+    var rejected = [];
+    for(var i = element.lastDroppedFiles.length - 1; i >= 0; i--) {
+      if( !formatInList(element, i) ) {
+        var rejectedFile = element.lastDroppedFiles.splice(i, 1);
+        rejected.push(rejectedFile[0].name);
+      }
+    }
+
+    if(rejected.length > 0) {
+      emitCustomEvents(element, 'rejectedFormat', rejected);
+    }
+  };
+
+  function formatInList(element, index) {
+    var formatArray = element.lastDroppedFiles[index].type.split('/'),
+      type = formatArray[0]+'/*',
+      extension = formatArray.length > 1 ? formatArray[1]: false;
+
+    var accepted = false;
+    for(var i = 0; i < element.options.acceptFile.length; i++) {
+      if(element.lastDroppedFiles[index].type == element.options.acceptFile[i] || type == element.options.acceptFile[i] || (extension && extension == element.options.acceptFile[i]) ) {
+        accepted = true;
+        break;
+      }
+
+      if(extension && extensionInList(extension, element.options.acceptFile[i])) { // extension could be list of format; e.g. for the svg it is svg+xml
+        accepted = true;
+        break;
+      }
+    }
+    return accepted;
+  };
+
+  function extensionInList(extensionList, extension) {
+    // extension could be .svg, .pdf, ..
+    // extensionList could be png, svg+xml, ...
+    if('.'+extensionList  == extension) return true;
+    var accepted = false;
+    var extensionListArray = extensionList.split('+');
+    for(var i = 0; i < extensionListArray.length; i++) {
+      if('.'+extensionListArray[i] == extension) {
+        accepted = true;
+        break;
+      }
+    }
+    return accepted;
+  }
+
+  function filterMaxFiles(element) { // check number of uploaded files
+    if(element.options.maxFiles >= element.droppedFiles.length) return; 
+    var rejected = [];
+    while (element.droppedFiles.length > element.options.maxFiles) {
+      var rejectedFile = element.droppedFiles.pop();
+      element.lastDroppedFiles.pop();
+      rejected.push(rejectedFile.name);
+    }
+
+    if(rejected.length > 0) {
+      emitCustomEvents(element, 'rejectedNumber', rejected);
+    }
+  };
+
+  function updateDndAreaMessage(element) {
+    if(element.progress && element.progress[0]) { // reset progress bar 
+      element.progressObj[0].setProgressBarValue(0);
+      Util.toggleClass(element.progress[0], 'is-hidden', element.droppedFiles.length == 0);
+      Util.removeClass(element.progress[0], element.progressCompleteClass);
+    }
+
+    if(element.droppedFiles.length > 0 && element.labelEndMessage) {
+      var finalMessage = element.labelEnd.innerHTML;
+      if(element.labelEndMessage.length > 3) {
+        finalMessage = element.droppedFiles.length > 1 
+          ? element.labelEndMessage[0] + element.labelEndMessage[2] + element.labelEndMessage[3]
+          : element.labelEndMessage[0] + element.labelEndMessage[1] + element.labelEndMessage[3];
+      }
+      element.labelEnd[0].innerHTML = finalMessage.replace('{n}', element.droppedFiles.length);
+    }
+  };
+
+  function updateDndList(element) {
+    // create new list of files to be appended
+    if(!element.fileItems || element.fileItems.length == 0) return
+    var clone = element.fileItems[0].cloneNode(true),
+      string = '';
+    Util.removeClass(clone, 'is-hidden');
+    for(var i = 0; i < element.lastDroppedFiles.length; i++) {
+      clone.getElementsByClassName('js-ddf__file-name')[0].textContent = element.lastDroppedFiles[i].name;
+      string = clone.outerHTML + string;
+    }
+
+    if(element.options.replaceFiles) { // replace all files in list with new files
+      string = element.fileItems[0].outerHTML + string;
+      element.filesList[0].innerHTML = string;
+    } else {
+      element.fileItems[0].insertAdjacentHTML('afterend', string);
+    }
+
+    if(element.options.upload) storeMultipleProgress(element);
+
+    Util.toggleClass(element.filesList[0], 'is-hidden', element.droppedFiles.length == 0);
+  };
+
+  function initRemoveFile(element) { // if list of files is visible - option to remove file from list
+    element.filesList[0].addEventListener('click', function(event){
+      if(!event.target.closest('.js-ddf__remove-btn')) return;
+      event.preventDefault();
+      var item = event.target.closest('.js-ddf__item'),
+        index = Util.getIndexInArray(element.filesList[0].getElementsByClassName('js-ddf__item'), item);
+      
+      var removedFile = element.droppedFiles.splice(element.droppedFiles.length - index, 1);
+      if(element.progress && element.progress.length > element.droppedFiles.length - index) {
+        element.progress.splice();
+      }
+      // check if we need to remove items form the lastDroppedFiles array
+      var lastDroppedIndex = element.lastDroppedFiles.length - index;
+      if(lastDroppedIndex >= 0 && lastDroppedIndex < element.lastDroppedFiles.length - 1) {
+        element.lastDroppedFiles.splice(element.lastDroppedFiles.length - index, 1);
+      }
+      item.remove();
+      emitCustomEvents(element, 'fileRemoved', removedFile);
+    });
+
+  };
+
+  function storeMultipleProgress(element) { // handle progress bar elements
+    element.progress = [];
+    var delta = element.droppedFiles.length - element.lastDroppedFiles.length;
+    for(var i = 0; i < element.lastDroppedFiles.length; i++) {
+      element.progress[i] = element.fileItems[element.droppedFiles.length - delta - i].getElementsByClassName('js-ddf__progress')[0];
+    }
+    initProgress(element, 0, element.lastDroppedFiles.length, true);
+  };
+
+  function initProgress(element, start, end, bool) {
+    element.progressObj = [];
+    if(!element.progress || element.progress.length == 0) return;
+    for(var i = start; i < end; i++) {(function(i){
+      element.progressObj.push(new CProgressBar(element.progress[i]));
+      if(bool) Util.removeClass(element.progress[i], 'is-hidden');
+      // listen for 100% progress
+      element.progress[i].addEventListener('updateProgress', function(event){
+        if(event.detail.value == 100 ) Util.addClass(element.progress[i], element.progressCompleteClass);
+      });
+    })(i);}
+  };
+
+  function emitCustomEvents(element, eventName, detail) {
+		var event = new CustomEvent(eventName, {detail: detail});
+		element.element.dispatchEvent(event);
+  };
+  
+  Ddf.defaults = {
+    element : '',
+    maxFiles: false, // max number of files
+    maxSize: false, // max weight - set in kb
+    showFiles: false, // show list of selected files
+    replaceFiles: true, // when new files are loaded -> they replace the old ones
+    upload: false // show progress bar for the upload process
+  };
+
+  window.Ddf = Ddf;
+}());
+// File#: _2_draggable-img-gallery
+// Usage: codyhouse.co/license
+(function() {
+  var DragGallery = function(element) {
+    this.element = element;
+    this.list = this.element.getElementsByTagName('ul')[0];
+    this.imgs = this.list.children;
+    this.gestureHint = this.element.getElementsByClassName('drag-gallery__gesture-hint');// drag gesture hint
+    this.galleryWidth = getGalleryWidth(this); 
+    this.translate = 0; // store container translate value
+    this.dragStart = false; // start dragging position
+    // drag momentum option
+    this.dragMStart = false;
+    this.dragTimeMStart = false;
+    this.dragTimeMEnd = false;
+    this.dragMSpeed = false;
+    this.dragAnimId = false;
+    initDragGalleryEvents(this); 
+  };
+
+  function initDragGalleryEvents(gallery) {
+    initDragging(gallery); // init dragging
+
+    gallery.element.addEventListener('update-gallery-width', function(event){ // window resize
+      gallery.galleryWidth = getGalleryWidth(gallery); 
+      // reset translate value if not acceptable
+      checkTranslateValue(gallery);
+      setTranslate(gallery);
+    });
+     
+    if(intersectionObsSupported) initOpacityAnim(gallery); // init image animation
+
+    if(!reducedMotion && gallery.gestureHint.length > 0) initHintGesture(gallery); // init hint gesture element animation
+
+    initKeyBoardNav(gallery);
+  };
+
+  function getGalleryWidth(gallery) {
+    return gallery.list.scrollWidth - gallery.list.offsetWidth;
+  };
+
+  function initDragging(gallery) { // gallery drag
+    new SwipeContent(gallery.element);
+    gallery.element.addEventListener('dragStart', function(event){
+      window.cancelAnimationFrame(gallery.dragAnimId);
+      Util.addClass(gallery.element, 'drag-gallery--is-dragging'); 
+      gallery.dragStart = event.detail.x;
+      gallery.dragMStart = event.detail.x;
+      gallery.dragTimeMStart = new Date().getTime();
+      gallery.dragTimeMEnd = false;
+      gallery.dragMSpeed = false;
+      initDragEnd(gallery);
+    });
+
+    gallery.element.addEventListener('dragging', function(event){
+      if(!gallery.dragStart) return;
+      if(Math.abs(event.detail.x - gallery.dragStart) < 5) return;
+      gallery.translate = Math.round(event.detail.x - gallery.dragStart + gallery.translate);
+      gallery.dragStart = event.detail.x;
+      checkTranslateValue(gallery);
+      setTranslate(gallery);
+    });
+  };
+
+  function initDragEnd(gallery) {
+    gallery.element.addEventListener('dragEnd', function cb(event){
+      gallery.element.removeEventListener('dragEnd', cb);
+      Util.removeClass(gallery.element, 'drag-gallery--is-dragging');
+      initMomentumDrag(gallery); // drag momentum
+      gallery.dragStart = false;
+    });
+  };
+
+  function initKeyBoardNav(gallery) {
+    gallery.element.setAttribute('tabindex', 0);
+    // navigate gallery using right/left arrows
+    gallery.element.addEventListener('keyup', function(event){
+      if( event.keyCode && event.keyCode == 39 || event.key && event.key.toLowerCase() == 'arrowright' ) {
+        keyboardNav(gallery, 'right');
+      } else if(event.keyCode && event.keyCode == 37 || event.key && event.key.toLowerCase() == 'arrowleft') {
+        keyboardNav(gallery, 'left');
+      }
+    });
+  };
+
+  function keyboardNav(gallery, direction) {
+    var delta = parseFloat(window.getComputedStyle(gallery.imgs[0]).marginRight) + gallery.imgs[0].offsetWidth;
+    gallery.translate = (direction == 'right') ? gallery.translate - delta : gallery.translate + delta;
+    checkTranslateValue(gallery);
+    setTranslate(gallery);
+  };
+
+  function checkTranslateValue(gallery) { // make sure translate is in the right interval
+    if(gallery.translate > 0) {
+      gallery.translate = 0;
+      gallery.dragMSpeed = 0;
+    }
+    if(Math.abs(gallery.translate) > gallery.galleryWidth) {
+      gallery.translate = gallery.galleryWidth*-1;
+      gallery.dragMSpeed = 0;
+    }
+  };
+
+  function setTranslate(gallery) {
+    gallery.list.style.transform = 'translateX('+gallery.translate+'px)';
+    gallery.list.style.msTransform = 'translateX('+gallery.translate+'px)';
+  };
+
+  function initOpacityAnim(gallery) { // animate img opacities on drag
+    for(var i = 0; i < gallery.imgs.length; i++) {
+      var observer = new IntersectionObserver(opacityCallback.bind(gallery.imgs[i]), { threshold: [0, 0.1] });
+		  observer.observe(gallery.imgs[i]);
+    }
+  };
+
+  function opacityCallback(entries, observer) { // reveal images when they enter the viewport
+    var threshold = entries[0].intersectionRatio.toFixed(1);
+		if(threshold > 0) {
+      Util.addClass(this, 'drag-gallery__item--visible');
+      observer.unobserve(this);
+    }
+  };
+
+  function initMomentumDrag(gallery) {
+    // momentum effect when drag is over
+    if(reducedMotion) return;
+    var timeNow = new Date().getTime();
+    gallery.dragMSpeed = 0.95*(gallery.dragStart - gallery.dragMStart)/(timeNow - gallery.dragTimeMStart);
+
+    var currentTime = false;
+
+    function animMomentumDrag(timestamp) {
+      if (!currentTime) currentTime = timestamp;         
+      var progress = timestamp - currentTime;
+      currentTime = timestamp;
+      if(Math.abs(gallery.dragMSpeed) < 0.01) {
+        gallery.dragAnimId = false;
+        return;
+      } else {
+        gallery.translate = Math.round(gallery.translate + (gallery.dragMSpeed*progress));
+        checkTranslateValue(gallery);
+        setTranslate(gallery);
+        gallery.dragMSpeed = gallery.dragMSpeed*0.95;
+        gallery.dragAnimId = window.requestAnimationFrame(animMomentumDrag);
+      }
+    };
+
+    gallery.dragAnimId = window.requestAnimationFrame(animMomentumDrag);
+  };
+
+  function initHintGesture(gallery) { // show user a hint about gallery dragging
+    var observer = new IntersectionObserver(hintGestureCallback.bind(gallery.gestureHint[0]), { threshold: [0, 1] });
+		observer.observe(gallery.gestureHint[0]);
+  };
+
+  function hintGestureCallback(entries, observer) {
+    var threshold = entries[0].intersectionRatio.toFixed(1);
+		if(threshold > 0) {
+      Util.addClass(this, 'drag-gallery__gesture-hint--animate');
+      observer.unobserve(this);
+    }
+  };
+
+  //initialize the DragGallery objects
+  var dragGallery = document.getElementsByClassName('js-drag-gallery'),
+    intersectionObsSupported = ('IntersectionObserver' in window && 'IntersectionObserverEntry' in window && 'intersectionRatio' in window.IntersectionObserverEntry.prototype),
+    reducedMotion = Util.osHasReducedMotion();
+
+  if( dragGallery.length > 0 ) {
+    var dragGalleryArray = [];
+    for( var i = 0; i < dragGallery.length; i++) {
+      (function(i){ 
+        if(!intersectionObsSupported || reducedMotion) Util.addClass(dragGallery[i], 'drag-gallery--anim-off');
+        dragGalleryArray.push(new DragGallery(dragGallery[i]));
+      })(i);
+    }
+
+    // resize event
+    var resizingId = false,
+      customEvent = new CustomEvent('update-gallery-width');
+    
+    window.addEventListener('resize', function() {
+      clearTimeout(resizingId);
+      resizingId = setTimeout(doneResizing, 500);
+    });
+
+    function doneResizing() {
+      for( var i = 0; i < dragGalleryArray.length; i++) {
+        (function(i){dragGalleryArray[i].element.dispatchEvent(customEvent)})(i);
+      };
+    };
+  }
+}());
+// File#: _2_drawer-navigation
+// Usage: codyhouse.co/license
+(function() {
+  function initDrNavControl(element) {
+    var circle = element.getElementsByTagName('circle');
+    if(circle.length > 0) {
+      // set svg attributes to create fill-in animation on click
+      initCircleAttributes(element, circle[0]);
+    }
+
+    var drawerId = element.getAttribute('aria-controls'),
+      drawer = document.getElementById(drawerId);
+    if(drawer) {
+      // when the drawer is closed without click (e.g., user presses 'Esc') -> reset trigger status
+      drawer.addEventListener('drawerIsClose', function(event){ 
+        if(!event.detail || (event.detail && !event.detail.closest('.js-dr-nav-control[aria-controls="'+drawerId+'"]')) ) resetTrigger(element);
+      });
+    }
+  };
+
+  function initCircleAttributes(element, circle) {
+    // set circle stroke-dashoffset/stroke-dasharray values
+    var circumference = (2*Math.PI*circle.getAttribute('r')).toFixed(2);
+    circle.setAttribute('stroke-dashoffset', circumference);
+    circle.setAttribute('stroke-dasharray', circumference);
+    Util.addClass(element, 'dr-nav-control--ready-to-animate');
+  };
+
+  function resetTrigger(element) {
+    Util.removeClass(element, 'anim-menu-btn--state-b'); 
+  };
+
+  var drNavControl = document.getElementsByClassName('js-dr-nav-control');
+  if(drNavControl.length > 0) initDrNavControl(drNavControl[0]);
 }());
 // File#: _2_dropdown
 // Usage: codyhouse.co/license
@@ -12629,6 +17675,77 @@ function initContactMap(wrapper) {
 			(function(i){new OffCanvasNav(offCanvasNav[i]);})(i);
 		}
 	}
+}());
+// File#: _2_page-transition-v1
+// Usage: codyhouse.co/license
+(function() {
+  var pageTransitionWrapper = document.getElementsByClassName('js-page-trans');
+  if(pageTransitionWrapper.length < 1) return;
+  
+  var transPanel = document.getElementsByClassName('page-trans-v1'),
+    loaderScale = '--page-trans-v1-loader-scale',
+    timeoutId = false,
+    loaderScaleDown = 0.2;
+
+  var timeLeaveAnim = 0;
+  
+  new PageTransition({
+    leaveAnimation: function(initContent, link, cb) {
+      timeLeaveAnim = 0;
+      Util.addClass(transPanel[0], 'page-trans-v1--is-visible');
+      transPanel[0].addEventListener('transitionend', function cbLeave(){
+        transPanel[0].removeEventListener('transitionend', cbLeave);
+        setTimeout(function(){
+          animateLoader(300, 1, loaderScaleDown, function(){
+            Util.addClass(initContent, 'is-hidden');
+            timeLeaveAnim = new Date().getTime();
+            cb();
+          });
+        }, 100);
+      });
+    },
+    enterAnimation: function(initContent, newContent, link, cb) {
+      if(timeoutId) {
+        window.cancelAnimationFrame(timeoutId);
+        timeoutId = false;
+      }
+
+      // set a minimum loader animation duration of 0.75s
+      var duration = Math.max((750 - new Date().getTime() + timeLeaveAnim), 300);
+  
+      // complete page-trans-v1__loader scale animation
+      animateLoader(duration, parseFloat(getComputedStyle(transPanel[0]).getPropertyValue(loaderScale)), 1, function() {
+        Util.removeClass(transPanel[0], 'page-trans-v1--is-visible');
+        transPanel[0].addEventListener('transitionend', function cbEnter(){
+          transPanel[0].removeEventListener('transitionend', cbEnter);
+          cb();
+        });
+      });
+    },
+    progressAnimation: function(link) {
+      animateLoader(3000, loaderScaleDown, 0.9);
+    }
+  });
+
+  function animateLoader(duration, startValue, finalValue, cb) {
+    // takes care of animating the loader element
+    var currentTime = false;
+
+    var animateScale = function(timestamp) {
+      if (!currentTime) currentTime = timestamp;        
+      var progress = timestamp - currentTime;
+      if(progress > duration) progress = duration;
+      var val = Math.easeInOutQuart(progress, startValue, finalValue - startValue, duration);
+      transPanel[0].style.setProperty(loaderScale, val);
+      if(progress < duration) {
+        timeoutId = window.requestAnimationFrame(animateScale);
+      } else {
+        // reveal page content
+        if(cb) cb();
+      }
+    };
+    timeoutId = window.requestAnimationFrame(animateScale);
+  };
 }());
 // File#: _2_password-strength
 // Usage: codyhouse.co/license

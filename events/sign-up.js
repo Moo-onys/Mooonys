@@ -47,8 +47,8 @@ router.post('/', async (req, res, next) => {
     } = req.body;
 
     if (await req.mongodb.db(req.env.realm.db).collection('users').findOne({
-            username: username
-        })) {
+        username: username
+    })) {
         return res.json({
             err: {
                 elements: ['#username'],
@@ -61,8 +61,8 @@ router.post('/', async (req, res, next) => {
     }
 
     if (await req.mongodb.db(req.env.realm.db).collection('users').findOne({
-            "_information.email": email
-        })) {
+        "_information.email": email
+    })) {
         return res.json({
             err: {
                 elements: ['#email'],
@@ -86,28 +86,29 @@ router.post('/', async (req, res, next) => {
             lastname: lastname,
             email: email,
             address: '',
-            telephone: ''
+            telephone: '',
+            birthday: ''
         },
         _options: {
             status: false,
             clearance: 1,
             _uuid: _uuid,
             notifications: [{
-                    authors: {
-                        profile: 'logo.svg',
-                        username: 'Mooonys'
-                    },
-                    notification: `<i class="font-semibold">${username}</i> has just signed up.`,
-                    _moment: moment().format()
+                authors: {
+                    profile: 'logo.svg',
+                    username: 'Mooonys'
                 },
-                {
-                    authors: {
-                        profile: 'logo.svg',
-                        username: 'Mooonys'
-                    },
-                    notification: `<i class="font-semibold">Olivia Saturday</i> commented on your <i class="font-semibold">"This is all it takes to improve..."</i> post.`,
-                    _moment: moment().format()
-                }
+                notification: `<i class="font-semibold">${username}</i> has just signed up.`,
+                _moment: moment().format()
+            },
+            {
+                authors: {
+                    profile: 'logo.svg',
+                    username: 'Mooonys'
+                },
+                notification: `<i class="font-semibold">Olivia Saturday</i> commented on your <i class="font-semibold">"This is all it takes to improve..."</i> post.`,
+                _moment: moment().format()
+            }
             ]
         },
         username: username,
