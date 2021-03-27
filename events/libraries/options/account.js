@@ -57,7 +57,7 @@ router.post('/', async (req, res, next) => {
     } = req.body;
 
     req.mongodb.db(req.env.realm.db).collection('users').updateOne({
-        username: username
+        _id: req.session.users._id
     }, {
         _information: {
             img: `${img}`,
