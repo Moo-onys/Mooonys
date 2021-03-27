@@ -302,8 +302,144 @@
     </fieldset>
 
     <div class="border-top border-contrast-lower padding-top-md text-right">
-        <button title="Save your settings with the updated information." type="submit" class="btn hbs-ui__text btn--primary btn--sm">
-            <i class="fas fa-save"></i>
+        <button type="submit" title="Save your settings with the updated information."
+                class="btn hbs-ui__text btn--primary btn--sm">
+            <span class="btn__content-a"><i class="fas fa-save"></i></span>
+            <span class="btn__content-b">
+                <svg class="icon icon--is-spinning" aria-hidden="true" viewBox="0 0 16 16">
+                    <title>Loading</title>
+                    <g stroke-width="1" fill="currentColor" stroke="currentColor">
+                        <path d="M.5,8a7.5,7.5,0,1,1,1.91,5" fill="none" stroke="currentColor"
+                            stroke-linecap="round" stroke-linejoin="round"></path>
+                    </g>
+                </svg>
+            </span>
         </button>
     </div>
 </section>
+
+<script class="hbs-ui__scripts">
+    $(async () => {
+        $('[type=submit]').on('click', async (e) => {
+            e.preventDefault();
+
+            $('[type=submit]').toggleClass('btn--state-b');
+
+            $.ajax({
+                type: 'POST',
+                url: '/options/account',
+                dataType: 'json',
+                contentType: 'application/x-www-form-urlencoded',
+                data: {
+                    fn: document.querySelector('#fn').value,
+                    ln: document.querySelector('#ln').value,
+                    address: document.querySelector('#address').value,
+                    bio: document.querySelector('#bio').value,
+                    employed: document.querySelector('#employed').value,
+                    birthday: document.querySelector('#birthday').value,
+                },
+                beforeSend: async (xhr) => {
+                    console.log('You have requested to update your account with Mooonys.');
+                },
+                error: async (err) => {
+                    if (err) {
+                        $('[type=submit]').toggleClass('btn--state-b');
+
+                        return console.error(err);
+                    }
+                },
+                success: async (args) => {
+                    const {
+                        err,
+                        _id,
+                        xhr
+                    } = args;
+
+                    if (err) {
+                        return await (async (err) => {
+                            const {
+                                elements,
+                                xhr,
+                                async
+                            } = err;
+
+                            if (async) {
+                                return await elements.forEach(async (_id, i, elements) => {
+                                    if (!document.querySelector(_id)) {
+                                        $('[type=submit]').toggleClass('btn--state-b');
+
+                                        return;
+                                    }
+
+                                    const element = document.querySelector(_id);
+
+                                    element.classList.add('form-control--error');
+
+                                    element.addEventListener('focus', async (e) => {
+                                        if (e.target.closest('input').classList.contains('form-control--error')) {
+                                            e.target.closest('input').classList.remove('form-control--error');
+                                        }
+                                    });
+
+                                    if (xhr) {
+                                        element.setAttribute('placeholder', xhr[_id]);
+                                    }
+
+                                    $('[type=submit]').toggleClass('btn--state-b');
+                                });
+                            }
+
+                            elements.forEach((_id, i, elements) => {
+                                if (!document.querySelector(_id)) {
+                                    $('[type=submit]').toggleClass('btn--state-b');
+
+                                    return;
+                                }
+
+                                const element = document.querySelector(_id);
+
+                                element.classList.add('form-control--error');
+
+                                element.addEventListener('focus', (e) => {
+                                    if (e.target.closest('input').classList.contains('form-control--error')) {
+                                        e.target.closest('input').classList.remove('form-control--error');
+                                    }
+                                });
+
+                                if (xhr) {
+                                    element.setAttribute('placeholder', xhr[_id]);
+                                }
+
+                                $('[type=submit]').toggleClass('btn--state-b');
+                            });
+                        })(err);
+                    }
+
+                    localStorage.setItem('_id', _id);
+
+                    if (xhr) {
+                        const {
+                            uuid,
+                            url,
+                            async
+                        } = xhr;
+
+                        if (uuid) {
+                            sessionStorage.setItem('uuid', uuid);
+
+                            if (async) {
+                                $('[type=submit]').toggleClass('btn--state-b');
+
+                                return await window.location.replace(url);
+                            }
+
+                            $('[type=submit]').toggleClass('btn--state-b');
+
+                            window.location.replace(url);
+                        }
+                    }
+                }
+            });
+        });
+    });
+</script>
