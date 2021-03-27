@@ -56,7 +56,7 @@ router.post('/', async (req, res, next) => {
         birthday
     } = req.body;
 
-    req.mongodb.db(req.env.realm.db).collection('users').updateOne({
+    await req.mongodb.db(req.env.realm.db).collection('users').updateOne({
         _id: req.session.users._id
     }, {
         _information: {
@@ -69,16 +69,16 @@ router.post('/', async (req, res, next) => {
             telephone: `${telephone}`,
             birthday: `${birthday}`
         }
-    }).then(async () => {
-        res.json({
-            err: false,
-            _id: req.session.users._id,
-            xhr: {
-                uuid: req.session.users._options._uuid,
-                url: '/options/account',
-                async: true
-            }
-        });
+    });
+
+    res.json({
+        err: false,
+        _id: req.session.users._id,
+        xhr: {
+            uuid: req.session._uuid,
+            url: '/options/account',
+            async: true
+        }
     });
 });
 
