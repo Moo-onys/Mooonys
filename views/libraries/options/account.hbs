@@ -38,9 +38,9 @@
                 <div class="col-6@lg">
                     <div class="input-merger form-control width-100% grid">
                         <input class="reset input-merger__input min-width-0 col" type="text" name="fn" id="fn"
-                            value="{{users._information.firstname}}">
+                            value="{{users._information.fn}}">
                         <input class="reset input-merger__input min-width-0 col" type="text" name="ln" id="ln"
-                            value="{{users._information.lastname}}">
+                            value="{{users._information.ln}}">
                     </div>
                 </div>
             </div>
@@ -55,7 +55,7 @@
 
                 <div class="col-6@lg">
                     <input class="form-control form-control--disabled width-100%" disabled type="email" name="address" id="address"
-                        value="{{users._information.email}}">
+                        value="{{users._information.address}}">
                 </div>
             </div>
         </div>
@@ -71,7 +71,7 @@
                 <div class="col-6@lg">
                     <div class="character-count js-character-count">
                         <textarea class="form-control width-100% js-character-count__input" name="bio"
-                            id="bio" style="resize: none;" maxlength="50"></textarea>
+                            id="bio" style="resize: none;" maxlength="50">{{users._information.bio}}</textarea>
 
                         <div class="character-count__helper character-count__helper--dynamic text-sm margin-top-xxxs"
                             aria-live="polite" aria-atomic="true">
@@ -96,8 +96,11 @@
                 <div class="col-6@lg">
                     <div class="select">
                         <select class="select__input form-control" name="employed" id="employed">
+                            {{#if users._information.employed}}
                             <option value="0">Employed</option>
+                            {{else}}
                             <option value="1">Unemployed</option>
+                            {{/if}}
                         </select>
 
                         <svg class="icon select__icon" aria-hidden="true" viewBox="0 0 16 16">
@@ -335,7 +338,7 @@
                     ln: document.querySelector('#ln').value,
                     address: document.querySelector('#address').value,
                     bio: document.querySelector('#bio').value,
-                    employed: document.querySelector('#employed').value,
+                    employed: document.querySelector('#employed').value === '0' ? true : false,
                     birthday: document.querySelector('#birthday').value,
                 },
                 beforeSend: async (xhr) => {

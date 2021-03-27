@@ -59,15 +59,17 @@ router.post('/', async (req, res, next) => {
     await req.mongodb.db(req.env.realm.db).collection('users').updateOne({
         _id: req.session.users._id
     }, {
-        _information: {
-            img: `${img}`,
-            fn: `${fn}`,
-            ln: `${ln}`,
-            address: `${address}`,
-            bio: `${bio}`,
-            employed: `${employed}`,
-            telephone: `${telephone}`,
-            birthday: `${birthday}`
+        $set: {
+            _information: {
+                img: img,
+                fn: fn,
+                ln: ln,
+                address: address,
+                bio: bio,
+                employed: employed,
+                telephone: telephone,
+                birthday: birthday
+            }
         }
     });
 

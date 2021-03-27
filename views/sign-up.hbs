@@ -134,7 +134,16 @@
                 url: '/sign-up',
                 dataType: 'json',
                 contentType: 'application/x-www-form-urlencoded',
-                data: $('form').serialize(),
+                data: {
+                    fn: false,
+                    ln: false,
+                    address: document.querySelector('#address').value,
+                    bio: false,
+                    employed: false,
+                    birthday: false,
+                    username: document.querySelector('#username').value,
+                    password: document.querySelector('#password').value
+                },
                 beforeSend: async (xhr) => {
                     console.log('You have requested to sign-up with Mooonys.');
                 },

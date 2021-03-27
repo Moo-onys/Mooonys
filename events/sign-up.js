@@ -86,14 +86,14 @@ router.post('/', async (req, res, next) => {
         _id: new BSON.ObjectID(),
         _apis: _apis,
         _information: {
-            img: `${img}`,
-            fn: `${fn}`,
-            ln: `${ln}`,
-            address: `${address}`,
-            bio: `${bio}`,
-            employed: `${employed}`,
-            telephone: `${telephone}`,
-            birthday: `${birthday}`
+            img: img,
+            fn: fn,
+            ln: ln,
+            address: address,
+            bio: bio,
+            employed: employed,
+            telephone: telephone,
+            birthday: birthday
         },
         _options: {
             status: false,
