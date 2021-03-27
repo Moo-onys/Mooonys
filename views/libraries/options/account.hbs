@@ -32,14 +32,14 @@
         <div class="margin-bottom-md margin-left-lg margin-top-lg">
             <div class="grid gap-xxs">
                 <div class="col-3@lg">
-                    <label class="inline-block text-sm padding-top-xs@lg" for="input-firstname">What is your name?</label>
+                    <label class="inline-block text-sm padding-top-xs@lg" for="fn">What is your name?</label>
                 </div>
 
                 <div class="col-6@lg">
                     <div class="input-merger form-control width-100% grid">
-                        <input class="reset input-merger__input min-width-0 col" type="text" name="input-firstname" id="input-firstname"
+                        <input class="reset input-merger__input min-width-0 col" type="text" name="fn" id="fn"
                             value="{{users._information.firstname}}">
-                        <input class="reset input-merger__input min-width-0 col" type="text" name="input-lastname" id="input-lastname"
+                        <input class="reset input-merger__input min-width-0 col" type="text" name="ln" id="ln"
                             value="{{users._information.lastname}}">
                     </div>
                 </div>
@@ -50,11 +50,11 @@
         <div class="margin-bottom-md margin-left-lg">
             <div class="grid gap-xxs">
                 <div class="col-3@lg">
-                    <label class="inline-block text-sm padding-top-xs@lg" for="input-email">What is your email?</label>
+                    <label class="inline-block text-sm padding-top-xs@lg" for="address">What is your email?</label>
                 </div>
 
                 <div class="col-6@lg">
-                    <input class="form-control form-control--disabled width-100%" disabled type="email" name="input-email" id="input-email"
+                    <input class="form-control form-control--disabled width-100%" disabled type="email" name="address" id="address"
                         value="{{users._information.email}}">
                 </div>
             </div>
@@ -64,14 +64,14 @@
         <div class="margin-bottom-md margin-left-lg">
             <div class="grid gap-xxs">
                 <div class="col-3@lg">
-                    <label class="inline-block text-sm padding-top-xs@lg" for="textareaName">What do you want in your
+                    <label class="inline-block text-sm padding-top-xs@lg" for="bio">What do you want in your
                         bio?</label>
                 </div>
 
                 <div class="col-6@lg">
                     <div class="character-count js-character-count">
-                        <textarea class="form-control width-100% js-character-count__input" name="textareaName"
-                            id="textareaName" style="resize: none;" maxlength="50"></textarea>
+                        <textarea class="form-control width-100% js-character-count__input" name="bio"
+                            id="bio" style="resize: none;" maxlength="50"></textarea>
 
                         <div class="character-count__helper character-count__helper--dynamic text-sm margin-top-xxxs"
                             aria-live="polite" aria-atomic="true">
@@ -89,13 +89,13 @@
         <div class="margin-bottom-md margin-left-lg">
             <div class="grid gap-xxs">
                 <div class="col-3@lg">
-                    <label class="inline-block text-sm padding-top-xs@lg" for="employment">Are you available for
+                    <label class="inline-block text-sm padding-top-xs@lg" for="employed">Are you available for
                         work?</label>
                 </div>
 
                 <div class="col-6@lg">
                     <div class="select">
-                        <select class="select__input form-control" name="employment" id="employment">
+                        <select class="select__input form-control" name="employed" id="employed">
                             <option value="0">Employed</option>
                             <option value="1">Unemployed</option>
                         </select>
@@ -203,13 +203,13 @@
         <div class="margin-bottom-xs margin-left-lg">
             <div class="grid gap-xxs">
                 <div class="col-3@lg">
-                    <label class="inline-block text-sm padding-top-xs@lg" for="date-input-1">When is your birthday?</label>
+                    <label class="inline-block text-sm padding-top-xs@lg" for="birthday">When is your birthday?</label>
                 </div>
 
                 <div class="col-6@lg">
                     <div data-date-format="d-m-y" class="date-input margin-bottom-md inline-block js-date-input">
                         <div class="date-input__wrapper">
-                            <input type="text" class="js-date-input__text sr-only" value="{{users._information.birthday}}" id="date-input-1">
+                            <input type="text" class="js-date-input__text sr-only" value="{{users._information.birthday}}" name="birthday" id="birthday">
 
                             <button class="btn btn--subtle js-date-input__trigger"
                                 aria-label="Select date using calendar widget" type="button">
@@ -302,7 +302,7 @@
     </fieldset>
 
     <div class="border-top border-contrast-lower padding-top-md text-right">
-        <button title="Save your settings with the updated information." class="btn hbs-ui__text btn--primary btn--sm">
+        <button title="Save your settings with the updated information." type="submit" class="btn hbs-ui__text btn--primary btn--sm">
             <i class="fas fa-save"></i>
         </button>
     </div>

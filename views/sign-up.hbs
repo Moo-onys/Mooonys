@@ -27,15 +27,15 @@
         <!--<div class="margin-bottom-sm">
             <div class="grid gap-xs">
                 <div class="col-6@md">
-                    <label class="form-label margin-bottom-xxxs" for="firstname">Firstname</label>
-                    <input class="form-control width-100%" placeholder="____________" required type="text" name="firstname"
-                        id="firstname">
+                    <label class="form-label margin-bottom-xxxs" for="fn">fn</label>
+                    <input class="form-control width-100%" placeholder="____________" required type="text" name="fn"
+                        id="fn">
                 </div>
 
                 <div class="col-6@md">
-                    <label class="form-label margin-bottom-xxxs" for="lastname">Lastname</label>
-                    <input class="form-control width-100%" placeholder="__________" required type="text" name="lastname"
-                        id="lastname">
+                    <label class="form-label margin-bottom-xxxs" for="ln">ln</label>
+                    <input class="form-control width-100%" placeholder="__________" required type="text" name="ln"
+                        id="ln">
                 </div>
             </div>
         </div>-->
@@ -48,11 +48,11 @@
         </div>
 
         <div class="margin-bottom-sm">
-            <label class="form-label margin-bottom-xxxs" for="email">What is your email address?
+            <label class="form-label margin-bottom-xxxs" for="address">What is your email address?
                 <span class="margin-left-xxxs"><i class="fas icon text-sm fa-info-circle"></i></span>
             </label>
-            <input class="form-control width-100%" id="email" title="There is a maximum length of 64 characters." autocomplete="off" name="email"
-                aria-label="Email" type="email" placeholder="john_doe1216@jdoe.com" maxlength="64" pattern=".{8,}" required
+            <input class="form-control width-100%" id="address" title="There is a maximum length of 64 characters." autocomplete="off" name="address"
+                aria-label="address" type="address" placeholder="john_doe1216@jdoe.com" maxlength="64" pattern=".{8,}" required
                 title="8 characters minimum">
         </div>
 
@@ -105,10 +105,10 @@
 
     {
         err: {
-            elements: ['username', 'email', 'password'],
+            elements: ['username', 'address', 'password'],
             xhr: {
                 username: 'You have entered an already in-use username..',
-                email: 'You have entered an already in-use email address.'
+                address: 'You have entered an already in-use address address.'
                 password: 'You have entered an invalid and in-secure password.',
             },
             async: true

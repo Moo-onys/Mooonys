@@ -8,6 +8,7 @@ const moment = require('moment');
 const uuid = require('uuid');
 const crypto = require('crypto');
 const express = require('express');
+const { fn } = require('moment');
 const router = this.$.router = express.Router();
 const path = this.$.path = ['/sign-up'][0];
 
@@ -38,12 +39,16 @@ router.post('/', async (req, res, next) => {
     next();
 }, async (req, res) => {
     const {
-        firstname,
-        lastname,
-        email,
+        img,
+        fn,
+        ln,
+        address,
+        bio,
+        employed,
+        telephone,
+        birthday,
         username,
         password,
-        _img
     } = req.body;
 
     if (await req.mongodb.db(req.env.realm.db).collection('users').findOne({
@@ -61,13 +66,13 @@ router.post('/', async (req, res, next) => {
     }
 
     if (await req.mongodb.db(req.env.realm.db).collection('users').findOne({
-        "_information.email": email
+        "_information.address": address
     })) {
         return res.json({
             err: {
-                elements: ['#email'],
+                elements: ['#address'],
                 xhr: {
-                    email: 'You have provided an already in-use email.'
+                    address: 'You have provided an already in-use address.'
                 },
                 async: true
             }
@@ -81,13 +86,14 @@ router.post('/', async (req, res, next) => {
         _id: new BSON.ObjectID(),
         _apis: _apis,
         _information: {
-            _img: _img || 'default.svg',
-            firstname: firstname,
-            lastname: lastname,
-            email: email,
-            address: '',
-            telephone: '',
-            birthday: ''
+            img: `${img}`,
+            fn: `${fn}`,
+            ln: `${ln}`,
+            address: `${address}`,
+            bio: `${bio}`,
+            employed: `${employed}`,
+            telephone: `${telephone}`,
+            birthday: `${birthday}`
         },
         _options: {
             status: false,
@@ -100,16 +106,7 @@ router.post('/', async (req, res, next) => {
                 },
                 notification: `<i class="font-semibold">${username}</i> has just signed up.`,
                 _moment: moment().format()
-            },
-            {
-                authors: {
-                    profile: 'logo.svg',
-                    username: 'Mooonys'
-                },
-                notification: `<i class="font-semibold">Olivia Saturday</i> commented on your <i class="font-semibold">"This is all it takes to improve..."</i> post.`,
-                _moment: moment().format()
-            }
-            ]
+            }]
         },
         username: username,
         password: crypto.createHash('sha256').update(password).digest('base64')
@@ -124,7 +121,7 @@ router.post('/', async (req, res, next) => {
             layout: false,
             fullname: users.username,
             username: users.username,
-            email: users._information.email
+            address: users._information.address
         }, async (err, html) => {
             if (err) {
                 return console.error(err);
@@ -132,7 +129,7 @@ router.post('/', async (req, res, next) => {
 
             await req.utils.nodemailer.sendMail({
                 from: req.env.nodemailer.username,
-                to: users._information.email,
+                to: users._information.address,
                 subject: `Thank you for registering on our site, ${users.username}.`,
                 html: html
             });

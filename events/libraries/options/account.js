@@ -38,4 +38,48 @@ router.get('/', async (req, res, next) => {
     });
 });
 
+router.post('/', async (req, res, next) => {
+    if (!req.session._uuid) {
+        return res.redirect('/sign-in');
+    }
+
+    next();
+}, async (req, res) => {
+    const {
+        img,
+        fn,
+        ln,
+        address,
+        bio,
+        employed,
+        telephone,
+        birthday
+    } = req.body;
+
+    req.mongodb.db(req.env.realm.db).collection('users').updateOne({
+        username: username
+    }, {
+        _information: {
+            img: `${img}`,
+            fn: `${fn}`,
+            ln: `${ln}`,
+            address: `${address}`,
+            bio: `${bio}`,
+            employed: `${employed}`,
+            telephone: `${telephone}`,
+            birthday: `${birthday}`
+        }
+    }).then(async (users) => {
+        res.json({
+            err: false,
+            _id: users._id,
+            xhr: {
+                uuid: users._options._uuid,
+                url: '/options/account',
+                async: true
+            }
+        });
+    });
+});
+
 module.exports = this;
