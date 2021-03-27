@@ -69,12 +69,12 @@ router.post('/', async (req, res, next) => {
             telephone: `${telephone}`,
             birthday: `${birthday}`
         }
-    }).then(async (users) => {
+    }).then(async () => {
         res.json({
             err: false,
-            _id: users._id,
+            _id: req.session.users._id,
             xhr: {
-                uuid: users._options._uuid,
+                uuid: req.session.users._options._uuid,
                 url: '/options/account',
                 async: true
             }
