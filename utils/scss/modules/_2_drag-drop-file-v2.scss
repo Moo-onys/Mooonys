@@ -13,16 +13,16 @@ Usage: codyhouse.co/license
   position: relative;
   overflow: hidden;
   border-radius: 50em;
-  border: 2px solid var(--color-contrast-low);
+  border: 2px solid var(--color-contrast-lower);
   padding-top: var(--space-xl);
-  background-color: var(--color-contrast-lower);
+  background-color: var(--color-bg);
   transition: .3s;
   background-blend-mode: overlay;
   width: 240px;
   height: 240px;
 
   &:hover {
-    border-color: var(--color-contrast-medium);
+    border-color: var(--color-contrast-higher);
   }
 }
 
@@ -44,6 +44,10 @@ Usage: codyhouse.co/license
   *:nth-child(2) {
     transition: fill .3s;
     fill: var(--color-contrast-lower);
+
+    &:hover {
+      fill: var(--color-contrast-higher);
+    }
   }
 }
 
