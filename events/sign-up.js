@@ -8,7 +8,6 @@ const moment = require('moment');
 const uuid = require('uuid');
 const crypto = require('crypto');
 const express = require('express');
-const { fn } = require('moment');
 const router = this.$.router = express.Router();
 const path = this.$.path = ['/sign-up'][0];
 
