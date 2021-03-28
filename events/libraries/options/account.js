@@ -64,7 +64,7 @@ router.post('/', async (req, res, next) => {
                 img: img,
                 fn: fn,
                 ln: ln,
-                address: res.locals.users._information.address,
+                address: res.locals.session.users._information.address,
                 bio: bio,
                 employed: employed,
                 telephone: telephone,
