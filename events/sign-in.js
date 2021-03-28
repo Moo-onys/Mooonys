@@ -46,32 +46,7 @@ router.get('/github', async (req, res, next) => {
 
     const {
         login,
-        id,
-        node_id,
-        avatar_url,
-        gravatar_id,
-        type,
-        site_admin,
-        name,
-        company,
-        blog,
-        location,
-        email,
-        hireable,
-        bio,
-        twitter_username,
-        public_repos,
-        public_gists,
-        followers,
-        following,
-        created_at,
-        updated_at,
-        private_gists,
-        total_private_repos,
-        owned_private_repos,
-        disk_usage,
-        collaborators,
-        two_factor_authentication
+        id
     } = (await superagent
         .get('https://api.github.com/user')
         .set('User-Agent', 'PostmanRuntime/7.26.8')
