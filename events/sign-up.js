@@ -6,6 +6,7 @@ const {
 
 const moment = require('moment');
 const uuid = require('uuid');
+const superagent = require('superagent');
 const crypto = require('crypto');
 const express = require('express');
 const router = this.$.router = express.Router();
