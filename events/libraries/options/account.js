@@ -56,6 +56,8 @@ router.post('/', async (req, res, next) => {
         birthday
     } = req.body;
 
+    console.log(img);
+
     await req.mongodb.db(req.env.realm.db).collection('users').updateOne({
         _id: req.session.users._id
     }, {

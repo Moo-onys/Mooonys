@@ -35,7 +35,7 @@
         <div class="margin-bottom-md margin-left-lg margin-top-lg">
             <div class="grid items-center gap-xxs">
                 <div class="col-3@lg">
-                    <label class="inline-block text-sm padding-top-xs@lg" for="fn">What is your name?</label>
+                    <label class="inline-block text-sm padding-top-xs@lg" for="fn">Upload your profile picture?</label>
                 </div>
 
                 <div class="col-6@lg">
@@ -43,7 +43,7 @@
                         <div style="background-image: url({{users._information.img}});"
                             class="ddf-v2__area padding-x-md js-ddf-v2__area">
                             <input class="ddf-v2__input sr-only js-ddf-v2__input" type="image" id="img"
-                                name="img">
+                                name="img" value="{{users._information.img}}">
 
                             <label class="ddf-v2__label js-ddf-v2__label" for="img">
                                 <i class="ddf-v2__label-inner">
@@ -392,6 +392,7 @@
                 dataType: 'json',
                 contentType: 'application/x-www-form-urlencoded',
                 data: {
+                    img: document.querySelector('#img').value,
                     fn: document.querySelector('#fn').value,
                     ln: document.querySelector('#ln').value,
                     address: document.querySelector('#address').value,
