@@ -7,13 +7,17 @@
             <label class="hbs-ui__text" for="hbs-ui__languages-input">Select your language</label>
 
             <select name="language-picker-select" id="hbs-ui__languages-input">
-                <option lang="en" class="hbs-ui__text" value="english" {{#if location.english.isSelected}} selected{{/if}}>
+                <option lang="en" class="hbs-ui__text" value="english" {{#if location.english.isSelected}}
+                    selected{{/if}}>
                     English</option>
-                <option lang="de" class="hbs-ui__text" value="deutsch" {{#if location.deutsch.isSelected}} selected{{/if}}>
+                <option lang="de" class="hbs-ui__text" value="deutsch" {{#if location.deutsch.isSelected}}
+                    selected{{/if}}>
                     Deutsch</option>
-                <option lang="fr" class="hbs-ui__text" value="francais" {{#if location.francais.isSelected}} selected{{/if}}>
+                <option lang="fr" class="hbs-ui__text" value="francais" {{#if location.francais.isSelected}}
+                    selected{{/if}}>
                     Français</option>
-                <option lang="it" class="hbs-ui__text" value="italiano" {{#if location.italiano.isSelected}} selected{{/if}}>
+                <option lang="it" class="hbs-ui__text" value="italiano" {{#if location.italiano.isSelected}}
+                    selected{{/if}}>
                     Italiano</option>
             </select>
         </form>
@@ -28,23 +32,53 @@
     <fieldset class="bg padding-md shadow-xs radius-md">
         <legend class="form-legend sr-only margin-bottom-md">Profile Settings</legend>
 
-        <div class="ddf-v2">
-            <div style="background-image: url({{users._information.img}});" class="ddf-v2__area padding-x-md js-ddf-v2__area">
-                <input class="ddf-v2__input sr-only js-ddf-v2__input" type="file" id="upload-file" multiple name="file[]">
+        <div class="margin-bottom-md margin-left-lg margin-top-lg">
+            <div class="grid gap-xxs">
+                <div class="col-3@lg">
+                    <label class="inline-block text-sm padding-top-xs@lg" for="fn">What is your name?</label>
+                </div>
 
-                <label class="ddf-v2__label js-ddf-v2__label" for="upload-file">
-                    <i class="ddf-v2__label-inner">
-                        <svg class="icon icon--xl color-contrast-higher ddf-v2__icon-cloud" viewBox="0 0 64 64" aria-hidden="true"><path fill="currentColor" d="M51,27c-.374,0-.742.025-1.109.056a18,18,0,0,0-35.782,0C13.742,27.025,13.374,27,13,27a13,13,0,0,0,0,26H51a13,13,0,0,0,0-26Z"/><path d="M43.764,41.354l-11-13a1.033,1.033,0,0,0-1.526,0l-11,13A1,1,0,0,0,21,43h7V59h8V43h7a1,1,0,0,0,.764-1.646Z" fill="var(--color-bg)"/></svg>                                
-                    </i>
-                </label>
-                
-                <span class="ddf-v2__label-end">
-                    <i class="ddf-v2__label-end-inner">
-                        <svg class="icon icon--xl color-contrast-higher ddf-v2__icon-file" viewBox="0 0 64 64" aria-hidden="true"><path fill="currentColor" d="M1.4,16.868,7,15.636,18.972,13A1.783,1.783,0,0,1,21.1,14.359L28.21,46.683a1.783,1.783,0,0,1-1.358,2.124L9.28,52.675a1.784,1.784,0,0,1-2.124-1.358L.042,18.993A1.783,1.783,0,0,1,1.4,16.868Z" opacity="0.69"/><path fill="currentColor" d="M62.6,16.868,57,15.636,45.028,13A1.783,1.783,0,0,0,42.9,14.359L35.79,46.683a1.783,1.783,0,0,0,1.358,2.124L54.72,52.675a1.784,1.784,0,0,0,2.124-1.358l7.114-32.324A1.783,1.783,0,0,0,62.6,16.868Z" opacity="0.69"/><rect fill="currentColor" x="13" y="9" width="38" height="46" rx="2"/><path d="M42.941,41.664l-5-14a1,1,0,0,0-1.624-.4l-15,14A1,1,0,0,0,22,43H42a1,1,0,0,0,.941-1.336Z" fill="var(--color-bg)"/><circle cx="24" cy="26" r="3" fill="var(--color-bg)"/></svg>
+                <div class="col-6@lg">
+                    <div class="ddf-v2">
+                        <div style="background-image: url({{users._information.img}});"
+                            class="ddf-v2__area padding-x-md js-ddf-v2__area">
+                            <input class="ddf-v2__input sr-only js-ddf-v2__input" type="file" id="upload-file" multiple
+                                name="file[]">
 
-                        <span class="js-ddf-v2__files-counter">{n} selected %file%files%</span>
-                    </i>
-                </span>
+                            <label class="ddf-v2__label js-ddf-v2__label" for="upload-file">
+                                <i class="ddf-v2__label-inner">
+                                    <svg class="icon icon--xl color-contrast-higher ddf-v2__icon-cloud"
+                                        viewBox="0 0 64 64" aria-hidden="true">
+                                        <path fill="currentColor"
+                                            d="M51,27c-.374,0-.742.025-1.109.056a18,18,0,0,0-35.782,0C13.742,27.025,13.374,27,13,27a13,13,0,0,0,0,26H51a13,13,0,0,0,0-26Z" />
+                                        <path
+                                            d="M43.764,41.354l-11-13a1.033,1.033,0,0,0-1.526,0l-11,13A1,1,0,0,0,21,43h7V59h8V43h7a1,1,0,0,0,.764-1.646Z"
+                                            fill="var(--color-bg)" /></svg>
+                                </i>
+                            </label>
+
+                            <span class="ddf-v2__label-end">
+                                <i class="ddf-v2__label-end-inner">
+                                    <svg class="icon icon--xl color-contrast-higher ddf-v2__icon-file"
+                                        viewBox="0 0 64 64" aria-hidden="true">
+                                        <path fill="currentColor"
+                                            d="M1.4,16.868,7,15.636,18.972,13A1.783,1.783,0,0,1,21.1,14.359L28.21,46.683a1.783,1.783,0,0,1-1.358,2.124L9.28,52.675a1.784,1.784,0,0,1-2.124-1.358L.042,18.993A1.783,1.783,0,0,1,1.4,16.868Z"
+                                            opacity="0.69" />
+                                        <path fill="currentColor"
+                                            d="M62.6,16.868,57,15.636,45.028,13A1.783,1.783,0,0,0,42.9,14.359L35.79,46.683a1.783,1.783,0,0,0,1.358,2.124L54.72,52.675a1.784,1.784,0,0,0,2.124-1.358l7.114-32.324A1.783,1.783,0,0,0,62.6,16.868Z"
+                                            opacity="0.69" />
+                                        <rect fill="currentColor" x="13" y="9" width="38" height="46" rx="2" />
+                                        <path
+                                            d="M42.941,41.664l-5-14a1,1,0,0,0-1.624-.4l-15,14A1,1,0,0,0,22,43H42a1,1,0,0,0,.941-1.336Z"
+                                            fill="var(--color-bg)" />
+                                        <circle cx="24" cy="26" r="3" fill="var(--color-bg)" /></svg>
+
+                                    <span class="js-ddf-v2__files-counter">{n} selected %file%files%</span>
+                                </i>
+                            </span>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -74,8 +108,8 @@
                 </div>
 
                 <div class="col-6@lg">
-                    <input class="form-control form-control--disabled width-100%" disabled type="email" name="address" id="address"
-                        value="{{users._information.address}}">
+                    <input class="form-control form-control--disabled width-100%" disabled type="email" name="address"
+                        id="address" value="{{users._information.address}}">
                 </div>
             </div>
         </div>
@@ -90,8 +124,8 @@
 
                 <div class="col-6@lg">
                     <div class="character-count js-character-count">
-                        <textarea class="form-control width-100% js-character-count__input" name="bio"
-                            id="bio" style="resize: none;" maxlength="50">{{users._information.bio}}</textarea>
+                        <textarea class="form-control width-100% js-character-count__input" name="bio" id="bio"
+                            style="resize: none;" maxlength="50">{{users._information.bio}}</textarea>
 
                         <div class="character-count__helper character-count__helper--dynamic text-sm margin-top-xxxs"
                             aria-live="polite" aria-atomic="true">
@@ -117,9 +151,9 @@
                     <div class="select">
                         <select class="select__input form-control" name="employed" id="employed">
                             {{#if users._information.employed}}
-                            <option value="0">Employed</option>
+                                <option value="0">Employed</option>
                             {{else}}
-                            <option value="1">Unemployed</option>
+                                <option value="1">Unemployed</option>
                             {{/if}}
                         </select>
 
@@ -140,7 +174,9 @@
                 </div>
 
                 <div class="col-6@lg">
-                    <span title="This option has been disabled for reasons unknown." class="text-xs noselect inline-block color-contrast-medium">This option has been disabled.</span>
+                    <span title="This option has been disabled for reasons unknown."
+                        class="text-xs noselect inline-block color-contrast-medium">This option has been
+                        disabled.</span>
 
                     <ul class="choice-tags sr-only flex flex-wrap gap-xxs js-choice-tags">
                         <li>
@@ -232,7 +268,8 @@
                 <div class="col-6@lg">
                     <div data-date-format="d-m-y" class="date-input margin-bottom-md inline-block js-date-input">
                         <div class="date-input__wrapper">
-                            <input type="text" class="js-date-input__text sr-only" value="{{users._information.birthday}}" name="birthday" id="birthday">
+                            <input type="text" class="js-date-input__text sr-only"
+                                value="{{users._information.birthday}}" name="birthday" id="birthday">
 
                             <button class="btn btn--subtle js-date-input__trigger"
                                 aria-label="Select date using calendar widget" type="button">
@@ -246,7 +283,8 @@
                                     </g>
                                 </svg>
 
-                                <span class="js-date-input__value" aria-hidden="true">{{#if users._information.birthday}}{{else}}Birthday{{/if}}</span>
+                                <span class="js-date-input__value"
+                                    aria-hidden="true">{{#if users._information.birthday}}{{else}}Birthday{{/if}}</span>
                             </button>
                         </div>
 
@@ -326,14 +364,14 @@
 
     <div class="border-top border-contrast-lower padding-top-md text-right">
         <button type="submit" title="Save your settings with the updated information."
-                class="btn hbs-ui__text btn--primary btn--sm">
+            class="btn hbs-ui__text btn--primary btn--sm">
             <span class="btn__content-a"><i class="fas fa-save"></i></span>
             <span class="btn__content-b">
                 <svg class="icon icon--is-spinning" aria-hidden="true" viewBox="0 0 16 16">
                     <title>Loading</title>
                     <g stroke-width="1" fill="currentColor" stroke="currentColor">
-                        <path d="M.5,8a7.5,7.5,0,1,1,1.91,5" fill="none" stroke="currentColor"
-                            stroke-linecap="round" stroke-linejoin="round"></path>
+                        <path d="M.5,8a7.5,7.5,0,1,1,1.91,5" fill="none" stroke="currentColor" stroke-linecap="round"
+                            stroke-linejoin="round"></path>
                     </g>
                 </svg>
             </span>
@@ -358,11 +396,14 @@
                     ln: document.querySelector('#ln').value,
                     address: document.querySelector('#address').value,
                     bio: document.querySelector('#bio').value,
-                    employed: document.querySelector('#employed').value === '0' ? true : false,
+                    employed: document.querySelector('#employed').value === '0' ? true :
+                        false,
                     birthday: document.querySelector('#birthday').value,
                 },
                 beforeSend: async (xhr) => {
-                    console.log('You have requested to update your account with Mooonys.');
+                    console.log(
+                        'You have requested to update your account with Mooonys.'
+                        );
                 },
                 error: async (err) => {
                     if (err) {
@@ -387,53 +428,107 @@
                             } = err;
 
                             if (async) {
-                                return await elements.forEach(async (_id, i, elements) => {
-                                    if (!document.querySelector(_id)) {
-                                        $('[type=submit]').toggleClass('btn--state-b');
+                                return await elements.forEach(async (
+                                    _id, i, elements) => {
+                                    if (!document
+                                        .querySelector(_id)
+                                        ) {
+                                        $('[type=submit]')
+                                            .toggleClass(
+                                                'btn--state-b'
+                                                );
 
                                         return;
                                     }
 
-                                    const element = document.querySelector(_id);
+                                    const element = document
+                                        .querySelector(_id);
 
-                                    element.classList.add('form-control--error');
+                                    element.classList.add(
+                                        'form-control--error'
+                                        );
 
-                                    element.addEventListener('focus', async (e) => {
-                                        if (e.target.closest('input').classList.contains('form-control--error')) {
-                                            e.target.closest('input').classList.remove('form-control--error');
-                                        }
-                                    });
+                                    element
+                                        .addEventListener(
+                                            'focus', async (
+                                                e) => {
+                                                if (e
+                                                    .target
+                                                    .closest(
+                                                        'input'
+                                                        )
+                                                    .classList
+                                                    .contains(
+                                                        'form-control--error'
+                                                        )
+                                                    ) {
+                                                    e.target
+                                                        .closest(
+                                                            'input'
+                                                            )
+                                                        .classList
+                                                        .remove(
+                                                            'form-control--error'
+                                                            );
+                                                }
+                                            });
 
                                     if (xhr) {
-                                        element.setAttribute('placeholder', xhr[_id]);
+                                        element
+                                            .setAttribute(
+                                                'placeholder',
+                                                xhr[_id]);
                                     }
 
-                                    $('[type=submit]').toggleClass('btn--state-b');
+                                    $('[type=submit]')
+                                        .toggleClass(
+                                            'btn--state-b');
                                 });
                             }
 
                             elements.forEach((_id, i, elements) => {
-                                if (!document.querySelector(_id)) {
-                                    $('[type=submit]').toggleClass('btn--state-b');
+                                if (!document.querySelector(
+                                    _id)) {
+                                    $('[type=submit]')
+                                        .toggleClass(
+                                            'btn--state-b');
 
                                     return;
                                 }
 
-                                const element = document.querySelector(_id);
+                                const element = document
+                                    .querySelector(_id);
 
-                                element.classList.add('form-control--error');
+                                element.classList.add(
+                                    'form-control--error');
 
-                                element.addEventListener('focus', (e) => {
-                                    if (e.target.closest('input').classList.contains('form-control--error')) {
-                                        e.target.closest('input').classList.remove('form-control--error');
-                                    }
-                                });
+                                element.addEventListener(
+                                    'focus', (e) => {
+                                        if (e.target
+                                            .closest(
+                                                'input')
+                                            .classList
+                                            .contains(
+                                                'form-control--error'
+                                                )) {
+                                            e.target
+                                                .closest(
+                                                    'input')
+                                                .classList
+                                                .remove(
+                                                    'form-control--error'
+                                                    );
+                                        }
+                                    });
 
                                 if (xhr) {
-                                    element.setAttribute('placeholder', xhr[_id]);
+                                    element.setAttribute(
+                                        'placeholder', xhr[
+                                            _id]);
                                 }
 
-                                $('[type=submit]').toggleClass('btn--state-b');
+                                $('[type=submit]').toggleClass(
+                                    'btn--state-b');
                             });
                         })(err);
                     }
