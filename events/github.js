@@ -36,7 +36,7 @@ router.get('/', async (req, res, next) => {
             code: code
         })
         .set('accept', 'json')
-        .then(async (xhr) => {
+        .end(async (xhr) => {
             const {
                 access_token
             } = xhr.body;
