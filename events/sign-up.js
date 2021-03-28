@@ -80,7 +80,11 @@ router.post('/', async (req, res, next) => {
     }
 
     const _uuid = uuid.v4();
-    const _apis = uuid.v4();
+    const _apis = {
+        _: uuid.v4(),
+        github: false,
+        twitter: false
+    };
 
     await req.mongodb.db(req.env.realm.db).collection('users').insertOne({
         _id: new BSON.ObjectID(),
