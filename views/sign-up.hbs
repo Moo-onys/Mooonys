@@ -24,22 +24,6 @@
 
         <p class="text-center margin-y-xxs">or</p>
 
-        <!--<div class="margin-bottom-sm">
-            <div class="grid gap-xs">
-                <div class="col-6@md">
-                    <label class="form-label margin-bottom-xxxs" for="fn">fn</label>
-                    <input class="form-control width-100%" placeholder="____________" required type="text" name="fn"
-                        id="fn">
-                </div>
-
-                <div class="col-6@md">
-                    <label class="form-label margin-bottom-xxxs" for="ln">ln</label>
-                    <input class="form-control width-100%" placeholder="__________" required type="text" name="ln"
-                        id="ln">
-                </div>
-            </div>
-        </div>-->
-
         <div class="margin-bottom-sm">
             <label class="form-label margin-bottom-xxxs" for="username">What do you want as your username?</label>
             <input class="form-control width-100%" id="username" title="There is a maximum length of 12 characters." autocomplete="off" name="username"
@@ -99,30 +83,6 @@
 </div>
 
 <script class="hbs-ui__scripts">
-    /*
-
-    /- Sign-up -/
-
-    {
-        err: {
-            elements: ['username', 'address', 'password'],
-            xhr: {
-                username: 'You have entered an already in-use username..',
-                address: 'You have entered an already in-use address address.'
-                password: 'You have entered an invalid and in-secure password.',
-            },
-            async: true
-        },
-        _id: 'ObjectID("2151581259245125")',
-        xhr: {
-            uuid: 'juhawjdaw-gaw9241-waf981',
-            url: '/sign-in',
-            async: true
-        }
-    }
-
-    */
-
     $(async () => {
         $('form').on('submit', async (e) => {
             e.preventDefault();

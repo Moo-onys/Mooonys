@@ -17,7 +17,9 @@
         <meta name="twitter:title" content="Mooonys">
         <meta name="twitter:description" content="Dynamics are important when designing for the web.">
         <meta name="twitter:image" content="https://www.mooonys.co/utils/img/jpg/favicon.jpg">
-        <script>document.getElementsByTagName("html")[0].className += " js";</script>
+        <script>
+            document.getElementsByTagName("html")[0].className += " js";
+        </script>
         <link rel="icon" type="image/svg+xml" href="{{URL 'utils/img/svg/favicon.svg'}}">
         <link rel="alternate icon" href="{{URL 'utils/img/ico/favicon.ico'}}" type="image/ico">
         <link id="css" rel="stylesheet" href="{{URL 'utils/scss/.dir/~css.css'}}">
@@ -31,17 +33,6 @@
                 upgrade: false,
                 reconnection: false
             });
-        </script>
-        <script type="text/javascript">
-            //<![CDATA[
-            var tlJsHost = ((window.location.protocol == "https:") ? "https://secure.trust-provider.com/" :
-                "http://www.trustlogo.com/");
-            document.getElementById('ssh').innerHTML = unescape("%3Cscript src='" + tlJsHost +
-                "trustlogo/javascript/trustlogo.js' type='text/javascript'%3E%3C/script%3E");
-            //]]>
-        </script>
-        <script language="JavaScript" type="text/javascript">
-            TrustLogo("https://www.positivessl.com/images/seals/positivessl_trust_seal_md_167x42.png", "POSDV", "none");
         </script>
         <script>
             if (!('CSS' in window) || !CSS.supports('color', 'var(--color-var)')) {
@@ -66,7 +57,6 @@
 
                 {{{body}}}
 
-                <a href="javascript:if(window.open('https://secure.trust-provider.com/ttb_searcher/trustlogo?v_querytype=W&amp;v_shortname=POSDV&amp;v_search=https://www.mooonys.co/options/styles&amp;x=6&amp;y=5','tl_wnd_credentials'+(new Date()).getTime(),'toolbar=0,scrollbars=1,location=1,status=1,menubar=1,resizable=1,width=374,height=660,left=60,top=120')){};tLlB(tLTB);" class="position-absolute bottom-0 padding-md"><img src="https://www.positivessl.com/images/seals/positivessl_trust_seal_md_167x42.png" border="0"></a>
             </main>
 
             <div class="circle-loader hbs-ui__body--is-hidden hbs-ui__body--v2 circle-loader--v3" role="alert">
@@ -79,7 +69,6 @@
         </div>
 
         <script id="js" src="{{URL 'utils/js/.dir/~js.js'}}"></script>
-        <!--<script id="utility" src="{{URL 'utils/js/libraries/utility.js'}}"></script>-->
         <script id="Utils" src="{{URL 'utils/js/libraries/Utils.js'}}"></script>
     </body>
 

@@ -4,14 +4,19 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <meta property="og:title" content="Mooonys"/>
-        <meta property="og:type" content="website"/>
-        <meta property="og:url" content="https://www.mooonys.co"/>
-        <meta property="og:image" content="https://www.mooonys.co/utils/favicon.jpg"/>
-        <meta property="og:site_name" content=""/>
-        <meta property="og:description" content="Dynamics are important when designing for the web."/>
-        <meta property="twitter:card" content="https://www.mooonys.co/utils/favicon.jpg"/>
         <meta property="og:email" content="contact-us@mooonys.co"/>
+        <meta name="description" content="Dynamics are important when designing for the web.">
+        <meta property="og:url" content="https://www.mooonys.co/">
+        <meta property="og:type" content="website">
+        <meta property="og:title" content="Mooonys">
+        <meta property="og:description" content="Dynamics are important when designing for the web.">
+        <meta property="og:image" content="https://www.mooonys.co/utils/img/jpg/favicon.jpg">
+        <meta name="twitter:card" content="summary_large_image">
+        <meta property="twitter:domain" content="mooonys.co">
+        <meta property="twitter:url" content="https://www.mooonys.co/">
+        <meta name="twitter:title" content="Mooonys">
+        <meta name="twitter:description" content="Dynamics are important when designing for the web.">
+        <meta name="twitter:image" content="https://www.mooonys.co/utils/img/jpg/favicon.jpg">
         <script>
             document.getElementsByTagName("html")[0].className += " js";
         </script>
@@ -50,7 +55,7 @@
         <div class="app-ui hbs-ui js-hbs-ui js-app-ui">
             <header class="app-ui__header shadow-xs padding-x-md padding-x-0@md">
                 <div class="app-ui__logo-wrapper padding-x-sm@md">
-                    <a href="#0" style="width: 30px;" class="app-ui__logo">
+                    <a href="/" style="width: 30px;" class="app-ui__logo">
                         <svg width="30" height="30" viewBox="0 0 30 30" fill="var(--color-contrast-higher)">
                             <title>Mooonys</title>
                             <circle cx="15" cy="15" r="15" fill="var(--color-contrast-lower)" />
@@ -164,7 +169,6 @@
                                                     <span class="sr-only">Mooonys</span>
                                                     <p class="hbs-ui__text">You haven't received any new notifications.
                                                     </p>
-                                                    <!--<p class="text-sm sr-only color-contrast-medium margin-top-xxxs"></p>-->
                                                 </div>
                                             </div>
                                         </a>
@@ -222,6 +226,9 @@
                                 <div class="dropdown__wrapper">
                                     <a class="app-ui__user-btn js-dropdown__trigger js-tab-focus"
                                         href="#profiles?_id={{users._id}}">
+                                        {{#if users._information.img}}
+                                        <img src="{{users._information.img}}" width="30" height="30" title="{{users.username}}">
+                                        {{else}}
                                         <svg width="30" height="30" viewBox="0 0 30 30" class="icon"
                                             fill="var(--color-contrast-higher)">
                                             <title>{{users.username}}</title>
@@ -229,6 +236,7 @@
                                             <path
                                                 d="M 25.607 4.393 L 4.393 25.607 A 15 15 0 0 0 25.607 4.393 Z M 19 11 A 1 1 0 0 0 12 18" />
                                         </svg>
+                                        {{/if}}
                                     </a>
 
                                     <ul class="dropdown__menu js-dropdown__menu" aria-label="dropdown">
@@ -552,7 +560,6 @@
         </div>
 
         <script id="js" src="{{URL 'utils/js/.dir/~js.js'}}"></script>
-        <!--<script id="utility" src="{{URL 'utils/js/libraries/utility.js'}}"></script>-->
         <script id="Utils" src="{{URL 'utils/js/libraries/Utils.js'}}"></script>
     </body>
 

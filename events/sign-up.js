@@ -107,7 +107,7 @@ router.get('/github', async (req, res, next) => {
             ln: '',
             address: email,
             bio: bio,
-            employed: hireable,
+            employed: hireable ? false : true,
             telephone: false,
             birthday: false
         },
