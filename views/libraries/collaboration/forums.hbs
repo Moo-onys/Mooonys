@@ -41,10 +41,10 @@
                 <div class="flex gap-xs flex-column flex-row@xs justify-end@md">
                     <button class="btn btn--subtle btn--posts btn--sm radius-full padding-xs">
                         <svg class="icon" style="transform: rotate(45deg);" aria-hidden="true" viewBox="0 0 16 16">><g>
-                            <path
-                                d="M14.7,1.3c-0.4-0.4-1-0.4-1.4,0L8,6.6L2.7,1.3c-0.4-0.4-1-0.4-1.4,0s-0.4,1,0,1.4L6.6,8l-5.3,5.3 c-0.4,0.4-0.4,1,0,1.4C1.5,14.9,1.7,15,2,15s0.5-0.1,0.7-0.3L8,9.4l5.3,5.3c0.2,0.2,0.5,0.3,0.7,0.3s0.5-0.1,0.7-0.3 c0.4-0.4,0.4-1,0-1.4L9.4,8l5.3-5.3C15.1,2.3,15.1,1.7,14.7,1.3z">
-                            </path>
-                        </g></svg>
+                                <path
+                                    d="M14.7,1.3c-0.4-0.4-1-0.4-1.4,0L8,6.6L2.7,1.3c-0.4-0.4-1-0.4-1.4,0s-0.4,1,0,1.4L6.6,8l-5.3,5.3 c-0.4,0.4-0.4,1,0,1.4C1.5,14.9,1.7,15,2,15s0.5-0.1,0.7-0.3L8,9.4l5.3,5.3c0.2,0.2,0.5,0.3,0.7,0.3s0.5-0.1,0.7-0.3 c0.4-0.4,0.4-1,0-1.4L9.4,8l5.3-5.3C15.1,2.3,15.1,1.7,14.7,1.3z">
+                                </path>
+                            </g></svg>
                     </button>
                 </div>
             </div>
@@ -56,7 +56,7 @@
         <ol class="stories__list">
             <li class="stories__story flex justify-between position-relative">
                 <div class="flex">
-                    <a href="#0" class="stories__img-wrapper">
+                    <a href="#0" aria-controls="dialog-1" class="stories__img-wrapper">
                         <figure>
                             <img src="{{URL 'utils/img/svg/placeholders/article-example-img-1.svg'}}"
                                 alt="Image description">
@@ -64,7 +64,8 @@
                     </a>
 
                     <div class="stories__text text-component line-height-md v-space-sm">
-                        <h4 class="stories__headline"><a href="#0">My two natures had memory in common.</a></h4>
+                        <h4 class="stories__headline"><a aria-controls="dialog-1" href="#0">My two natures had memory in
+                                common.</a></h4>
                         <p class="stories__metadata"><time datetime="2020-05-10">Match 5, 2020</time> <span
                                 class="stories__separator" role="separator"></span> <a href="#0">Review</a></p>
                     </div>

@@ -27,12 +27,47 @@
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
         <script src="//cdn.jsdelivr.net/jquery.scrollto/2.1.2/jquery.scrollTo.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.4/socket.io.js"></script>
-        <script defer>
+        <script>
             const socket = io({
                 transports: ['websocket'],
                 upgrade: false,
-                reconnection: false
+                reconnection: true
             });
+
+            this.socketio = {
+                connection: {
+                    socket: socket,
+                    state: false,
+                    reconnection: {
+                        interval: 10000,
+                        state: false,
+                        cb: async () => {
+                            setTimeout(async () => {
+                                if (!this.socketio.connection.state) {
+                                    $.get('/api/ts', async () => {
+                                        this.socketio.connection.state = true;
+                                        window.location.href = unescape(window.location.pathname);
+                                    });
+                                    retryConnectOnFailure(this.socketio.connection.reconnection.interval);
+                                }
+                            }, this.socketio.connection.reconnection.interval);
+                        }
+                    }
+                },
+            };
+
+            socket.on('connect', async () => {
+                this.socketio.connection.state = true;
+                clearTimeout(this.socketio.connection.reconnection.state);
+            });
+
+            socket.on('disconnect', async () => {
+                this.socketio.connection.state = false;
+                this.socketio.connection.reconnection.cb();
+            });
+
+            socket.connect();
+            this.socketio.connection.reconnection.cb();
         </script>
         <script>
             if (!('CSS' in window) || !CSS.supports('color', 'var(--color-var)')) {

@@ -35,49 +35,12 @@
         <div class="margin-bottom-md margin-left-lg margin-top-lg">
             <div class="grid items-center gap-xxs">
                 <div class="col-3@lg">
-                    <label class="inline-block text-sm padding-top-xs@lg" for="fn">Upload your profile picture?</label>
+                    <label class="inline-block text-sm padding-top-xs@lg" for="fn">What is your profile picture?</label>
                 </div>
 
                 <div class="col-6@lg">
-                    <div class="ddf-v2">
-                        <div style="background-image: url({{users._information.img}});"
-                            class="ddf-v2__area padding-x-md js-ddf-v2__area">
-                            <input class="ddf-v2__input sr-only js-ddf-v2__input" type="image" id="img"
-                                name="img" value="{{users._information.img}}">
-
-                            <label class="ddf-v2__label js-ddf-v2__label" for="img">
-                                <i class="ddf-v2__label-inner">
-                                    <svg class="icon icon--xl color-contrast-higher ddf-v2__icon-cloud"
-                                        viewBox="0 0 64 64" aria-hidden="true">
-                                        <path fill="currentColor"
-                                            d="M51,27c-.374,0-.742.025-1.109.056a18,18,0,0,0-35.782,0C13.742,27.025,13.374,27,13,27a13,13,0,0,0,0,26H51a13,13,0,0,0,0-26Z" />
-                                        <path
-                                            d="M43.764,41.354l-11-13a1.033,1.033,0,0,0-1.526,0l-11,13A1,1,0,0,0,21,43h7V59h8V43h7a1,1,0,0,0,.764-1.646Z"
-                                            fill="var(--color-bg)" /></svg>
-                                </i>
-                            </label>
-
-                            <span class="ddf-v2__label-end">
-                                <i class="ddf-v2__label-end-inner">
-                                    <svg class="icon icon--xl color-contrast-higher ddf-v2__icon-file"
-                                        viewBox="0 0 64 64" aria-hidden="true">
-                                        <path fill="currentColor"
-                                            d="M1.4,16.868,7,15.636,18.972,13A1.783,1.783,0,0,1,21.1,14.359L28.21,46.683a1.783,1.783,0,0,1-1.358,2.124L9.28,52.675a1.784,1.784,0,0,1-2.124-1.358L.042,18.993A1.783,1.783,0,0,1,1.4,16.868Z"
-                                            opacity="0.69" />
-                                        <path fill="currentColor"
-                                            d="M62.6,16.868,57,15.636,45.028,13A1.783,1.783,0,0,0,42.9,14.359L35.79,46.683a1.783,1.783,0,0,0,1.358,2.124L54.72,52.675a1.784,1.784,0,0,0,2.124-1.358l7.114-32.324A1.783,1.783,0,0,0,62.6,16.868Z"
-                                            opacity="0.69" />
-                                        <rect fill="currentColor" x="13" y="9" width="38" height="46" rx="2" />
-                                        <path
-                                            d="M42.941,41.664l-5-14a1,1,0,0,0-1.624-.4l-15,14A1,1,0,0,0,22,43H42a1,1,0,0,0,.941-1.336Z"
-                                            fill="var(--color-bg)" />
-                                        <circle cx="24" cy="26" r="3" fill="var(--color-bg)" /></svg>
-
-                                    <span class="js-ddf-v2__files-counter">{n} selected %file%files%</span>
-                                </i>
-                            </span>
-                        </div>
-                    </div>
+                    <input class="form-control width-100%" type="url" name="img"
+                        id="img" value="{{users._information.img}}">
                 </div>
             </div>
         </div>
@@ -108,7 +71,7 @@
                 </div>
 
                 <div class="col-6@lg">
-                    <input class="form-control form-control--disabled width-100%" disabled type="email" name="address"
+                    <input class="form-control form-control--disabled width-100%" {{#if users._information.address}}disabled{{/if}} type="email" name="address"
                         id="address" value="{{users._information.address}}">
                 </div>
             </div>
@@ -150,11 +113,8 @@
                 <div class="col-6@lg">
                     <div class="select">
                         <select class="select__input form-control" name="employed" id="employed">
-                            {{#if users._information.employed}}
-                                <option value="0">Employed</option>
-                            {{else}}
-                                <option value="1">Unemployed</option>
-                            {{/if}}
+                                <option {{#if users._information.employed}}selected{{/if}} value="0">Employed</option>
+                                <option {{#if users._information.employed}}{{else}}selected{{/if}} value="1">Unemployed</option>
                         </select>
 
                         <svg class="icon select__icon" aria-hidden="true" viewBox="0 0 16 16">
@@ -397,8 +357,7 @@
                     ln: document.querySelector('#ln').value,
                     address: document.querySelector('#address').value,
                     bio: document.querySelector('#bio').value,
-                    employed: document.querySelector('#employed').value === '0' ? true :
-                        false,
+                    employed: document.querySelector('#employed').value,
                     birthday: document.querySelector('#birthday').value,
                 },
                 beforeSend: async (xhr) => {

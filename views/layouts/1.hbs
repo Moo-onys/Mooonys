@@ -4,7 +4,7 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <meta property="og:email" content="contact-us@mooonys.co"/>
+        <meta property="og:email" content="contact-us@mooonys.co" />
         <meta name="description" content="Dynamics are important when designing for the web.">
         <meta property="og:url" content="https://www.mooonys.co/">
         <meta property="og:type" content="website">
@@ -27,12 +27,47 @@
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
         <script src="//cdn.jsdelivr.net/jquery.scrollto/2.1.2/jquery.scrollTo.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.4/socket.io.js"></script>
-        <script defer>
+        <script>
             const socket = io({
                 transports: ['websocket'],
                 upgrade: false,
-                reconnection: false
+                reconnection: true
             });
+
+            this.socketio = {
+                connection: {
+                    socket: socket,
+                    state: false,
+                    reconnection: {
+                        interval: 10000,
+                        state: false,
+                        cb: async () => {
+                            setTimeout(async () => {
+                                if (!this.socketio.connection.state) {
+                                    $.get('/api/ts', async () => {
+                                        this.socketio.connection.state = true;
+                                        window.location.href = unescape(window.location.pathname);
+                                    });
+                                    retryConnectOnFailure(this.socketio.connection.reconnection.interval);
+                                }
+                            }, this.socketio.connection.reconnection.interval);
+                        }
+                    }
+                },
+            };
+
+            socket.on('connect', async () => {
+                this.socketio.connection.state = true;
+                clearTimeout(this.socketio.connection.reconnection.state);
+            });
+
+            socket.on('disconnect', async () => {
+                this.socketio.connection.state = false;
+                this.socketio.connection.reconnection.cb();
+            });
+
+            socket.connect();
+            this.socketio.connection.reconnection.cb();
         </script>
         <script>
             if (!('CSS' in window) || !CSS.supports('color', 'var(--color-var)')) {
@@ -55,7 +90,7 @@
         <div class="app-ui hbs-ui js-hbs-ui js-app-ui">
             <header class="app-ui__header shadow-xs padding-x-md padding-x-0@md">
                 <div class="app-ui__logo-wrapper padding-x-sm@md">
-                    <a href="/" style="width: 30px;" class="app-ui__logo">
+                    <a href="/" style="width: 30px;" class="app-ui__logo cursor-pointer sr-only">
                         <svg width="30" height="30" viewBox="0 0 30 30" fill="var(--color-contrast-higher)">
                             <title>Mooonys</title>
                             <circle cx="15" cy="15" r="15" fill="var(--color-contrast-lower)" />
@@ -64,7 +99,7 @@
                     </a>
                 </div>
 
-                <button class="reset app-ui__menu-btn hide@md js-app-ui__menu-btn js-tab-focus" aria-label="Toggle menu"
+                <button class="reset app-ui__menu-btn cursor-pointer hide@md js-app-ui__menu-btn js-tab-focus" aria-label="Toggle menu"
                     aria-controls="app-ui-navigation">
                     <svg class="icon" viewBox="0 0 24 24">
                         <g class="icon__group" fill="none" stroke="currentColor" stroke-linecap="square"
@@ -96,15 +131,15 @@
                             </div>
                         </div>
 
-                        <button class="reset expandable-search__btn">
+                        <a class="reset expandable-search__btn">
                             <svg class="icon" viewBox="0 0 20 20">
-                                <title class="hbs-ui__text">Search</title>
+                                <title class="hbs-ui__text cursor-pointer">Search</title>
                                 <g fill="none" stroke="currentColor" stroke-miterlimit="10" stroke-width="2">
                                     <circle cx="8" cy="8" r="6" />
                                     <line x1="12.243" y1="12.243" x2="18" y2="18" />
                                 </g>
                             </svg>
-                        </button>
+                        </a>
 
                         <div class="autocomplete__results  js-autocomplete__results">
                             <ul id="autocomplete1" class="autocomplete__list js-autocomplete__list">
@@ -120,11 +155,10 @@
 
                     {{#if users}}
                         <div class="flex gap-xxxs">
-                            <a class="app-ui__header-btn position-relative js-tab-focus" aria-controls="notifications"
-                                href="#0">
-                                <i style="top: 9px; left: 9.5px;" class="fas width-100% position-absolute icon fa-bell">
-                                    <title>Notifications</title>
-                                </i>
+                            <a href="#notifications" class="app-ui__header-btn position-relative js-tab-focus" aria-controls="notifications">
+                                <svg class="icon" viewBox="0 0 448 512" class="fa-bell fa-w-14 fa-3x">
+                                    <path fill="currentColor" d="M224 512c35.32 0 63.97-28.65 63.97-64H160.03c0 35.35 28.65 64 63.97 64zm215.39-149.71c-19.32-20.76-55.47-51.99-55.47-154.29 0-77.7-54.48-139.9-127.94-155.16V32c0-17.67-14.32-32-31.98-32s-31.98 14.33-31.98 32v20.84C118.56 68.1 64.08 130.3 64.08 208c0 102.3-36.15 133.53-55.47 154.29-6 6.45-8.66 14.16-8.61 21.71.11 16.4 12.98 32 32.1 32h383.8c19.12 0 32-15.6 32.1-32 .05-7.55-2.61-15.27-8.61-21.71z"></path>
+                                </svg>
 
                                 {{#if (hasLength [users._options.notifications, 1]) }}
                                     <span class="app-ui__notification-indicator"><i class="sr-only">You have
@@ -133,8 +167,8 @@
                                 {{/if}}
                             </a>
 
-                            <a class="app-ui__header-btn js-tab-focus" href="/options/account">
-                                <i style="top: 8.5px; left: 8px;" class="fas width-100% position-absolute icon fa-cog">
+                            <a href="/options/account" class="app-ui__header-btn js-tab-focus">
+                                <i class="fas icon fa-cog">
                                     <title>Options</title>
                                 </i>
                             </a>
@@ -145,7 +179,7 @@
                                     class="bg bg-opacity-90% backdrop-blur-10 text-sm padding-sm shadow-xs position-sticky top-0 z-index-2">
                                     <div class="flex justify-between items-baseline">
                                         <h1 class="text-md hbs-ui__text">Notifications</h1>
-                                        <a class="hbs-ui__text" href="/notifications">View all</a>
+                                        <a class="hbs-ui__text noselect" href="/notifications">View all</a>
                                     </div>
                                 </header>
 
@@ -227,15 +261,15 @@
                                     <a class="app-ui__user-btn js-dropdown__trigger js-tab-focus"
                                         href="#profiles?_id={{users._id}}">
                                         {{#if users._information.img}}
-                                        <img src="{{users._information.img}}" width="60" title="{{users.username}}">
+                                            <img src="{{users._information.img}}" width="60" title="{{users.username}}">
                                         {{else}}
-                                        <svg width="30" height="30" viewBox="0 0 30 30" class="icon"
-                                            fill="var(--color-contrast-higher)">
-                                            <title>{{users.username}}</title>
-                                            <circle cx="15" cy="15" r="15" fill="var(--color-contrast-lower)" />
-                                            <path
-                                                d="M 25.607 4.393 L 4.393 25.607 A 15 15 0 0 0 25.607 4.393 Z M 19 11 A 1 1 0 0 0 12 18" />
-                                        </svg>
+                                            <svg width="30" height="30" viewBox="0 0 30 30" class="icon"
+                                                fill="var(--color-contrast-higher)">
+                                                <title>{{users.username}}</title>
+                                                <circle cx="15" cy="15" r="15" fill="var(--color-contrast-lower)" />
+                                                <path
+                                                    d="M 25.607 4.393 L 4.393 25.607 A 15 15 0 0 0 25.607 4.393 Z M 19 11 A 1 1 0 0 0 12 18" />
+                                            </svg>
                                         {{/if}}
                                     </a>
 
@@ -284,8 +318,9 @@
                                         <hr class="dropdown__separator" role="separator">
 
                                         <li>
-                                            <a class="dropdown__item hbs-ui__text" style="color: var(--color-error);"
-                                                href="/sign-out">Signout</a>
+                                            <form action="/sign-in" method="DELETE">
+                                                <button class="dropdown__item hbs-ui__text" type="submit" style="color: var(--color-error);">Do you want to exit?</button>
+                                            </form>
                                         </li>
                                     </ul>
                                 </div>
@@ -540,7 +575,7 @@
                                 </svg></label>
                             <div aria-hidden="true" class="radio-switch__marker"></div>
                         </li>
-                    </ul>                    
+                    </ul>
                 </div>
             </div>
 

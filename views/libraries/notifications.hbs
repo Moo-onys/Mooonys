@@ -44,7 +44,7 @@
         _notifs.innerHTML = "";
         const notifs = document.querySelectorAll('.notif__item');
 
-        document.getElementById('notif__amount').innerHTML = notifs.length > 1 ? document.getElementById('notif__amount').innerHTML.replace(/\d/g, notifs.length - 1) : `You haven't received any new notifications.`;
+        document.getElementById('notif__amount').innerHTML = notifs.length > 1 ? `You have ${notifs.length - 1} notifications that you haven't closed.` : `You haven't received any new notifications.`;
 
         notifs.forEach(async (notif, i, notifs) => {
             const _notif = document.createElement('li');
@@ -53,7 +53,7 @@
             _notif.innerHTML = notif.innerHTML;
 
             if (i !== 0) {
-                _notif.children[0].children[2].setAttribute('onclick', "document.getElementById('notifs-ui__dropdown').children[$(this).parent().parent().index()].remove(); document.getElementById('notif__amount').innerHTML = (document.querySelector('#notifs-ui__list').children.length-1) > 1 ? document.getElementById('notif__amount').innerHTML.replace('/\d/g', (document.querySelector('#notifs-ui__list').children.length - 1)) : `You haven't received any new notifications.`; if (($(this).parent().parent().parent().children().length - 1) <= 1) { document.getElementsByClassName('notifs-ui__disabled')[0].classList.toggle('sr-only'); document.getElementsByClassName('notifs-ui__disabled')[1].classList.toggle('sr-only') } $(this).parent().parent().remove(); if (document.getElementsByClassName('notif__dot').length <= 0) { if (!document.getElementsByClassName('app-ui__notification-indicator')[0]) { return; } document.getElementsByClassName('app-ui__notification-indicator')[0].remove(); }");
+                _notif.children[0].children[2].setAttribute('onclick', "document.getElementById('notifs-ui__dropdown').children[$(this).parent().parent().index()].remove(); document.getElementById('notif__amount').innerHTML = (document.querySelector('#notifs-ui__list').children.length-1) > 1 ? `You have ${document.querySelector('#notifs-ui__list').children.length - 2} notifications that you haven't closed.` : `You haven't received any new notifications.`; if (($(this).parent().parent().parent().children().length - 1) <= 1) { document.getElementsByClassName('notifs-ui__disabled')[0].classList.toggle('sr-only'); document.getElementsByClassName('notifs-ui__disabled')[1].classList.toggle('sr-only') } $(this).parent().parent().remove(); if (document.getElementsByClassName('notif__dot').length <= 0) { if (!document.getElementsByClassName('app-ui__notification-indicator')[0]) { return; } document.getElementsByClassName('app-ui__notification-indicator')[0].remove(); }");
             }
 
             _notifs.appendChild(_notif);

@@ -169,6 +169,17 @@ this.Utils.hbs = async () => {
                 return;
             }
 
+            if (!uri.includes('chatrooms') && window.location.href.includes('chatrooms')) {
+                socket.viewers = false;
+                socket.emit('viewers', -1);
+
+                if (this['hbs-ui__body'].hasAttribute('data-contributors')) {
+                    this['hbs-ui__body'].removeAttribute('data-contributors')
+                    socket.contributors = false;
+                    socket.emit('contributors', -1);
+                }
+            }
+
             await this['hbs-ui__selection'](uri);
             _hbs[window.location.pathname] = this['hbs-ui__body'].innerHTML;
 

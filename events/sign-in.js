@@ -102,6 +102,22 @@ router.get('/github', async (req, res, next) => {
     });
 });
 
+router.delete('/sign-in', async (req, res, next) => {
+    if (!req.session._uuid) {
+        return res.redirect('/sign-in');
+    }
+
+    next();
+}, async (req, res) => {
+    req.session.destroy(async (err) => {
+        if (err) {
+            return res.redirect('/dashboard');
+        }
+    });
+
+    res.redirect('/sign-in');
+});
+
 router.post('/', async (req, res, next) => {
     if (req.session._uuid) {
         return res.redirect('/dashboard');
