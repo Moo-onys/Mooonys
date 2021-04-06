@@ -1,15 +1,15 @@
-const fs = require('fs');
-const path = require('path');
-const nodemailer = require('nodemailer');
-const env = require('C:/Users/reece_barker/Desktop/_1/Mooonys/env/Mooonys/env.json');
+const fs = require(`fs`);
+const path = require(`path`);
+const nodemailer = require(`nodemailer`);
+const env = require(`${process.env.DIR}/env.json`);
 
 this.hbs_js = () => {
     const hbs = {};
 
-    fs.readdir('C:/Users/reece_barker/Desktop/_1/Mooonys/env/Mooonys/utils/hbs', (err, files) => {
+    fs.readdir(`${process.env.DIR}/utils/hbs`, (err, files) => {
         files.forEach((hbs_) => {
-            require(`C:/Users/reece_barker/Desktop/_1/Mooonys/env/Mooonys/utils/hbs/${hbs_}`).forEach((_hbs, i, __hbs) => {
-                if (typeof _hbs === 'function') {
+            require(`${process.env.DIR}/utils/hbs/${hbs_}`).forEach((_hbs, i, __hbs) => {
+                if (typeof _hbs === `function`) {
                     hbs[__hbs[i - 1]] = _hbs;
                 }
             });
@@ -20,7 +20,7 @@ this.hbs_js = () => {
 }
 
 this.nodemailer = nodemailer.createTransport({
-    host: 'mail.privateemail.com',
+    host: `mail.privateemail.com`,
     port: 465,
     secure: true,
     auth: {

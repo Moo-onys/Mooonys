@@ -4,8 +4,8 @@
   "description": "Dynamics are important when designing for the web.",
   "main": "www.js",
   "scripts": {
-    "win32": "PATHS=C:/Users/reece_barker/Desktop/_1/Mooonys/env/Mooonys PORT=443 URL=https://www.mooonys.co/ SECURITY=true npm run gulp watch",
-    "darwin": "PATHS=/Volumes/Macintosh/_1/Mooonys/env/Mooonys PORT=443 URL=https://www.mooonys.co/ SECURITY=true npm run gulp watch",
+    "win32": "node .",
+    "darwin": "npm run gulp watch",
     "gulp": "gulp",
     "forge": "electron-forge start",
     "package": "electron-forge package",
