@@ -1,6 +1,6 @@
 // File#: _3_dashboard-navigation
 // Usage: codyhouse.co/license
-(function() {
+/*(function() {
   var appUi = document.getElementsByClassName('js-app-ui');
   if(appUi.length > 0) {
     var appMenuBtn = appUi[0].getElementsByClassName('js-app-ui__menu-btn');
@@ -71,4 +71,4 @@
       return (element.offsetWidth || element.offsetHeight || element.getClientRects().length);
     };
   }
-}());
+}());*/

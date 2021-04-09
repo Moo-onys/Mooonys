@@ -84,10 +84,10 @@ router.get('/github', async (req, res, next) => {
         _information: {
             img: avatar_url,
             fn: name,
-            ln: '',
+            ln: false,
             address: email,
             bio: bio,
-            employed: hireable ? false : true,
+            employed: hireable,
             telephone: false,
             birthday: false
         },

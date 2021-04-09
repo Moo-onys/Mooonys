@@ -6,18 +6,41 @@
 
         <div class="grid gap-xs">
             <div class="col-6@xs">
-                <button class="btn btn--subtle width-100%">
-                    <i class="fab icon margin-right-xxxs fa-twitter"></i>
-
-                    <span>Signup with Twitter</span>
-                </button>
+                <a onclick="$(this).toggleClass('btn--state-b'); setTimeout(() => {$(this).toggleClass('btn--state-b');}, 4000)"
+                    class="btn btn--subtle btn--preserve-width btn--form width-100%">
+                    <span class="btn__content-a">
+                        <i class="fab icon margin-right-xxxs fa-twitter"></i>
+                        <span>Signin with Twitter</span>
+                    </span>
+                    <span class="btn__content-b">
+                        <svg class="icon icon--is-spinning" aria-hidden="true" viewBox="0 0 16 16">
+                            <title>Loading</title>
+                            <g stroke-width="1" fill="currentColor" stroke="currentColor">
+                                <path d="M.5,8a7.5,7.5,0,1,1,1.91,5" fill="none" stroke="currentColor"
+                                    stroke-linecap="round" stroke-linejoin="round"></path>
+                            </g>
+                        </svg>
+                    </span>
+                </a>
             </div>
 
             <div class="col-6@xs">
-                <a href="https://github.com/login/oauth/authorize?client_id=0b388312f5490f76f94c&scope=user" class="btn btn--subtle width-100%">
-                    <i class="fab icon margin-right-xxxs fa-github"></i>
-
-                    <span>Signup with Github</span>
+                <a onclick="$(this).toggleClass('btn--state-b'); setTimeout(() => {$(this).toggleClass('btn--state-b');}, 4000)"
+                    href="https://github.com/login/oauth/authorize?client_id=0b388312f5490f76f94c&scope=user"
+                    class="btn btn--subtle btn--preserve-width btn--form width-100%">
+                    <span class="btn__content-a">
+                        <i class="fab icon margin-right-xxxs fa-github"></i>
+                        <span>Signin with Github</span>
+                    </span>
+                    <span class="btn__content-b">
+                        <svg class="icon icon--is-spinning" aria-hidden="true" viewBox="0 0 16 16">
+                            <title>Loading</title>
+                            <g stroke-width="1" fill="currentColor" stroke="currentColor">
+                                <path d="M.5,8a7.5,7.5,0,1,1,1.91,5" fill="none" stroke="currentColor"
+                                    stroke-linecap="round" stroke-linejoin="round"></path>
+                            </g>
+                        </svg>
+                    </span>
                 </a>
             </div>
         </div>
@@ -26,18 +49,27 @@
 
         <div class="margin-bottom-sm">
             <label class="form-label margin-bottom-xxxs" for="username">What do you want as your username?</label>
-            <input class="form-control width-100%" id="username" title="There is a maximum length of 12 characters." autocomplete="off" name="username"
-                aria-label="Username" type="text" placeholder="john_doe202" maxlength="12" pattern=".{8,}" required
-                title="8 characters minimum">
+            <input class="form-control width-100%" id="username" title="There is a maximum length of 12 characters."
+                autocomplete="off" name="username" aria-label="Username" type="text" placeholder="john_doe202"
+                maxlength="12" pattern=".{8,}" required title="8 characters minimum">
         </div>
 
         <div class="margin-bottom-sm">
             <label class="form-label margin-bottom-xxxs" for="address">What is your email address?
-                <span class="margin-left-xxxs"><i class="fas icon text-sm fa-info-circle"></i></span>
+                <i aria-controls="privacy-policy" class="fas margin-left-xxxs noselect icon text-sm fa-info-circle"></i>
             </label>
-            <input class="form-control width-100%" id="address" title="There is a maximum length of 64 characters." autocomplete="off" name="address"
-                aria-label="address" type="address" placeholder="john_doe1216@jdoe.com" maxlength="64" pattern=".{8,}" required
+            <input class="form-control width-100%" id="address" title="There is a maximum length of 64 characters."
+                autocomplete="off" name="address" aria-label="address" type="address"
+                placeholder="john_doe1216@jdoe.com" maxlength="64" pattern=".{8,}" required
                 title="8 characters minimum">
+        </div>
+
+        <div id="privacy-policy" class="popover bg padding-sm radius-md shadow-md js-popover js-tab-focus"
+            role="dialog">
+            <div class="text-component text-sm">
+                <h1 class="text-md">Suspicious?</h1>
+                <p>You can learn more about our privacy policy by visiting our <a class="noselect" href="/legals/privacy-policy">legals</a>.</p>
+            </div>
         </div>
 
         <div class="margin-bottom-sm">
@@ -46,16 +78,15 @@
                 <span class="text-sm"><a href="/forgot-your-password">Forgot your password?</a></span>
             </div>
 
-            <input class="form-control password__input js-password__input width-100%" id="password"
-                autocomplete="off" class="form-control " name="password" aria-label="Password"
-                type="password" placeholder="jdoe/@01" title="There is a maximum length of 20 characters." maxlength="20" pattern=".{10,}" required
+            <input class="form-control password__input js-password__input width-100%" id="password" autocomplete="off"
+                class="form-control " name="password" aria-label="Password" type="password" placeholder="jdoe/@01"
+                title="There is a maximum length of 20 characters." maxlength="20" pattern=".{10,}" required
                 title="10 characters minimum">
         </div>
 
         <div class="margin-bottom-sm">
             <div class="flex justify-between">
-                <input class="checkbox checkbox--inline" type="checkbox" name="newsletter"
-                    id="newsletter">
+                <input class="checkbox checkbox--inline" type="checkbox" name="newsletter" id="newsletter">
                 <label class="text-sm" for="newsletter">Send me updates and news about Mooonys</label>
             </div>
         </div>
@@ -130,53 +161,107 @@
                             } = err;
 
                             if (async) {
-                                return await elements.forEach(async (_id, i, elements) => {
-                                    if (!document.querySelector(_id)) {
-                                        $('[type=submit]').toggleClass('btn--state-b');
+                                return await elements.forEach(async (
+                                    _id, i, elements) => {
+                                    if (!document
+                                        .querySelector(_id)
+                                        ) {
+                                        $('[type=submit]')
+                                            .toggleClass(
+                                                'btn--state-b'
+                                                );
 
                                         return;
                                     }
 
-                                    const element = document.querySelector(_id);
+                                    const element = document
+                                        .querySelector(_id);
 
-                                    element.classList.add('form-control--error');
+                                    element.classList.add(
+                                        'form-control--error'
+                                        );
 
-                                    element.addEventListener('focus', async (e) => {
-                                        if (e.target.closest('input').classList.contains('form-control--error')) {
-                                            e.target.closest('input').classList.remove('form-control--error');
-                                        }
-                                    });
+                                    element
+                                        .addEventListener(
+                                            'focus', async (
+                                                e) => {
+                                                if (e
+                                                    .target
+                                                    .closest(
+                                                        'input'
+                                                        )
+                                                    .classList
+                                                    .contains(
+                                                        'form-control--error'
+                                                        )
+                                                    ) {
+                                                    e.target
+                                                        .closest(
+                                                            'input'
+                                                            )
+                                                        .classList
+                                                        .remove(
+                                                            'form-control--error'
+                                                            );
+                                                }
+                                            });
 
                                     if (xhr) {
-                                        element.setAttribute('placeholder', xhr[_id]);
+                                        element
+                                            .setAttribute(
+                                                'placeholder',
+                                                xhr[_id]);
                                     }
 
-                                    $('[type=submit]').toggleClass('btn--state-b');
+                                    $('[type=submit]')
+                                        .toggleClass(
+                                            'btn--state-b');
                                 });
                             }
 
                             elements.forEach((_id, i, elements) => {
-                                if (!document.querySelector(_id)) {
-                                    $('[type=submit]').toggleClass('btn--state-b');
+                                if (!document.querySelector(
+                                    _id)) {
+                                    $('[type=submit]')
+                                        .toggleClass(
+                                            'btn--state-b');
 
                                     return;
                                 }
 
-                                const element = document.querySelector(_id);
+                                const element = document
+                                    .querySelector(_id);
 
-                                element.classList.add('form-control--error');
+                                element.classList.add(
+                                    'form-control--error');
 
-                                element.addEventListener('focus', (e) => {
-                                    if (e.target.closest('input').classList.contains('form-control--error')) {
-                                        e.target.closest('input').classList.remove('form-control--error');
-                                    }
-                                });
+                                element.addEventListener(
+                                    'focus', (e) => {
+                                        if (e.target
+                                            .closest(
+                                                'input')
+                                            .classList
+                                            .contains(
+                                                'form-control--error'
+                                                )) {
+                                            e.target
+                                                .closest(
+                                                    'input')
+                                                .classList
+                                                .remove(
+                                                    'form-control--error'
+                                                    );
+                                        }
+                                    });
 
                                 if (xhr) {
-                                    element.setAttribute('placeholder', xhr[_id]);
+                                    element.setAttribute(
+                                        'placeholder', xhr[
+                                            _id]);
                                 }
 
-                                $('[type=submit]').toggleClass('btn--state-b');
+                                $('[type=submit]').toggleClass(
+                                    'btn--state-b');
                             });
                         })(err);
                     }

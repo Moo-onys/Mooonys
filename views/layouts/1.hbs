@@ -5,18 +5,17 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta property="og:email" content="contact-us@mooonys.co" />
-        <meta name="description" content="Dynamics are important when designing for the web.">
-        <meta property="og:url" content="https://www.mooonys.co/">
+        <meta name="description" content="{{$.description}}">
+        <meta property="og:url" content="{{$.url}}">
         <meta property="og:type" content="website">
-        <meta property="og:title" content="Mooonys">
-        <meta property="og:description" content="Dynamics are important when designing for the web.">
-        <meta property="og:image" content="https://www.mooonys.co/utils/img/jpg/favicon.jpg">
-        <meta name="twitter:card" content="summary_large_image">
-        <meta property="twitter:domain" content="mooonys.co">
-        <meta property="twitter:url" content="https://www.mooonys.co/">
-        <meta name="twitter:title" content="Mooonys">
-        <meta name="twitter:description" content="Dynamics are important when designing for the web.">
-        <meta name="twitter:image" content="https://www.mooonys.co/utils/img/jpg/favicon.jpg">
+        <meta property="og:title" content="{{$.title}}">
+        <meta property="og:description" content="{{$.description}}">
+        <meta property="og:image" content="{{$.favicon}}">
+        <meta name="twitter:card" content="{{$.favicon}}">
+        <meta property="twitter:url" content="{{$.url}}">
+        <meta name="twitter:title" content="{{$.title}}">
+        <meta name="twitter:description" content="{{$.description}}">
+        <meta name="twitter:image" content="{{$.favicon}}">
         <script>
             document.getElementsByTagName("html")[0].className += " js";
         </script>
@@ -46,9 +45,11 @@
                                 if (!this.socketio.connection.state) {
                                     $.get('/api/ts', async () => {
                                         this.socketio.connection.state = true;
-                                        window.location.href = unescape(window.location.pathname);
+                                        window.location.href = unescape(window.location
+                                            .pathname);
                                     });
-                                    retryConnectOnFailure(this.socketio.connection.reconnection.interval);
+                                    retryConnectOnFailure(this.socketio.connection.reconnection
+                                        .interval);
                                 }
                             }, this.socketio.connection.reconnection.interval);
                         }
@@ -87,10 +88,10 @@
             {{> '1' h1='Bad Request' p='You must have javascript enabled to view this page.'}}
         </noscript>
 
-        <div class="app-ui hbs-ui js-hbs-ui js-app-ui">
+        <div class="app-ui hbs-ui js-hbs-ui overflow-hidden js-app-ui">
             <header class="app-ui__header shadow-xs padding-x-md padding-x-0@md">
                 <div class="app-ui__logo-wrapper padding-x-sm@md">
-                    <a href="/" style="width: 30px;" class="app-ui__logo cursor-pointer sr-only">
+                    <a href="/" style="width: 30px;" class="app-ui__logo cursor-pointer">
                         <svg width="30" height="30" viewBox="0 0 30 30" fill="var(--color-contrast-higher)">
                             <title>Mooonys</title>
                             <circle cx="15" cy="15" r="15" fill="var(--color-contrast-lower)" />
@@ -99,8 +100,8 @@
                     </a>
                 </div>
 
-                <button class="reset app-ui__menu-btn cursor-pointer hide@md js-app-ui__menu-btn js-tab-focus" aria-label="Toggle menu"
-                    aria-controls="app-ui-navigation">
+                <button class="reset app-ui__menu-btn cursor-pointer hide@md js-app-ui__menu-btn js-tab-focus"
+                    aria-label="Toggle menu" aria-controls="app-ui-navigation">
                     <svg class="icon" viewBox="0 0 24 24">
                         <g class="icon__group" fill="none" stroke="currentColor" stroke-linecap="square"
                             stroke-miterlimit="10" stroke-width="2">
@@ -155,9 +156,12 @@
 
                     {{#if users}}
                         <div class="flex gap-xxxs">
-                            <a href="#notifications" class="app-ui__header-btn position-relative js-tab-focus" aria-controls="notifications">
+                            <a href="#notifications" class="app-ui__header-btn position-relative js-tab-focus"
+                                aria-controls="notifications">
                                 <svg class="icon" viewBox="0 0 448 512" class="fa-bell fa-w-14 fa-3x">
-                                    <path fill="currentColor" d="M224 512c35.32 0 63.97-28.65 63.97-64H160.03c0 35.35 28.65 64 63.97 64zm215.39-149.71c-19.32-20.76-55.47-51.99-55.47-154.29 0-77.7-54.48-139.9-127.94-155.16V32c0-17.67-14.32-32-31.98-32s-31.98 14.33-31.98 32v20.84C118.56 68.1 64.08 130.3 64.08 208c0 102.3-36.15 133.53-55.47 154.29-6 6.45-8.66 14.16-8.61 21.71.11 16.4 12.98 32 32.1 32h383.8c19.12 0 32-15.6 32.1-32 .05-7.55-2.61-15.27-8.61-21.71z"></path>
+                                    <path fill="currentColor"
+                                        d="M224 512c35.32 0 63.97-28.65 63.97-64H160.03c0 35.35 28.65 64 63.97 64zm215.39-149.71c-19.32-20.76-55.47-51.99-55.47-154.29 0-77.7-54.48-139.9-127.94-155.16V32c0-17.67-14.32-32-31.98-32s-31.98 14.33-31.98 32v20.84C118.56 68.1 64.08 130.3 64.08 208c0 102.3-36.15 133.53-55.47 154.29-6 6.45-8.66 14.16-8.61 21.71.11 16.4 12.98 32 32.1 32h383.8c19.12 0 32-15.6 32.1-32 .05-7.55-2.61-15.27-8.61-21.71z">
+                                    </path>
                                 </svg>
 
                                 {{#if (hasLength [users._options.notifications, 1]) }}
@@ -318,9 +322,10 @@
                                         <hr class="dropdown__separator" role="separator">
 
                                         <li>
-                                            <form action="/sign-in" method="DELETE">
-                                                <button class="dropdown__item hbs-ui__text" type="submit" style="color: var(--color-error);">Do you want to exit?</button>
-                                            </form>
+                                            <a class="dropdown__item hbs-ui__text flex-center" href="/sign-in?alt=true">
+                                                <img style="filter: invert(21%) sepia(55%) saturate(4736%) hue-rotate(337deg) brightness(92%) contrast(91%);"
+                                                    draggable="false" src="{{URL 'utils/img/icons/fa/portal-exit.svg'}}"
+                                                    width="20" height="20" alt="portal-exit" /></a>
                                         </li>
                                     </ul>
                                 </div>
@@ -334,7 +339,7 @@
                 <div class="padding-x-md padding-top-md hide@md">
                     <div class="search-input search-input--icon-right">
                         <input class="search-input__input form-control" type="search" name="search-input"
-                            id="search-input" placeholder="Search..." aria-label="Search">
+                            id="search-input" aria-label="Search">
                         <button class="search-input__btn">
                             <svg class="icon" viewBox="0 0 24 24">
                                 <title class="hbs-ui__text">Submit</title>
@@ -585,7 +590,7 @@
 
             </main>
 
-            <div class="circle-loader hbs-ui__body--is-hidden circle-loader--v3" role="alert">
+            <div style="position: fixed;" class="circle-loader hbs-ui__body--is-hidden circle-loader--v3" role="alert">
                 <p class="circle-loader__label">Content is loading...</p>
                 <div aria-hidden="true">
                     <div class="circle-loader__circle circle-loader__circle--1st"></div>
@@ -596,6 +601,90 @@
 
         <script id="js" src="{{URL 'utils/js/.dir/~js.js'}}"></script>
         <script id="Utils" src="{{URL 'utils/js/libraries/Utils.js'}}"></script>
+        <script>
+            (function () {
+                var appUi = document.getElementsByClassName('js-app-ui');
+                if (appUi.length > 0) {
+                    var appMenuBtn = appUi[0].getElementsByClassName('js-app-ui__menu-btn');
+                    if (appMenuBtn.length < 1) return;
+                    var appExpandedClass = 'app-ui--nav-expanded';
+                    var firstFocusableElement = false,
+                        // we'll use these to store the node that needs to receive focus when the mobile menu is closed 
+                        focusMenu = false;
+
+                    // toggle navigation on mobile
+                    appMenuBtn[0].addEventListener('click', function (event) {
+                        var openMenu = !Util.hasClass(appUi[0], appExpandedClass);
+                        Util.toggleClass(appUi[0], appExpandedClass, openMenu);
+                        appMenuBtn[0].setAttribute('aria-expanded', openMenu);
+                        if (openMenu) {
+                            firstFocusableElement = getMenuFirstFocusable();
+                            //if (firstFocusableElement) firstFocusableElement
+                            //    .focus(); // move focus to first focusable element
+                        } else if (focusMenu) {
+                            //focusMenu.focus();
+                            focusMenu = false;
+                        }
+                    });
+
+                    // listen for key events
+                    window.addEventListener('keyup', function (event) {
+                        // listen for esc key
+                        if ((event.keyCode && event.keyCode == 27) || (event.key && event.key
+                                .toLowerCase() == 'escape')) {
+                            // close navigation on mobile if open
+                            if (appMenuBtn[0].getAttribute('aria-expanded') == 'true' && isVisible(
+                                    appMenuBtn[0])) {
+                                focusMenu = appMenuBtn[0]; // move focus to menu trigger when menu is close
+                                appMenuBtn[0].click();
+                            }
+                        }
+                        // listen for tab key
+                        if ((event.keyCode && event.keyCode == 9) || (event.key && event.key
+                                .toLowerCase() == 'tab')) {
+                            // close navigation on mobile if open when nav loses focus
+                            if (appMenuBtn[0].getAttribute('aria-expanded') == 'true' && isVisible(
+                                    appMenuBtn[0]) && !document.activeElement.closest('.js-app-ui__nav'))
+                                appMenuBtn[0].click();
+                        }
+                    });
+
+                    // listen for resize
+                    var resizingId = false;
+                    window.addEventListener('resize', function () {
+                        clearTimeout(resizingId);
+                        resizingId = setTimeout(doneResizing, 500);
+                    });
+
+                    function doneResizing() {
+                        if (!isVisible(appMenuBtn[0]) && Util.hasClass(appUi[0], appExpandedClass)) appMenuBtn[0]
+                            .click();
+                    };
+
+                    function getMenuFirstFocusable() {
+                        var mobileNav = appUi[0].getElementsByClassName('js-app-ui__nav');
+                        if (mobileNav.length < 1) return false;
+                        var focusableEle = mobileNav[0].querySelectorAll(
+                                '[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), button:not([disabled]), [tabindex]:not([tabindex="-1"]), [controls], summary'
+                            ),
+                            firstFocusable = false;
+                        for (var i = 0; i < focusableEle.length; i++) {
+                            if (focusableEle[i].offsetWidth || focusableEle[i].offsetHeight || focusableEle[i]
+                                .getClientRects().length) {
+                                firstFocusable = focusableEle[i];
+                                break;
+                            }
+                        }
+
+                        return firstFocusable;
+                    };
+
+                    function isVisible(element) {
+                        return (element.offsetWidth || element.offsetHeight || element.getClientRects().length);
+                    };
+                }
+            }());
+        </script>
     </body>
 
 </html>

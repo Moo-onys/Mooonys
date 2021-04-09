@@ -1,5 +1,3 @@
-this.$ = new Object();
-
 const {
     BSON
 } = require('mongodb-stitch-browser-sdk');
@@ -9,10 +7,34 @@ const crypto = require('crypto');
 const express = require('express');
 const superagent = require('superagent');
 const moment = require('moment');
-const router = this.$.router = express.Router();
-const path = this.$.path = ['/sign-in'][0];
+const router = express.Router();
+
+this['/sign-in'] = {
+    $: {
+        router: router,
+        path: '/sign-in',
+        url: 'https://www.mooonys.co/sign-in',
+        title: '/sign-in',
+        favicon: 'https://www.mooonys.co/utils/img/jpg/favicon.jpg',
+        description: 'This area of our site allows users to sign into their Mooonys account.'
+    }
+}
 
 router.get('/', async (req, res, next) => {
+    if (req.query.alt) {
+        if (!req.session._uuid) {
+            return res.redirect('/sign-in');
+        }
+
+        req.session.destroy(async (err) => {
+            if (err) {
+                return res.redirect('/dashboard');
+            }
+        });
+
+        return res.redirect('/sign-in');
+    }
+
     if (req.session._uuid) {
         return res.redirect('/dashboard');
     }
@@ -22,6 +44,7 @@ router.get('/', async (req, res, next) => {
     const next = async () => {
         res.render('sign-in', {
             layout: '2',
+            $: this['/sign-in'].$,
             _url: '/sign-in',
             cly: req.session.cly || false,
             users: false
@@ -100,22 +123,6 @@ router.get('/github', async (req, res, next) => {
 
         res.redirect('/dashboard');
     });
-});
-
-router.delete('/sign-in', async (req, res, next) => {
-    if (!req.session._uuid) {
-        return res.redirect('/sign-in');
-    }
-
-    next();
-}, async (req, res) => {
-    req.session.destroy(async (err) => {
-        if (err) {
-            return res.redirect('/dashboard');
-        }
-    });
-
-    res.redirect('/sign-in');
 });
 
 router.post('/', async (req, res, next) => {
@@ -202,4 +209,4 @@ router.post('/', async (req, res, next) => {
     });
 });
 
-module.exports = this;
+module.exports = this['/sign-in'];

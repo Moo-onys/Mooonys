@@ -20,7 +20,8 @@ router.get('/', async (req, res, next) => {
             layout: false,
             _url: `/administration?hbs=true`,
             location: req.session.location || false,
-            users: res.locals.session.users || false
+            users: res.locals.session.users || false,
+            _users: await req.mongodb.db(req.env.realm.db).collection('users').find({})
         }, async (err, hbs) => {
             if (err) {
                 return console.error(err);
@@ -34,7 +35,8 @@ router.get('/', async (req, res, next) => {
         layout: '1',
         _url: `/administration`,
         location: req.session.location || false,
-        users: res.locals.session.users || false
+        users: res.locals.session.users || false,
+        _users: await req.mongodb.db(req.env.realm.db).collection('users').find({})
     });
 });
 

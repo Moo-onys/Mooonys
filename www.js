@@ -90,6 +90,11 @@ io.use(require(`express-socket.io-session`)(client.get(`session`), {
     autoSave: true
 }));
 
+client.set('hosts', {
+    www: 'www',
+    api: 'api'
+});
+
 client.set(`contributors`, 0);
 client.set(`viewers`, 0);
 
@@ -172,7 +177,7 @@ client.use(require(`body-parser`).urlencoded({
 client.use(async (req, res, next) => {
     req.io = io;
     req.env = env;
-    req.mongodb = await (await this.mongodb());
+    req.mongodb = await this.mongodb();
     req.utils = utils;
 
     next();
@@ -201,7 +206,7 @@ client.use(async (req, res, next) => {
         _id: req.session.users._id,
         _uuid: req.session._uuid,
         status: true,
-        users: await (await this.mongodb()).db(`slacks`).collection(`users`).findOne({
+        users: await req.mongodb.db(`slacks`).collection(`users`).findOne({
             _id: req.session.users._id
         })
     } : false;
@@ -237,6 +242,7 @@ this.__init__(`${process.env.DIR}/events`, _ev).then(async (_v) => {
     (async () => {
         _v.forEach(async (__v) => {
             const v = require(__v);
+
             routes.push(v.$.path);
             client.use(v.$.path, v.$.router);
         });

@@ -26,6 +26,10 @@
     </p>
 
     <div class="bg padding-md shadow-xs radius-md margin-bottom-sm">
+        <p class="int-table__row-empty sr-only">
+            There are no more users to track?
+        </p>
+
         <div class="int-table int-table--sticky-header text-sm js-int-table">
             <div class="int-table__inner">
                 <table class="int-table__table" aria-label="Interactive table example">
@@ -68,11 +72,41 @@
                                     </li>
                                 </ul>
                             </th>
+                            
+                            <th class="int-table__cell int-table__cell--th int-table__cell--sort js-int-table__cell--sort"
+                                data-date-format="dd-mm-yyyy">
+                                <div class="flex items-center">
+                                    <span>Username</span>
+
+                                    <svg class="icon icon--xxs margin-left-xxxs int-table__sort-icon" aria-hidden="true"
+                                        viewBox="0 0 12 12">
+                                        <polygon class="arrow-up" points="6 0 10 5 2 5 6 0" />
+                                        <polygon class="arrow-down" points="6 12 2 7 10 7 6 12" /></svg>
+                                </div>
+
+                                <ul class="sr-only js-int-table__sort-list">
+                                    <li>
+                                        <input type="radio" name="sortingDate" id="sortingDateNone" value="none"
+                                            checked>
+                                        <label for="sortingDateNone">No sorting</label>
+                                    </li>
+
+                                    <li>
+                                        <input type="radio" name="sortingDate" id="sortingDateAsc" value="asc">
+                                        <label for="sortingDateAsc">Sort in ascending order</label>
+                                    </li>
+
+                                    <li>
+                                        <input type="radio" name="sortingDate" id="sortingDateDes" value="desc">
+                                        <label for="sortingDateDes">Sort in descending order</label>
+                                    </li>
+                                </ul>
+                            </th>
 
                             <th
                                 class="int-table__cell int-table__cell--th int-table__cell--sort js-int-table__cell--sort">
                                 <div class="flex items-center">
-                                    <span>Contributors</span>
+                                    <span>Address</span>
 
                                     <svg class="icon icon--xxs margin-left-xxxs int-table__sort-icon" aria-hidden="true"
                                         viewBox="0 0 12 12">
@@ -100,45 +134,16 @@
                             </th>
 
                             <th class="int-table__cell int-table__cell--th text-left">
-                                Details
+                                Bio
                             </th>
 
-                            <th class="int-table__cell int-table__cell--th int-table__cell--sort js-int-table__cell--sort"
-                                data-date-format="dd-mm-yyyy">
-                                <div class="flex items-center">
-                                    <span>Clearance</span>
-
-                                    <svg class="icon icon--xxs margin-left-xxxs int-table__sort-icon" aria-hidden="true"
-                                        viewBox="0 0 12 12">
-                                        <polygon class="arrow-up" points="6 0 10 5 2 5 6 0" />
-                                        <polygon class="arrow-down" points="6 12 2 7 10 7 6 12" /></svg>
-                                </div>
-
-                                <ul class="sr-only js-int-table__sort-list">
-                                    <li>
-                                        <input type="radio" name="sortingDate" id="sortingDateNone" value="none"
-                                            checked>
-                                        <label for="sortingDateNone">No sorting</label>
-                                    </li>
-
-                                    <li>
-                                        <input type="radio" name="sortingDate" id="sortingDateAsc" value="asc">
-                                        <label for="sortingDateAsc">Sort in ascending order</label>
-                                    </li>
-
-                                    <li>
-                                        <input type="radio" name="sortingDate" id="sortingDateDes" value="desc">
-                                        <label for="sortingDateDes">Sort in descending order</label>
-                                    </li>
-                                </ul>
-                            </th>
-
-                            <th class="int-table__cell int-table__cell--th text-left">Location</th>
+                            <th class="int-table__cell int-table__cell--th text-left">Birthday</th>
                             <th class="int-table__cell int-table__cell--th text-right"></th>
                         </tr>
                     </thead>
 
                     <tbody class="int-table__body js-int-table__body">
+                        {{#each _users}}
                         <tr class="int-table__row">
                             <th class="int-table__cell" scope="row">
                                 <div class="custom-checkbox int-table__checkbox">
@@ -147,16 +152,14 @@
                                     <div class="custom-checkbox__control" aria-hidden="true"></div>
                                 </div>
                             </th>
-                            <td class="int-table__cell"><a href="#0">Bryony Mcmillan</a></td>
-                            <td class="int-table__cell">r.email@email.com</td>
-                            <td class="int-table__cell max-width-xxxxs">Lorem ipsum dolor sit amet consectetur
-                                adipisicing
-                                elit. Repellat eveniet nisi itaque!</td>
-                            <td class="int-table__cell">01/01/2021</td>
-                            <td class="int-table__cell">Hungary</td>
+                            <td class="int-table__cell"><a href="#0">{{this._information.fn}} {{this._information.ln}}</a></td>
+                            <td class="int-table__cell">{{this.username}}</td>
+                            <td class="int-table__cell">{{this._information.address}}</td>
+                            <td class="int-table__cell max-width-xxxxs">{{this._information.bio}}</td>
+                            <td class="int-table__cell">{{this._information.birthday}}</td>
                             <td class="int-table__cell">
                                 <button class="reset int-table__menu-btn margin-left-auto js-tab-focus"
-                                    data-label="Edit row" aria-controls="menu-example">
+                                    data-label="Edit row" aria-controls="dropdown">
                                     <svg class="icon" viewBox="0 0 16 16">
                                         <circle cx="8" cy="7.5" r="1.5" />
                                         <circle cx="1.5" cy="7.5" r="1.5" />
@@ -164,249 +167,16 @@
                                 </button>
                             </td>
                         </tr>
-
-                        <tr class="int-table__row">
-                            <th class="int-table__cell" scope="row">
-                                <div class="custom-checkbox int-table__checkbox">
-                                    <input class="custom-checkbox__input js-int-table__select-row" type="checkbox"
-                                        aria-label="Select this row" />
-                                    <div class="custom-checkbox__control" aria-hidden="true"></div>
-                                </div>
-                            </th>
-                            <td class="int-table__cell"><a href="#0">Hetty Maxwell</a></td>
-                            <td class="int-table__cell">f.email@email.com</td>
-                            <td class="int-table__cell max-width-xxxxs">Lorem ipsum dolor sit amet consectetur
-                                adipisicing
-                                elit. Repellat eveniet nisi itaque!</td>
-                            <td class="int-table__cell">11/10/2020</td>
-                            <td class="int-table__cell">United Kingdom</td>
-                            <td class="int-table__cell">
-                                <button class="reset int-table__menu-btn margin-left-auto js-tab-focus"
-                                    data-label="Edit row" aria-controls="menu-example">
-                                    <svg class="icon" viewBox="0 0 16 16">
-                                        <circle cx="8" cy="7.5" r="1.5" />
-                                        <circle cx="1.5" cy="7.5" r="1.5" />
-                                        <circle cx="14.5" cy="7.5" r="1.5" /></svg>
-                                </button>
-                            </td>
-                        </tr>
-
-                        <tr class="int-table__row">
-                            <th class="int-table__cell" scope="row">
-                                <div class="custom-checkbox int-table__checkbox">
-                                    <input class="custom-checkbox__input js-int-table__select-row" type="checkbox"
-                                        aria-label="Select this row" />
-                                    <div class="custom-checkbox__control" aria-hidden="true"></div>
-                                </div>
-                            </th>
-                            <td class="int-table__cell"><a href="#0">Honey Leblanc</a></td>
-                            <td class="int-table__cell">v.email@email.com</td>
-                            <td class="int-table__cell max-width-xxxxs">Lorem ipsum dolor sit amet consectetur
-                                adipisicing
-                                elit. Repellat eveniet nisi itaque!</td>
-                            <td class="int-table__cell">17/09/2020</td>
-                            <td class="int-table__cell">Maldives</td>
-                            <td class="int-table__cell">
-                                <button class="reset int-table__menu-btn margin-left-auto js-tab-focus"
-                                    data-label="Edit row" aria-controls="menu-example">
-                                    <svg class="icon" viewBox="0 0 16 16">
-                                        <circle cx="8" cy="7.5" r="1.5" />
-                                        <circle cx="1.5" cy="7.5" r="1.5" />
-                                        <circle cx="14.5" cy="7.5" r="1.5" /></svg>
-                                </button>
-                            </td>
-                        </tr>
-
-                        <tr class="int-table__row">
-                            <th class="int-table__cell" scope="row">
-                                <div class="custom-checkbox int-table__checkbox">
-                                    <input class="custom-checkbox__input js-int-table__select-row" type="checkbox"
-                                        aria-label="Select this row" />
-                                    <div class="custom-checkbox__control" aria-hidden="true"></div>
-                                </div>
-                            </th>
-                            <td class="int-table__cell"><a href="#0">Maira Hodges</a></td>
-                            <td class="int-table__cell">a.email@email.com</td>
-                            <td class="int-table__cell max-width-xxxxs">Lorem ipsum dolor sit amet consectetur
-                                adipisicing
-                                elit. Repellat eveniet nisi itaque!</td>
-                            <td class="int-table__cell">04/08/2020</td>
-                            <td class="int-table__cell">Iceland</td>
-                            <td class="int-table__cell">
-                                <button class="reset int-table__menu-btn margin-left-auto js-tab-focus"
-                                    data-label="Edit row" aria-controls="menu-example">
-                                    <svg class="icon" viewBox="0 0 16 16">
-                                        <circle cx="8" cy="7.5" r="1.5" />
-                                        <circle cx="1.5" cy="7.5" r="1.5" />
-                                        <circle cx="14.5" cy="7.5" r="1.5" /></svg>
-                                </button>
-                            </td>
-                        </tr>
-
-                        <tr class="int-table__row">
-                            <th class="int-table__cell" scope="row">
-                                <div class="custom-checkbox int-table__checkbox">
-                                    <input class="custom-checkbox__input js-int-table__select-row" type="checkbox"
-                                        aria-label="Select this row" />
-                                    <div class="custom-checkbox__control" aria-hidden="true"></div>
-                                </div>
-                            </th>
-                            <td class="int-table__cell"><a href="#0">Nigel Lang</a></td>
-                            <td class="int-table__cell">g.email@email.com</td>
-                            <td class="int-table__cell max-width-xxxxs">Lorem ipsum dolor sit amet consectetur
-                                adipisicing
-                                elit. Repellat eveniet nisi itaque!</td>
-                            <td class="int-table__cell">03/07/2020</td>
-                            <td class="int-table__cell">Italy</td>
-                            <td class="int-table__cell">
-                                <button class="reset int-table__menu-btn margin-left-auto js-tab-focus"
-                                    data-label="Edit row" aria-controls="menu-example">
-                                    <svg class="icon" viewBox="0 0 16 16">
-                                        <circle cx="8" cy="7.5" r="1.5" />
-                                        <circle cx="1.5" cy="7.5" r="1.5" />
-                                        <circle cx="14.5" cy="7.5" r="1.5" /></svg>
-                                </button>
-                            </td>
-                        </tr>
-
-                        <tr class="int-table__row">
-                            <th class="int-table__cell" scope="row">
-                                <div class="custom-checkbox int-table__checkbox">
-                                    <input class="custom-checkbox__input js-int-table__select-row" type="checkbox"
-                                        aria-label="Select this row" />
-                                    <div class="custom-checkbox__control" aria-hidden="true"></div>
-                                </div>
-                            </th>
-                            <td class="int-table__cell"><a href="#0">Saif Acevedo</a></td>
-                            <td class="int-table__cell">l.email@email.com</td>
-                            <td class="int-table__cell max-width-xxxxs">Lorem ipsum dolor sit amet consectetur
-                                adipisicing
-                                elit. Repellat eveniet nisi itaque!</td>
-                            <td class="int-table__cell">21/05/2020</td>
-                            <td class="int-table__cell">Argentina</td>
-                            <td class="int-table__cell">
-                                <button class="reset int-table__menu-btn margin-left-auto js-tab-focus"
-                                    data-label="Edit row" aria-controls="menu-example">
-                                    <svg class="icon" viewBox="0 0 16 16">
-                                        <circle cx="8" cy="7.5" r="1.5" />
-                                        <circle cx="1.5" cy="7.5" r="1.5" />
-                                        <circle cx="14.5" cy="7.5" r="1.5" /></svg>
-                                </button>
-                            </td>
-                        </tr>
-
-                        <tr class="int-table__row">
-                            <th class="int-table__cell" scope="row">
-                                <div class="custom-checkbox int-table__checkbox">
-                                    <input class="custom-checkbox__input js-int-table__select-row" type="checkbox"
-                                        aria-label="Select this row" />
-                                    <div class="custom-checkbox__control" aria-hidden="true"></div>
-                                </div>
-                            </th>
-                            <td class="int-table__cell"><a href="#0">Isaak O'Gallagher</a></td>
-                            <td class="int-table__cell">b.email@email.com</td>
-                            <td class="int-table__cell max-width-xxxxs">Lorem ipsum dolor sit amet consectetur
-                                adipisicing
-                                elit. Repellat eveniet nisi itaque!</td>
-                            <td class="int-table__cell">11/04/2020</td>
-                            <td class="int-table__cell">Maldives</td>
-                            <td class="int-table__cell">
-                                <button class="reset int-table__menu-btn margin-left-auto js-tab-focus"
-                                    data-label="Edit row" aria-controls="menu-example">
-                                    <svg class="icon" viewBox="0 0 16 16">
-                                        <circle cx="8" cy="7.5" r="1.5" />
-                                        <circle cx="1.5" cy="7.5" r="1.5" />
-                                        <circle cx="14.5" cy="7.5" r="1.5" /></svg>
-                                </button>
-                            </td>
-                        </tr>
-
-                        <tr class="int-table__row">
-                            <th class="int-table__cell" scope="row">
-                                <div class="custom-checkbox int-table__checkbox">
-                                    <input class="custom-checkbox__input js-int-table__select-row" type="checkbox"
-                                        aria-label="Select this row" />
-                                    <div class="custom-checkbox__control" aria-hidden="true"></div>
-                                </div>
-                            </th>
-                            <td class="int-table__cell"><a href="#0">Lucille Arias</a></td>
-                            <td class="int-table__cell">m.email@email.com</td>
-                            <td class="int-table__cell max-width-xxxxs">Lorem ipsum dolor sit amet consectetur
-                                adipisicing
-                                elit. Repellat eveniet nisi itaque!</td>
-                            <td class="int-table__cell">05/03/2020</td>
-                            <td class="int-table__cell">Thailand</td>
-                            <td class="int-table__cell">
-                                <button class="reset int-table__menu-btn margin-left-auto js-tab-focus"
-                                    data-label="Edit row" aria-controls="menu-example">
-                                    <svg class="icon" viewBox="0 0 16 16">
-                                        <circle cx="8" cy="7.5" r="1.5" />
-                                        <circle cx="1.5" cy="7.5" r="1.5" />
-                                        <circle cx="14.5" cy="7.5" r="1.5" /></svg>
-                                </button>
-                            </td>
-                        </tr>
-
-                        <tr class="int-table__row">
-                            <th class="int-table__cell" scope="row">
-                                <div class="custom-checkbox int-table__checkbox">
-                                    <input class="custom-checkbox__input js-int-table__select-row" type="checkbox"
-                                        aria-label="Select this row" />
-                                    <div class="custom-checkbox__control" aria-hidden="true"></div>
-                                </div>
-                            </th>
-                            <td class="int-table__cell"><a href="#0">Kendall Rankin</a></td>
-                            <td class="int-table__cell">e.email@email.com</td>
-                            <td class="int-table__cell max-width-xxxxs">Lorem ipsum dolor sit amet consectetur
-                                adipisicing
-                                elit. Repellat eveniet nisi itaque!</td>
-                            <td class="int-table__cell">02/02/2020</td>
-                            <td class="int-table__cell">Austria</td>
-                            <td class="int-table__cell">
-                                <button class="reset int-table__menu-btn margin-left-auto js-tab-focus"
-                                    data-label="Edit row" aria-controls="menu-example">
-                                    <svg class="icon" viewBox="0 0 16 16">
-                                        <circle cx="8" cy="7.5" r="1.5" />
-                                        <circle cx="1.5" cy="7.5" r="1.5" />
-                                        <circle cx="14.5" cy="7.5" r="1.5" /></svg>
-                                </button>
-                            </td>
-                        </tr>
-
-                        <tr class="int-table__row">
-                            <th class="int-table__cell" scope="row">
-                                <div class="custom-checkbox int-table__checkbox">
-                                    <input class="custom-checkbox__input js-int-table__select-row" type="checkbox"
-                                        aria-label="Select this row" />
-                                    <div class="custom-checkbox__control" aria-hidden="true"></div>
-                                </div>
-                            </th>
-                            <td class="int-table__cell"><a href="#0">Raihan Boone</a></td>
-                            <td class="int-table__cell">c.email@email.com</td>
-                            <td class="int-table__cell max-width-xxxxs">Lorem ipsum dolor sit amet consectetur
-                                adipisicing
-                                elit. Repellat eveniet nisi itaque!</td>
-                            <td class="int-table__cell">01/01/2020</td>
-                            <td class="int-table__cell">USA</td>
-                            <td class="int-table__cell">
-                                <button class="reset int-table__menu-btn margin-left-auto js-tab-focus"
-                                    data-label="Edit row" aria-controls="menu-example">
-                                    <svg class="icon" viewBox="0 0 16 16">
-                                        <circle cx="8" cy="7.5" r="1.5" />
-                                        <circle cx="1.5" cy="7.5" r="1.5" />
-                                        <circle cx="14.5" cy="7.5" r="1.5" /></svg>
-                                </button>
-                            </td>
-                        </tr>
+                        {{/each}}
                     </tbody>
                 </table>
             </div>
         </div>
 
-        <menu id="menu-example" class="menu menu--table js-menu">
+        <menu id="dropdown" class="menu menu--table js-menu">
             <li role="menuitem">
                 <span class="menu__content js-menu__content">
-                    <i class="fas fa-info menu__icon icon"></i>
+                    <i class="fas padding-left-xxs fa-info menu__icon icon"></i>
                     <span class="sr-only">Information</span>
                 </span>
             </li>
@@ -426,7 +196,7 @@
             </li>
 
             <li role="menuitem">
-                <span class="menu__content js-menu__content">
+                <span class="menu__content menu-archives js-menu__content">
                     <i class="fas fa-archive menu__icon icon"></i>
                     <span class="sr-only">Archives</span>
                 </span>
@@ -434,3 +204,56 @@
         </menu>
     </div>
 </section>
+
+<script class="hbs-ui__scripts">
+    $(async () => {
+        const elements = [];
+
+        document.querySelector('.menu-archives').addEventListener('click', async (e) => {
+            document.querySelectorAll('.int-table__row--checked').forEach(async (element) => {
+                element.remove();
+            });
+            
+            document.querySelector('.js-int-table__select-all').click();
+
+            if ((document.querySelectorAll('.int-table__row').length - 1) <= 0) {
+                document.querySelector('.int-table').classList.add('sr-only');
+                document.querySelector('.int-table__row-empty').classList.remove('sr-only');
+            }
+        });
+
+        document.querySelectorAll('.int-table__menu-btn').forEach(async (element) => {
+            element.addEventListener('click', async (e) => {
+                e.preventDefault();
+
+                document.querySelectorAll('.int-table__selected').forEach(async (element) => {
+                    element.classList.remove('int-table__selected');
+                });
+
+                if (!element.parentElement.parentElement.classList.contains('int-table__row--checked')) {
+                    element.parentElement.parentElement.children[0].children[0].children[0].click();
+                    element.click();
+                }
+
+                element.parentElement.parentElement.classList.add('int-table__selected');
+                element.parentElement.parentElement.classList.add('int-table__row--checked');
+            });
+        });
+
+        document.querySelectorAll('.int-table__row').forEach(async (element) => {
+            if (element.classList.contains('int-table__row-empty')) {
+                return;
+            }
+
+            elements.push({
+                element: element,
+                _id: element.children[1].children[0].innerHTML,
+                username: element.children[2].innerHTML,
+                address: element.children[3].innerHTML,
+                bio: element.children[4].innerHTML,
+                birthday: element.children[5].innerHTML
+            });
+        });
+
+    });
+</script>
