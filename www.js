@@ -35,6 +35,13 @@ if (process.platform === `darwin`) {
     process.env.SECURITY = true;
 }
 
+if (!process.env.DIR) {
+    process.env.DIR = `.`;
+    process.env.PORT = 443;
+    process.env.URL = `https://www.mooonys.co/`;
+    process.env.SECURITY = true;
+}
+
 const client = express();
 const https = require('https').createServer({
     cert: fs.readFileSync(`${process.env.DIR}/ssl/mooonys_co.crt`, {
