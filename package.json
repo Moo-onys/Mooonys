@@ -1,13 +1,12 @@
 {
   "name": "Mooonys",
-  "version": "0.0.1",
+  "productName": "Mooonys",
+  "version": "v0.0.2",
   "description": "Dynamics are important when designing for the web.",
   "main": "www.js",
   "scripts": {
-    "win32": "node .",
-    "darwin": "npm run gulp watch",
-    "gulp": "gulp",
-    "forge": "electron-forge start",
+    "www": "gulp watch",
+    "start": "electron-forge start",
     "package": "electron-forge package",
     "make": "electron-forge make",
     "publish": "electron-forge publish"
@@ -16,31 +15,19 @@
     "name": "Mooonys",
     "email": "contact-us@mooonys.co"
   },
-  "license": "MIT",
   "config": {
     "forge": {
       "packagerConfig": {
-        "icon": "utils/img/Mooonys.icns"
+        "icon": "utils/ico/ico.icns"
       },
-      "makers": [{
-          "name": "@electron-forge/maker-squirrel",
-          "config": {
-            "name": "Mooonys"
-          }
-        },
+      "makers": [
         {
           "name": "@electron-forge/maker-zip",
           "platforms": [
-            "darwin"
+            "darwin",
+            "win32",
+            "linux"
           ]
-        },
-        {
-          "name": "@electron-forge/maker-deb",
-          "config": {}
-        },
-        {
-          "name": "@electron-forge/maker-rpm",
-          "config": {}
         }
       ]
     }
