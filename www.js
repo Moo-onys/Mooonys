@@ -23,21 +23,21 @@ const {
 
 const client = express();
 const https = require('https').createServer({
-    cert: fs.readFileSync(`${process.cwd()}/ssl/mooonys_co.crt`, {
+    cert: fs.readFileSync(`${process.env.DIR}/ssl/mooonys_co.crt`, {
         encoding: 'utf8'
     }),
-    ca: fs.readFileSync(`${process.cwd()}/ssl/mooonys_co.ca-bundle`, {
+    ca: fs.readFileSync(`${process.env.DIR}/ssl/mooonys_co.ca-bundle`, {
         encoding: 'utf8'
     }),
-    key: fs.readFileSync(`${process.cwd()}/ssl/mooonys_co.key`, {
+    key: fs.readFileSync(`${process.env.DIR}/ssl/mooonys_co.key`, {
         encoding: 'utf8'
     })
 },
     client);
 const io = require('socket.io')(https);
 
-const env = require(`${process.cwd()}/env.json`);
-const utils = require(`${process.cwd()}/utils.js`);
+const env = require(`${process.env.DIR}/env.json`);
+const utils = require(`${process.env.DIR}/utils.js`);
 const realm = Realm.App.getApp(env.realm._id);
 
 client.set('session', session({
@@ -58,8 +58,8 @@ client.set('session', session({
 client.set('hbs', exphbs.create({
     extname: '.hbs',
     defaultLayout: '1',
-    partialsDir: `${process.cwd()}/views/partials`,
-    layoutsDir: `${process.cwd()}/views/layouts`,
+    partialsDir: `${process.env.DIR}/views/partials`,
+    layoutsDir: `${process.env.DIR}/views/layouts`,
     helpers: utils.hbs_js()
 }));
 
@@ -76,7 +76,7 @@ client.use(client.get('session'));
 client.use(cors({ origin: process.env.URL }));
 client.use(require('cookie-parser')());
 
-client.use('/utils', express.static(`${process.cwd()}/utils`));
+client.use('/utils', express.static(`${process.env.DIR}/utils`));
 
 client.use(express.json());
 client.use(require('body-parser').urlencoded({
@@ -145,7 +145,7 @@ this.__init__ = async (dir, files) => {
     return files;
 }
 
-this.__init__(`${process.cwd()}/events`, env._.events).then(async (_v) => {
+this.__init__(`${process.env.DIR}/events`, env._.events).then(async (_v) => {
     const routes = [];
 
     (async () => {
