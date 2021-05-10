@@ -22,7 +22,7 @@ const {
 } = require('mongodb-stitch-browser-sdk');
 
 const client = express();
-const https = require('http').createServer(/*{
+const https = require('https').createServer({
     cert: fs.readFileSync(`${process.env.DIR}/ssl/mooonys_co.crt`, {
         encoding: 'utf8'
     }),
@@ -32,7 +32,7 @@ const https = require('http').createServer(/*{
     key: fs.readFileSync(`${process.env.DIR}/ssl/mooonys_co.key`, {
         encoding: 'utf8'
     })
-},*/
+},
     client);
 const io = require('socket.io')(https);
 
