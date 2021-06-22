@@ -76,10 +76,8 @@ this.Utils.hbs = async () => {
         '/options/styles',
         '/options/information',
         '/collaboration/agenda',
-        '/collaboration/events',
-        '/collaboration/chatrooms',
-        '/collaboration/forums',
-        '/collaboration/feedback',
+        '/collaboration/articles',
+        '/collaboration/organization',
         '/legals/frequently-asked-questions',
         '/legals/agreements',
         '/legals/contact-us',
@@ -152,7 +150,7 @@ this.Utils.hbs = async () => {
 
             $.ajax({
                 type: 'GET',
-                url: '/ajax?_is=true',
+                url: '/utils/ajax?_is=true',
                 success: async (_is) => {
                     if (_is.$) {
                         if (!_uri.includes('/legals/')) {

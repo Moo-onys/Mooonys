@@ -1,3 +1,3 @@
 module.exports = ['URL', (url) => {
-    return process.env.URL + url;
+    return 'https://www.mooonys.co/' + url;
 }];

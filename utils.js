@@ -1,14 +1,14 @@
 const fs = require(`fs`);
 const path = require(`path`);
 const nodemailer = require(`nodemailer`);
-const env = require(`${process.env.DIR}/env.json`);
+const env = require(`./env.json`);
 
 this.hbs_js = () => {
     const hbs = {};
 
-    fs.readdir(`${process.env.DIR}/utils/hbs`, (err, files) => {
+    fs.readdir(`./utils/hbs`, (err, files) => {
         files.forEach((hbs_) => {
-            require(`${process.env.DIR}/utils/hbs/${hbs_}`).forEach((_hbs, i, __hbs) => {
+            require(`./utils/hbs/${hbs_}`).forEach((_hbs, i, __hbs) => {
                 if (typeof _hbs === `function`) {
                     hbs[__hbs[i - 1]] = _hbs;
                 }
@@ -19,13 +19,25 @@ this.hbs_js = () => {
     return hbs;
 }
 
-this.nodemailer = nodemailer.createTransport({
+this.pkgs = [];
+
+this.ev = [];
+
+this.env = env;
+
+const realm = Realm.App.getApp(env.realm._id);
+
+realm.logIn(Realm.Credentials.emailPassword(env.realm.username, env.realm.password)).then(async (user) => {
+    this.db = user.mongoClient(env.realm._atlas);
+});
+
+this.tls = nodemailer.createTransport({
     host: `mail.privateemail.com`,
     port: 465,
     secure: true,
     auth: {
-        user: env.nodemailer.username,
-        pass: env.nodemailer.password
+        user: env.tls.username,
+        pass: env.tls.password
     },
     tls: {
         rejectUnauthorized: false

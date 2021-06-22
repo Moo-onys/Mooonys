@@ -80,7 +80,21 @@
                 </div>
 
                 <div class="organization-cell__cta">
-                    <button aria-controls="Munich-International-School" class='btn btn--join btn--primary'>Join</button>
+                    <button aria-controls="Munich-International-School" onclick="$(this).toggleClass('btn--state-b'); setTimeout(() => {$(this).toggleClass('btn--state-b');}, 1000)"
+                        class="btn btn--primary btn--join btn--preserve-width btn--form width-100%">
+                        <span class="btn__content-a">
+                            <span>Join</span>
+                        </span>
+                        <span class="btn__content-b">
+                            <svg class="icon icon--is-spinning" aria-hidden="true" viewBox="0 0 16 16">
+                                <title>Loading</title>
+                                <g stroke-width="1" fill="currentColor" stroke="currentColor">
+                                    <path d="M.5,8a7.5,7.5,0,1,1,1.91,5" fill="none" stroke="currentColor"
+                                        stroke-linecap="round" stroke-linejoin="round"></path>
+                                </g>
+                            </svg>
+                        </span>
+                    </button>
                 </div>
 
                 <div class="organization-cell__controls">
@@ -116,13 +130,31 @@
                             </a>
                         </p>
 
-                        <p aria-description="Buchhof-International-School" class="color-contrast-medium">The Bavarian International School strives to develop motivated, responsible life-long learners who make a difference to our world. Our Mission is inspiring and challenging young minds as a caring and committed international community to achieve excellence, assume responsibility and pursue life-long learning.
+                        <p aria-description="Buchhof-International-School" class="color-contrast-medium">The Bavarian
+                            International School strives to develop motivated, responsible life-long learners who make a
+                            difference to our world. Our Mission is inspiring and challenging young minds as a caring
+                            and committed international community to achieve excellence, assume responsibility and
+                            pursue life-long learning.
                         </p>
                     </div>
                 </div>
 
                 <div class="organization-cell__cta">
-                    <button aria-controls="Buchhof-International-School" class='btn btn--join btn--primary'>Join</button>
+                    <button aria-controls="Buchhof-International-School" onclick="$(this).toggleClass('btn--state-b'); setTimeout(() => {$(this).toggleClass('btn--state-b');}, 1000)"
+                        class="btn btn--primary btn--join btn--preserve-width btn--form width-100%">
+                        <span class="btn__content-a">
+                            <span>Join</span>
+                        </span>
+                        <span class="btn__content-b">
+                            <svg class="icon icon--is-spinning" aria-hidden="true" viewBox="0 0 16 16">
+                                <title>Loading</title>
+                                <g stroke-width="1" fill="currentColor" stroke="currentColor">
+                                    <path d="M.5,8a7.5,7.5,0,1,1,1.91,5" fill="none" stroke="currentColor"
+                                        stroke-linecap="round" stroke-linejoin="round"></path>
+                                </g>
+                            </svg>
+                        </span>
+                    </button>
                 </div>
 
                 <div class="organization-cell__controls">

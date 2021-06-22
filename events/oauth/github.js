@@ -71,7 +71,7 @@ router.get('/', async (req, res, next) => {
 
     const encryption = await crypto.createHash('sha256').update(`${id}`).digest('base64');
 
-    if (!await req.mongodb.db(req.env.realm.db).collection('users').findOne({
+    if (!await req.db.db(req.env.realm.db).collection('users').findOne({
         username: login,
         '_apis.github': encryption
     })) {

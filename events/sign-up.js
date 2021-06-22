@@ -59,13 +59,13 @@ router.get('/github', async (req, res, next) => {
 
     const encryption = await crypto.createHash('sha256').update(`${id}`).digest('base64');
 
-    if (await req.mongodb.db(req.env.realm.db).collection('users').findOne({
+    if (await req.db.db(req.env.realm.db).collection('users').findOne({
         username: login
     })) {
         return res.redirect('/sign-in');
     }
 
-    if (await req.mongodb.db(req.env.realm.db).collection('users').findOne({
+    if (await req.db.db(req.env.realm.db).collection('users').findOne({
         "_information.address": email
     })) {
         return res.redirect('/sign-in');
@@ -78,7 +78,7 @@ router.get('/github', async (req, res, next) => {
         twitter: false
     };
 
-    await req.mongodb.db(req.env.realm.db).collection('users').insertOne({
+    await req.db.db(req.env.realm.db).collection('users').insertOne({
         _id: new BSON.ObjectID(),
         _apis: _apis,
         _information: {
@@ -108,7 +108,7 @@ router.get('/github', async (req, res, next) => {
         password: false
     });
 
-    await req.mongodb.db(req.env.realm.db).collection('users').findOne({
+    await req.db.db(req.env.realm.db).collection('users').findOne({
         username: login,
         '_apis.github': encryption
     }).then(async (users) => {
@@ -154,7 +154,7 @@ router.post('/', async (req, res, next) => {
         password,
     } = req.body;
 
-    if (await req.mongodb.db(req.env.realm.db).collection('users').findOne({
+    if (await req.db.db(req.env.realm.db).collection('users').findOne({
         username: username
     })) {
         return res.json({
@@ -168,7 +168,7 @@ router.post('/', async (req, res, next) => {
         });
     }
 
-    if (await req.mongodb.db(req.env.realm.db).collection('users').findOne({
+    if (await req.db.db(req.env.realm.db).collection('users').findOne({
         "_information.address": address
     })) {
         return res.json({
@@ -189,7 +189,7 @@ router.post('/', async (req, res, next) => {
         twitter: false
     };
 
-    await req.mongodb.db(req.env.realm.db).collection('users').insertOne({
+    await req.db.db(req.env.realm.db).collection('users').insertOne({
         _id: new BSON.ObjectID(),
         _apis: _apis,
         _information: {
@@ -219,7 +219,7 @@ router.post('/', async (req, res, next) => {
         password: crypto.createHash('sha256').update(password).digest('base64')
     });
 
-    await req.mongodb.db(req.env.realm.db).collection('users').findOne({
+    await req.db.db(req.env.realm.db).collection('users').findOne({
         username: username
     }).then(async (users) => {
         req.app.render('emails/registration', {

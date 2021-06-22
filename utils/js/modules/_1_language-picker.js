@@ -152,12 +152,6 @@
 				event.preventDefault();
 				picker.element.getElementsByClassName('language-picker__list')[0].querySelector('[aria-selected="true"]').removeAttribute('aria-selected');
 				language.setAttribute('aria-selected', 'true');
-				if (document.getElementById('LANG')) {
-					document.getElementById('LANG').setAttribute('aria-selection', language.getAttribute('data-value'));
-					if (cly) {
-						cly(document.getElementById('LANG').getAttribute('aria-selection'));
-					}
-				}
 				picker.trigger.getElementsByClassName('language-picker__label')[0].setAttribute('class', 'language-picker__label language-picker__flag language-picker__flag--' + language.getAttribute('data-value'));
 				picker.trigger.getElementsByClassName('language-picker__label')[0].getElementsByTagName('em')[0].textContent = language.textContent;
 				picker.trigger.setAttribute('aria-expanded', 'false');

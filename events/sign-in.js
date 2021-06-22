@@ -77,14 +77,14 @@ router.get('/github', async (req, res, next) => {
 
     const encryption = await crypto.createHash('sha256').update(`${id}`).digest('base64');
 
-    if (!await req.mongodb.db(req.env.realm.db).collection('users').findOne({
+    if (!await req.db.db(req.env.realm.db).collection('users').findOne({
         username: login,
         '_apis.github': encryption
     })) {
         return res.redirect(`/sign-up/github?access_token=${access_token}`);
     }
 
-    await req.mongodb.db(req.env.realm.db).collection('users').findOne({
+    await req.db.db(req.env.realm.db).collection('users').findOne({
         username: login,
         '_apis.github': encryption
     }).then(async (users) => {
@@ -111,7 +111,7 @@ router.get('/github', async (req, res, next) => {
 
         req.session.save();
 
-        await req.mongodb.db(req.env.realm.db).collection('users').updateOne({
+        await req.db.db(req.env.realm.db).collection('users').updateOne({
             username: users.username
         }, {
             $set: {
@@ -140,7 +140,7 @@ router.post('/', async (req, res, next) => {
 
     const encryption = crypto.createHash('sha256').update(password).digest('base64');
 
-    if (!await req.mongodb.db(req.env.realm.db).collection('users').findOne({
+    if (!await req.db.db(req.env.realm.db).collection('users').findOne({
         username: username,
         password: encryption
     })) {
@@ -156,7 +156,7 @@ router.post('/', async (req, res, next) => {
         });
     }
 
-    await req.mongodb.db(req.env.realm.db).collection('users').findOne({
+    await req.db.db(req.env.realm.db).collection('users').findOne({
         username: username,
         password: encryption
     }).then(async (users) => {
@@ -187,7 +187,7 @@ router.post('/', async (req, res, next) => {
 
         req.session.save();
 
-        await req.mongodb.db(req.env.realm.db).collection('users').updateOne({
+        await req.db.db(req.env.realm.db).collection('users').updateOne({
             username: users.username
         }, {
             $set: {

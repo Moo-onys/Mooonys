@@ -43,7 +43,7 @@
                         cb: async () => {
                             setTimeout(async () => {
                                 if (!this.socketio.connection.state) {
-                                    $.get('/api/ts', async () => {
+                                    $.get('/utils/ts', async () => {
                                         this.socketio.connection.state = true;
                                         window.location.href = unescape(window.location.pathname);
                                     });

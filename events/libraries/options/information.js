@@ -16,7 +16,7 @@ router.get('/', async (req, res, next) => {
     } = req.query;
 
     if (hbs) {
-        return req.app.render(`libraries${path}`, {
+        return req.app.render(`libraries/${path}`, {
             layout: false,
             _url: `${path}?hbs=true`,
             location: req.session.location || false,
@@ -35,6 +35,37 @@ router.get('/', async (req, res, next) => {
         _url: `${path}`,
         location: req.session.location || false,
         users: res.locals.session.users || false
+    });
+});
+
+router.post('/', async (req, res, next) => {
+    if (!req.session._uuid) {
+        return res.redirect('/sign-in');
+    }
+
+    next();
+}, async (req, res) => {
+    const {
+        subject,
+        description,
+        rating
+    } = req.body;
+
+    await req.utils.nodemailer.sendMail({
+        from: req.env.nodemailer.username,
+        to: 'contact-us@mooonys.co',
+        subject: `New Feedback: ${subject}`,
+        html: description + `
+        
+        Rating:
+        ${rating}
+        `
+    });
+
+    res.json({
+        err: false,
+        _id: req.session.users._id,
+        xhr: false
     });
 });
 

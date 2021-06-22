@@ -1,7 +1,6 @@
 this.$ = new Object();
 
 const express = require('express');
-const { valid } = require('semver');
 const router = this.$.router = express.Router();
 const path = this.$.path = ['/options/account'][0];
 
@@ -59,13 +58,13 @@ router.post('/', async (req, res, next) => {
 
     let validity = true;
 
-    if (await req.mongodb.db(req.env.realm.db).collection('users').findOne({
+    if (await req.db.db(req.env.realm.db).collection('users').findOne({
         "_information.address": address
     })) {
         validity = false;
     }
 
-    await req.mongodb.db(req.env.realm.db).collection('users').updateOne({
+    await req.db.db(req.env.realm.db).collection('users').updateOne({
         _id: req.session.users._id
     }, {
         $set: {
