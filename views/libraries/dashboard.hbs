@@ -3,17 +3,17 @@
 
     <div class="language-picker margin-left-auto language-picker--flags js-language-picker"
         data-trigger-class="btn bg js-tab-focus">
-        <form id="LANG" action="" class="language-picker__form">
+        <form class="language-picker__form">
             <label class="hbs-ui__text" for="hbs-ui__languages-input">Select your language</label>
 
             <select name="language-picker-select" id="hbs-ui__languages-input">
-                <option lang="en" class="hbs-ui__text" value="english" {{#if cly.english.isSelected}} selected{{/if}}>
+                <option lang="en" class="hbs-ui__text" value="english" {{#if opt.english}} selected{{/if}}>
                     English</option>
-                <option lang="de" class="hbs-ui__text" value="deutsch" {{#if cly.deutsch.isSelected}} selected{{/if}}>
+                <option lang="de" class="hbs-ui__text" value="deutsch" {{#if opt.deutsch}} selected{{/if}}>
                     Deutsch</option>
-                <option lang="fr" class="hbs-ui__text" value="francais" {{#if cly.francais.isSelected}} selected{{/if}}>
+                <option lang="fr" class="hbs-ui__text" value="francais" {{#if opt.francais}} selected{{/if}}>
                     Français</option>
-                <option lang="it" class="hbs-ui__text" value="italiano" {{#if cly.italiano.isSelected}} selected{{/if}}>
+                <option lang="it" class="hbs-ui__text" value="italiano" {{#if opt.italiano}} selected{{/if}}>
                     Italiano</option>
             </select>
         </form>
@@ -24,6 +24,24 @@
     <p class="hbs-ui__text bg padding-md shadow-xs radius-md margin-bottom-sm">
         Mooonys is currently working on making the Dashboard section fully functional, please be patient.
     </p>
+
+    <div class="banner margin-bottom-sm shadow-xs bg radius-md overflow-hidden">
+        <a href="#0" class="text-decoration-none" aria-label="Shop Now">
+            <div class="grid flex-row-reverse@md">
+                <div class="col-6@md overflow-hidden" aria-hidden="true">
+                    <div class="banner__figure width-100%"
+                        style="background-image: url({{ URL 'utils/img/jpg/placeholders/places.png'}});"></div>
+                </div>
+
+                <div class="col-6@md">
+                    <div class="text-component v-space-md height-100% flex flex-column padding-md padding-lg@md">
+                        <h2>Do you want to show off with our stylish clothes?</h2>
+                        <p class="margin-top-sm margin-top-lg@md"><span class="banner__link"><i>Shop Now</i></span></p>
+                    </div>
+                </div>
+            </div>
+        </a>
+    </div>
 
     <div class="grid gap-sm">
         <!-- alert -->

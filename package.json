@@ -1,32 +1,44 @@
 {
   "name": "Mooonys",
-  "productName": "Mooonys",
-  "version": "v0.0.2",
+  "version": "v1.2.0",
   "description": "Dynamics are important when designing for the web.",
-  "main": "www.js",
+  "main": "@.js",
   "scripts": {
     "start": "node .",
-    "package": "electron-forge package",
-    "make": "electron-forge make",
+    "pack": "electron-forge package",
+    "build": "electron-forge make",
     "publish": "electron-forge publish"
   },
   "author": {
     "name": "Mooonys",
     "email": "contact-us@mooonys.co"
   },
+  "license": "MIT",
   "config": {
     "forge": {
       "packagerConfig": {
-        "icon": "utils/ico/ico.icns"
+        "icon": "utils/img/Mooonys.icns"
       },
       "makers": [
         {
+          "name": "@electron-forge/maker-squirrel",
+          "config": {
+            "name": "Mooonys"
+          }
+        },
+        {
           "name": "@electron-forge/maker-zip",
           "platforms": [
-            "darwin",
-            "win32",
-            "linux"
+            "darwin"
           ]
+        },
+        {
+          "name": "@electron-forge/maker-deb",
+          "config": {}
+        },
+        {
+          "name": "@electron-forge/maker-rpm",
+          "config": {}
         }
       ]
     }
@@ -49,6 +61,7 @@
     "arg": "^4.1.3",
     "ascii-table": "0.0.9",
     "autoprefixer": "^9.4.3",
+    "aws-sdk": "^2.942.0",
     "axios": "^0.21.0",
     "babel-core": "^6.26.3",
     "babel-preset-env": "^1.7.0",

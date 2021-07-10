@@ -58,13 +58,13 @@
                 </p>
 
                 <div class="margin-top-xs bg text-sm items-center radius-lg padding-lg">
-                    <input id="#agreements" class="sr-only"
+                    <input class="sr-only selection"
                         value="Copyright © 2020 Mooonys - {{URL 'legals/agreements'}}" type="text" />
                     <div class="flex justify-between">
                         <p>Copyright © 2020 Mooonys - <span class="tooltip-trigger noselect js-tooltip-trigger" title="You are hereby in liability of providing this link within your agreements.">{{URL 'legals/agreements'}}</span></p>
                         <a style="cursor: pointer;"
-                            onclick="const selection = document.getElementById('#agreements'); selection.value += (selection.parentElement.children[2].innerHTML + '\n' + selection.parentElement.children[3].innerHTML + '\n' + selection.parentElement.children[4].innerHTML); selection.select(); selection.setSelectionRange(0, 99999); document.execCommand('copy');"
-                            class="margin-right-sm">
+                            onclick="_selection();"
+                            class="btn radius-full btn--subtle">
                             <svg aria-hidden="true" class="icon" viewBox="0 0 16 16">
                                 <g>
                                     <path fill="none" stroke="currentColor" stroke-linejoin="round" stroke-width="1.5"
@@ -74,6 +74,20 @@
                                 </g>
                             </svg>
                         </a>
+
+                        <script class="hbs-ui__scripts">
+                            const selection = document.querySelector('.selection');
+
+                            function _selection() {
+                                selection.value += (selection.parentElement.children[2].innerHTML + '\n' + selection.parentElement.children[3].innerHTML + '\n' + selection.parentElement.children[4].innerHTML);
+
+                                selection.select();
+
+                                selection.setSelectionRange(0, 99999);
+
+                                document.execCommand('copy');
+                            }
+                        </script>
                     </div>
                     <p>Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:</p>
                     <p>The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.</p>
