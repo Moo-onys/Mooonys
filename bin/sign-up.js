@@ -142,7 +142,7 @@ router.post('/', async (req, res, next) => {
     next();
 }, async (req, res) => {
     const {
-        img,
+        avatar_url,
         fn,
         ln,
         address,
@@ -193,7 +193,7 @@ router.post('/', async (req, res, next) => {
         _id: new BSON.ObjectID(),
         _apis: _apis,
         _information: {
-            img: img,
+            img: avatar_url,
             fn: fn,
             ln: ln,
             address: address,

@@ -31,7 +31,7 @@ realm.logIn(Realm.Credentials.emailPassword(env.realm.username, env.realm.passwo
     this.db = user.mongoClient(env.realm._atlas);
 });
 
-this.tls = nodemailer.createTransport({
+this.nodemailer = nodemailer.createTransport({
     host: `mail.privateemail.com`,
     port: 465,
     secure: true,
